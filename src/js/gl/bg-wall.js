@@ -286,9 +286,11 @@ void main() {
   o.rgb *= dotw;
   o.rgb *= smoothstep(0.55, 0.05, length(vGlobalUv - 0.5));
 
-  // front faces show the pattern; box sides glow near the pointer
+  // front faces show the pattern; box sides glow near the pointer,
+  // and the whole tile patch brightens inside the cursor wake
   o.rgb *= vSideFace;
-  o.rgb += (1.0 - vSideFace) * 0.8 * vEmitSide * (0.05 + vDisplayWorks);
+  o.rgb *= 1.0 + min(vEmitSide * 2.2, 1.4);
+  o.rgb += (1.0 - vSideFace) * 0.9 * vEmitSide * (0.08 + vDisplayWorks);
 
   o.rgb *= 0.5;
   gl_FragColor = o;

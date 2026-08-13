@@ -15,11 +15,11 @@ uniform vec2 uVelocity;     // NDC per frame
 uniform float uAspect;
 varying vec2 vUv;
 void main() {
-  vec4 prev = texture2D(uPrev, vUv) * 0.94;   // dissipate
+  vec4 prev = texture2D(uPrev, vUv) * 0.965;  // lingering dissipation
   vec2 d = vUv - uPointer;
   d.x *= uAspect;
-  float splat = exp(-dot(d, d) * 220.0);
-  vec2 vel = prev.xy + uVelocity * splat * 4.0;
+  float splat = exp(-dot(d, d) * 70.0);       // wide wake around the cursor
+  vec2 vel = prev.xy + uVelocity * splat * 6.0;
   gl_FragColor = vec4(vel, 0.0, 1.0);
 }
 `;

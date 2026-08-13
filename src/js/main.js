@@ -112,7 +112,7 @@ async function boot() {
       if (reelIdx === 2) service.hideAll();
       else service.show(reelIdx);
     }
-    stellla.update(p.stellla);
+    stellla.update(p.stellla, sm.section);
     rail.update(sm.section);
   };
   requestAnimationFrame(frame);

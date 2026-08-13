@@ -134,6 +134,29 @@ function drawLetter(ctx, ch, x, y, w, h, stroke) {
   }
 }
 
+function drawX(ctx, x, y, w, h) {
+  // blocky X matching the 3D mark: tips on the corners, notched centre
+  const tx = 0.34 * w;
+  const ty = 0.34 * h;
+  const sTop = (w / 2 - tx) / (w - tx);
+  const ncY = (h / 2) - sTop * (h - ty);
+  const sSide = (h / 2 - ty) / (h - ty);
+  const ncX = (w / 2) - sSide * (w - tx);
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  const pts = [
+    [-w / 2, -h / 2], [-w / 2 + tx, -h / 2], [0, -ncY], [w / 2 - tx, -h / 2], [w / 2, -h / 2],
+    [w / 2, -h / 2 + ty], [ncX, 0], [w / 2, h / 2 - ty], [w / 2, h / 2],
+    [w / 2 - tx, h / 2], [0, ncY], [-w / 2 + tx, h / 2], [-w / 2, h / 2],
+    [-w / 2, h / 2 - ty], [-ncX, 0], [-w / 2, -h / 2 + ty]
+  ];
+  ctx.beginPath();
+  ctx.moveTo(cx + pts[0][0], cy + pts[0][1]);
+  for (let i = 1; i < pts.length; i++) ctx.lineTo(cx + pts[i][0], cy + pts[i][1]);
+  ctx.closePath();
+  ctx.fill();
+}
+
 function drawWord(word, W, H, letterH, weights = {}) {
   const c = document.createElement('canvas');
   c.width = W;
@@ -143,7 +166,7 @@ function drawWord(word, W, H, letterH, weights = {}) {
 
   const stroke = letterH * (weights.stroke ?? 0.24);
   const gap = letterH * (weights.gap ?? 0.16);
-  const widths = { A: 1.15, W: 1.35, M: 1.3, I: 0.34, L: 0.82, C: 0.92, H: 1.0, E: 0.9, O: 1.0, R: 0.95, K: 1.0, S: 0.92, V: 1.1 };
+  const widths = { A: 1.15, W: 1.35, M: 1.3, I: 0.34, L: 0.82, C: 0.92, H: 1.0, E: 0.9, O: 1.0, R: 0.95, K: 1.0, S: 0.92, V: 1.1, X: 1.1 };
 
   let total = 0;
   for (const ch of word) total += letterH * (widths[ch] ?? 1) + gap;
@@ -153,14 +176,16 @@ function drawWord(word, W, H, letterH, weights = {}) {
   const y = (H - letterH) / 2;
   for (const ch of word) {
     const w = letterH * (widths[ch] ?? 1);
-    drawLetter(ctx, ch, x, y, w, letterH, stroke);
+    if (ch === 'X') drawX(ctx, x, y, w, letterH);
+    else drawLetter(ctx, ch, x, y, w, letterH, stroke);
     x += w + gap;
   }
   return c;
 }
 
-export function createAlcheWordmarkTexture() {
-  return canvasTexture(drawWord('ALCHE', 1204, 250, 190, { stroke: 0.22, gap: 0.18 }));
+export function createBrandWordmarkTexture() {
+  // "XERO" — the X echoes the 3D mark, like the reference's triangular A
+  return canvasTexture(drawWord('XERO', 1204, 250, 190, { stroke: 0.22, gap: 0.2 }));
 }
 
 export function createWorksTitleTexture() {

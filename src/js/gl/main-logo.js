@@ -30,7 +30,7 @@ const SECTION_ROTATION = {
 const vert = /* glsl */ `
 ${GLSL_CONSTANTS}
 ${GLSL_ROTATE2}
-uniform float uVisionRotate;   // vision tilt (shows the side screen)
+uniform float uVisionRotate;   // vision tilt (shows the hologram band)
 uniform float uServiceRotate;  // morph toward a fullscreen sheet
 uniform float uScreenAspectRatio;
 varying vec2 vUv;
@@ -41,30 +41,15 @@ void main() {
   vec3 pos = position;
   vec3 nml = normal;
 
-  // scroll-driven tilts (vision) and the service sheet morph
-  float tiltA = (uVisionRotate * 0.15 + uServiceRotate * 0.5) * HPI;
+  // vision: the X locks upright and yaws to present its left side wall;
+  // service_in: it keeps turning while the camera dives into that wall
+  // (the X travels with the move — no detached sheet morph)
+  float tiltA = (uVisionRotate * 0.3 + uServiceRotate * 0.35) * HPI;
   pos.xz *= rot2(tiltA);
-  pos.yz *= rot2(uVisionRotate * -0.1 - uServiceRotate * 0.2);
+  pos.yz *= rot2(uVisionRotate * -0.1 - uServiceRotate * 0.1);
 
   vec4 mv = modelViewMatrix * vec4(pos, 1.0);
-  vec4 projected = projectionMatrix * mv;
-  projected.xyz /= projected.w;
-  projected.w = 1.0;
-
-  // clip-space sheet the side screen face expands into during service_in
-  vec3 sc = position;
-#ifdef IS_OUTLINE
-  sc -= nml * 0.001;
-#endif
-  sc.xz *= rot2(HPI);
-  vec4 sheet = vec4(
-    sc.x * (20.5 + (1.0 / uScreenAspectRatio) * 3.0),
-    sc.y * (7.0 + uScreenAspectRatio * 8.0) - 0.22,
-    projected.z,
-    1.0
-  );
-
-  gl_Position = mix(projected, sheet, uServiceRotate);
+  gl_Position = projectionMatrix * mv;
   vUv = uv;
   vNormal = normalMatrix * nml;
   vViewPos = -mv.xyz;
@@ -174,9 +159,8 @@ varying vec2 vUv;
 vec2 lensWarp(vec2 r, float a) { return r * (1.0 - a * dot(r, r)); }
 
 void main() {
-  // narrow slice of local uv (screen sits on a thin flank)
+  // the hologram band spans the X's whole left limb — use its full uv
   vec2 geoUv = vUv;
-  geoUv.x = (geoUv.x - 0.5) * 0.4 + 0.5;
   vec2 fullUv = gl_FragCoord.xy / uScreenResolution;
   vec2 uv = mix(geoUv, fullUv, pow(uServiceIn, 0.2));
 

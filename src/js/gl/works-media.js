@@ -9,18 +9,18 @@ import * as THREE from 'three';
  */
 
 const WORKS = [
-  { title: 'HELLO', sub: 'IN-GAME CONCERT', pal: ['#ff9ad5', '#7b2ff7', '#2ec4ff'] },
-  { title: 'WEAR GO LAND', sub: 'FASHION METAVERSE', pal: ['#ffd1ec', '#b28dff', '#8fe3ff'] },
-  { title: 'EXHIBITION', sub: 'VIRTUAL SHOW', pal: ['#e8e6df', '#b9b4a5', '#6c675c'] },
-  { title: 'RISE UP', sub: 'WORLD STAGE', pal: ['#ffd76a', '#ff9d2e', '#3aa0ff'] },
-  { title: 'RUN', sub: 'CHASE EVENT', pal: ['#d8d8d8', '#9aa4b2', '#3c4858'] },
-  { title: 'NOWHERE', sub: 'ROLE PLAYING MUSIC', pal: ['#cfd8ff', '#8090c0', '#26304e'] }
+  { title: 'TINY HOMES SA', sub: 'MODULAR HOMES ONLINE', pal: ['#ffd76a', '#ff9d2e', '#3aa0ff'] },
+  { title: 'COGNEXA', sub: 'AI BUSINESS SOLUTIONS', pal: ['#9be2ff', '#2e77ff', '#132b66'] },
+  { title: 'PEAK LEADS', sub: 'PIPELINE-FIRST AGENCY', pal: ['#b0ffe2', '#22c8a0', '#0d3a4a'] },
+  { title: 'SB LUXURY', sub: 'DIRECT-BOOKING STAYS', pal: ['#e8e6df', '#b9b4a5', '#6c675c'] },
+  { title: 'EYE CANDY', sub: 'CUSTOM AUTOMOTIVE', pal: ['#ff9ad5', '#7b2ff7', '#2ec4ff'] },
+  { title: 'CAJEE BOTES', sub: 'HEALTHCARE PRACTICE', pal: ['#cfd8ff', '#8090c0', '#26304e'] }
 ];
 
 const SERVICE = [
-  { title: 'CREATIVE', pal: ['#9be2ff', '#2e77ff', '#132b66'] },
-  { title: 'REALTIME', pal: ['#ffd8b8', '#c86a3a', '#241a20'] },
-  // the stellla reel goes fullscreen — bright pastel field, no big title
+  { title: 'ADS', sub: 'GOOGLE + META', pal: ['#9be2ff', '#2e77ff', '#132b66'] },
+  { title: 'SEO', sub: 'AI + TRADITIONAL', pal: ['#ffd8b8', '#c86a3a', '#241a20'] },
+  // the Cognexa reel goes fullscreen — bright pastel field, no big title
   { title: '', sub: '', pal: ['#ffd7e8', '#ffe9c9', '#9fc9ff'], bright: true }
 ];
 

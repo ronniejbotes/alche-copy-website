@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Lerper, Animator, easeOutCubic } from '../core/lerper.js';
 import { createFlowNoise } from './flow-noise.js';
 import { createStudioEnvMap } from './env-map.js';
-import { createAlcheWordmarkTexture, createWorksTitleTexture, createServicesTitleTexture } from './wordmark-textures.js';
+import { createBrandWordmarkTexture, createWorksTitleTexture, createServicesTitleTexture } from './wordmark-textures.js';
 import { WorksMedia } from './works-media.js';
 import { BGWall } from './bg-wall.js';
 import { GridOverlay } from './grid-overlay.js';
@@ -57,6 +57,7 @@ void main() {
   float arc = -cos((vUv.x - 0.5) * PI) * uMissionBlur;
   float sel = smoothstep(0.0, range, -vUv.y + uVisibleMission * (1.0 + range) + arc);
   mission *= smoothstep(1.5, 0.3, len);
+  mission *= 1.0 + pl * 0.15;   // faint cursor wake on the light scene too
   o = mix(o, mission, sel);
 
   vec3 service = texture2D(uServiceTex, vUv + pointer.xy * 0.01).rgb;
@@ -250,7 +251,7 @@ export class AlcheGL {
     this.envMap = createStudioEnvMap();
     this.media = new WorksMedia();
     this.pointerTrail = new PointerTrail(this.renderer);
-    this._alcheTex = createAlcheWordmarkTexture();
+    this._alcheTex = createBrandWordmarkTexture();
     this._worksTitleTex = createWorksTitleTexture();
     this._servicesTex = createServicesTitleTexture();
     this._loaderTex = null; // set by the loader once its canvas is final
@@ -430,8 +431,9 @@ export class AlcheGL {
       : name === 'works_intro' ? 'works_intro'
       : name === 'works' || name === 'works_outro' ? 'works'
       : name === 'mission_in' || name === 'mission' ? 'mission'
-      : name === 'vision' || name === 'vision_out' ? 'vision'
-      : name.startsWith('service') || name === 'stellla' ? 'service'
+      // stay locked (no hover wobble) through the dive into the side wall
+      : name === 'vision' || name === 'vision_out' || name === 'service_in' ? 'vision'
+      : name === 'service' || name === 'stellla' ? 'service'
       : 'default';
     this.logo.setSection(logoSection);
     this.animator.animate('kvZoom', name === 'kv' ? 1 : 0, 1);
@@ -629,8 +631,15 @@ export class AlcheGL {
     r.render(this.logo, this.camera);
     r.autoClear = true;
 
-    // 4. light scene (outline follows the logo pose) — ortho matches the flattened cam
+    // 4. light scene (outline follows the logo pose) — ortho matches the
+    // flattened cam; during service_in the camera dives INTO the X's side
+    // wall (zoom + pan), carrying the whole mark with the move
     if (this._missionVisible > 0.002 || visionRot > 0.002) {
+      const dive = serviceRot;
+      this.orthoCamera.zoom = 1 + Math.pow(dive, 1.5) * 14;
+      this.orthoCamera.position.x = -1.7 * dive;
+      this.orthoCamera.position.y = -0.15 * dive;
+      this.orthoCamera.updateProjectionMatrix();
       r.setRenderTarget(this.rtMission);
       r.render(this.missionScene, worksOutro > 0.5 ? this.orthoCamera : this.camera);
     }

@@ -16,8 +16,8 @@ import * as THREE from 'three';
  *  - hide: overlay fades 0.8 s, then the GL intro (uLoaded 0→1, 3 s) runs
  */
 
-const TAGLINE = 'Architect worlds that move hearts and spark hope.';
-const SCRAMBLE = ['A', 'L', 'C', 'H', 'E'];
+const TAGLINE = 'We turn ad spend into revenue.';
+const SCRAMBLE = ['X', 'E', 'R', 'O'];
 
 // bezier(.53,.25,.3,.99) approximation via sampled cubic
 function cubicBezierEase(x1, y1, x2, y2) {
@@ -88,7 +88,7 @@ export class Loader {
         span.innerHTML = '&nbsp;';
         span.style.opacity = '0';
       } else {
-        span.textContent = SCRAMBLE[(Math.random() * 5) | 0];
+        span.textContent = SCRAMBLE[(Math.random() * SCRAMBLE.length) | 0];
         span.style.opacity = '0.3';
       }
       this.textEl.appendChild(span);
@@ -105,7 +105,7 @@ export class Loader {
           c.span.style.opacity = '1';
           c.revealed = true;
         } else {
-          c.span.textContent = SCRAMBLE[(Math.random() * 5) | 0];
+          c.span.textContent = SCRAMBLE[(Math.random() * SCRAMBLE.length) | 0];
           allDone = false;
         }
       }
@@ -238,31 +238,29 @@ export class Loader {
 
   _drawLogoOutline(ctx, S, ox, oy, t) {
     if (t <= 0) return;
-    const px = (p) => ({ x: ox + p.x * S, y: oy + p.y * S });
-    const a = px(APEX), bl = px(BL), br = px(BR);
 
-    // A-mark path: outer triangle with foot slot + inner counter triangle
-    const slotW = 0.55 * (BR.x - BL.x);
-    const slotH = 0.013;
-    const baseY = BL.y;
-    const path = [];
-    // trace: BL → slot → BR → apex → BL
-    path.push([BL.x, baseY]);
-    path.push([0.5 - slotW / 2, baseY]);
-    path.push([0.5 - slotW / 2, baseY - slotH]);
-    path.push([0.5 + slotW / 2, baseY - slotH]);
-    path.push([0.5 + slotW / 2, baseY]);
-    path.push([BR.x, baseY]);
-    path.push([APEX.x, APEX.y]);
-    path.push([BL.x, baseY]);
-    // inner counter (43.7%)
-    const k = 0.437;
-    const icx = 0.5;
-    const icy = (APEX.y + 2 * baseY) / 3 + 0.004;
-    const iap = { x: icx, y: icy - k * (baseY - APEX.y) * 0.667 };
-    const ibl = { x: icx - k * (BR.x - BL.x) / 2, y: icy + k * (baseY - APEX.y) * 0.333 };
-    const ibr = { x: icx + k * (BR.x - BL.x) / 2, y: icy + k * (baseY - APEX.y) * 0.333 };
-    const inner = [[ibl.x, ibl.y], [iap.x, iap.y], [ibr.x, ibr.y], [ibl.x, ibl.y]];
+    // X-mark outline in sheet space: box matching the old mark's footprint
+    const bx0 = 0.2937, bx1 = 0.7063;
+    const W = bx1 - bx0;
+    const H = W * 0.8687;
+    const cx = 0.5;
+    const cy = 0.441;
+    const tx = 0.34 * W;
+    const ty = 0.34 * H;
+    const hw = W / 2, hh = H / 2;
+    const sTop = (hw - tx) / (2 * hw - tx);
+    const ncY = hh - sTop * (2 * hh - ty);
+    const sSide = (hh - ty) / (2 * hh - ty);
+    const ncX = hw - sSide * (2 * hw - tx);
+    const P = (x, y) => [cx + x, cy - y];
+    const path = [
+      P(-hw, hh), P(-hw + tx, hh), P(0, ncY), P(hw - tx, hh), P(hw, hh),
+      P(hw, hh - ty), P(ncX, 0), P(hw, -hh + ty), P(hw, -hh),
+      P(hw - tx, -hh), P(0, -ncY), P(-hw + tx, -hh), P(-hw, -hh),
+      P(-hw, -hh + ty), P(-ncX, 0), P(-hw, hh - ty), P(-hw, hh)
+    ];
+    // centre cross-hair accents inside the notches
+    const inner = [P(-ncX * 0.55, 0), P(ncX * 0.55, 0)];
 
     const drawPath = (pts, tt) => {
       let total = 0;

@@ -132,9 +132,16 @@ body[data-gl-ready="false"] .header { opacity: 0; }
 body[data-header-hidden="true"] .header { transform: translateY(-100%); }
 .header a, .header button { pointer-events: auto; }
 
-.header__logo svg { width: 120px; height: auto; display: block; }
-.header__logo svg polygon { fill: #fff; transition: fill 0.5s ease; }
-body[data-light="true"] .header__logo svg polygon { fill: #000; }
+.header__logo a { display: flex; align-items: center; gap: 10px; }
+.header__logo .logo-x { width: 22px; height: 19px; display: block; }
+.header__logo .logo-x polygon { fill: #fff; transition: fill 0.5s ease; }
+.header__logo .logo-word {
+  font-family: var(--sans); font-weight: 600; font-size: 17px;
+  letter-spacing: 0.14em; color: #fff; white-space: nowrap;
+  transition: color 0.5s ease;
+}
+body[data-light="true"] .header__logo .logo-x polygon { fill: #000; }
+body[data-light="true"] .header__logo .logo-word { color: #000; }
 
 .header__nav { display: flex; gap: 40px; }
 .header__nav a {
@@ -552,8 +559,8 @@ body[data-menu-open="true"] .side-menu__panel { opacity: 1; }
 }
 
 .footer {
-  position: relative; z-index: 6;
-  margin-top: -100vh;   /* overlays the outro screen bottom */
+  /* overlays the very bottom of the outro screen, like the reference */
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 6;
   padding: 50px 0 2px;
   color: #fff;
   pointer-events: auto;

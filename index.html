@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ALCHE — Rebuild Study</title>
-  <meta name="description" content="Design-study rebuild of alche.studio: WebGL glass logo, debug-panel HUD, scroll-driven top page." />
+  <title>POSITION XERO</title>
+  <meta name="description" content="Position Xero — lead generation, SEO and paid ads for service businesses. Immersive WebGL experience (local demo)." />
   <meta name="robots" content="noindex" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <meta name="theme-color" content="#000000" />
@@ -19,7 +19,7 @@
     <div class="loading__stage">
       <canvas class="loading__canvas" id="loading-canvas"></canvas>
     </div>
-    <div class="loading__text" id="loading-text" aria-label="Architect worlds that move hearts and spark hope."></div>
+    <div class="loading__text" id="loading-text" aria-label="We turn ad spend into revenue."></div>
   </div>
 
   <!-- GL layer: sticky inside a wrapper that spans only the scrolled content
@@ -32,35 +32,29 @@
   </div>
 
   <svg class="fallback-mark" viewBox="0 0 100 88" aria-hidden="true">
-    <polygon points="50,4 96,84 4,84" fill="none" stroke="#fff" stroke-width="1.5" />
-    <polygon points="50,40 68,72 32,72" fill="none" stroke="#fff" stroke-width="1.5" />
+    <polygon points="0,0 30,0 50,30 70,0 100,0 65,44 100,88 70,88 50,58 30,88 0,88 35,44" fill="none" stroke="#fff" stroke-width="1.5" />
   </svg>
 
   <!-- Header -->
   <header class="header">
     <div class="header__logo">
-      <a href="./" aria-label="ALCHE home">
-        <!-- Wordmark drawn as inline SVG polygons (original letterforms) -->
-        <svg viewBox="0 0 500 104" aria-hidden="true" class="wordmark-svg">
-          <polygon points="52,0 104,104 88,104 52,32 16,104 0,104" />
-          <polygon points="52,58 74,104 30,104" />
-          <polygon points="124,0 138,0 138,90 196,90 196,104 124,104" />
-          <polygon points="216,0 288,0 288,14 230,14 230,90 288,90 288,104 216,104 216,0" />
-          <polygon points="312,0 326,0 326,45 384,45 384,0 398,0 398,104 384,104 384,59 326,59 326,104 312,104" />
-          <polygon points="422,0 494,0 494,14 436,14 436,45 488,45 488,59 436,59 436,90 494,90 494,104 422,104" />
+      <a href="./" aria-label="Position Xero home">
+        <svg class="logo-x" viewBox="0 0 100 88" aria-hidden="true">
+          <polygon points="0,0 30,0 50,30 70,0 100,0 65,44 100,88 70,88 50,58 30,88 0,88 35,44" fill="#fff" />
         </svg>
+        <span class="logo-word">POSITION&nbsp;XERO</span>
       </a>
     </div>
     <nav class="header__nav" aria-label="Primary">
       <a href="./news/"><span>News</span></a>
       <a href="./works/"><span>Works</span></a>
       <a href="./about/"><span>About</span></a>
-      <a href="./stellla/"><span>stellla</span></a>
+      <a href="./stellla/"><span>Cognexa</span></a>
     </nav>
     <div class="header__right">
       <a class="btn-contact" href="./contact/">
-        <span class="btn-contact__inner">Contact / Recruit</span>
-        <span class="btn-contact__hover" aria-hidden="true">Contact / Recruit</span>
+        <span class="btn-contact__inner">Book Free Audit</span>
+        <span class="btn-contact__hover" aria-hidden="true">Book Free Audit</span>
       </a>
       <button class="sound-toggle" data-muted="true" aria-pressed="false" aria-label="Toggle sound">
         <span class="bar"></span><span class="bar"></span><span class="bar"></span>
@@ -80,14 +74,13 @@
         <a href="./news/">News</a>
         <a href="./works/">Works</a>
         <a href="./about/">About</a>
-        <a href="./stellla/">stellla</a>
-        <a href="./contact/">Contact / Recruit</a>
+        <a href="./stellla/">Cognexa</a>
+        <a href="./contact/">Book Free Audit</a>
       </nav>
       <div class="side-menu__social">
-        <a href="#" rel="noopener">TECH BLOG</a>
-        <a href="#" rel="noopener">note</a>
+        <a href="#" rel="noopener">Blog</a>
         <a href="#" rel="noopener">X</a>
-        <a href="#" rel="noopener">YouTube</a>
+        <a href="#" rel="noopener">LinkedIn</a>
       </div>
     </div>
   </div>
@@ -124,17 +117,18 @@
   <!-- News HUD (kv only) -->
   <aside class="news-hud" aria-label="Latest news">
     <div class="news-hud__title">News</div>
+    <!-- dates are placeholders — set real publish dates before any deploy -->
     <div class="news-hud__item">
-      <span class="news-hud__date">2025 06.26</span>
-      <a href="./news/">Unreal Fest Bali 2025で登壇しました</a>
+      <span class="news-hud__date">2026 08.01</span>
+      <a href="./news/">Free lead-value calculator — see what missed leads cost your business</a>
     </div>
     <div class="news-hud__item">
-      <span class="news-hud__date">2025 05.16</span>
-      <a href="./news/">丸紅が提供する次世代ファッションメタバースアプリ「WEAR GO LAND」をAlche Studioが開発</a>
+      <span class="news-hud__date">2026 06.12</span>
+      <a href="./news/">Your first 90 days, written down before you sign</a>
     </div>
     <div class="news-hud__item">
-      <span class="news-hud__date">2024 10.29</span>
-      <a href="./news/">博報堂DYメディアパートナーズとクリエイティブチーム「ReIMAGINE」を結成</a>
+      <span class="news-hud__date">2026 03.20</span>
+      <a href="./news/">AI search optimisation — ChatGPT, Perplexity, AI Overviews — standard on every engagement</a>
     </div>
   </aside>
 
@@ -143,7 +137,7 @@
   <!-- ============ scroll runways ============ -->
   <main class="main" id="main">
     <section class="runway runway--kv" data-top-section="kv">
-      <h1 class="visually-hidden">ALCHE — a creative studio building immersive entertainment. Design-study rebuild.</h1>
+      <h1 class="visually-hidden">Position Xero — lead generation, SEO and paid ads for service businesses. Immersive demo.</h1>
     </section>
     <section class="runway runway--works-intro" data-top-section="works_intro"></section>
     <section class="runway runway--works" data-top-section="works">
@@ -180,55 +174,56 @@
     <article class="works-item" data-work-item="0">
       <div class="works-item__info">
         <span class="works-item__date">2026 01.17</span>
+        <span class="works-item__impression">Prefab tiny homes, quoted and sold online</span>
       </div>
-      <h3 class="works-item__title"><a href="./works/">KizunaAI “Hello, Fortnite”</a></h3>
-      <p class="works-item__ja">KizunaAI “Hello, Fortnite”</p>
-      <ul class="works-item__cats"><li>In-Game-Concert</li><li>fortnite</li><li>metaverse</li></ul>
+      <h3 class="works-item__title"><a href="./works/">Tiny Homes SA</a></h3>
+      <p class="works-item__ja">Modular homes configurator &amp; lead funnel</p>
+      <ul class="works-item__cats"><li>web-design</li><li>e-commerce</li><li>lead-gen</li></ul>
     </article>
     <article class="works-item" data-work-item="1">
       <div class="works-item__info">
         <span class="works-item__date">2025 05.16</span>
-        <span class="works-item__impression">15ブランド以上が参加、「IS:SUE」がアンバサダーに就任！</span>
+        <span class="works-item__impression">Immersive 3D landing experience</span>
       </div>
-      <h3 class="works-item__title"><a href="./works/">WEAR GO LAND</a></h3>
-      <p class="works-item__ja">WEAR GO LAND</p>
-      <ul class="works-item__cats"><li>stellla</li><li>unreal_engine</li><li>metaverse</li><li>mobile</li></ul>
+      <h3 class="works-item__title"><a href="./works/">Cognexa</a></h3>
+      <p class="works-item__ja">AI business solutions — our second company</p>
+      <ul class="works-item__cats"><li>3d-web</li><li>threejs</li><li>ai</li></ul>
     </article>
     <article class="works-item" data-work-item="2">
       <div class="works-item__info">
         <span class="works-item__date">2025 02.20</span>
-        <span class="works-item__impression">人気ブランドDISCOAT(ディスコート)のファションショーを開催！</span>
+        <span class="works-item__impression">Founder-led lead generation build</span>
       </div>
-      <h3 class="works-item__title"><a href="./works/">DISCOAT 2025SS EXHIBITION in virtual</a></h3>
-      <p class="works-item__ja">DISCOAT 2025SS EXHIBITION in virtual</p>
-      <ul class="works-item__cats"><li>stellla</li><li>unreal_engine</li><li>metaverse</li><li>cloud rendering</li></ul>
+      <h3 class="works-item__title"><a href="./works/">Peak Leads Agency</a></h3>
+      <p class="works-item__ja">Pipeline-first agency site &amp; funnels</p>
+      <ul class="works-item__cats"><li>lead-gen</li><li>web-design</li><li>seo</li></ul>
     </article>
     <article class="works-item" data-work-item="3">
       <div class="works-item__info">
         <span class="works-item__date">2024 10.18</span>
-        <span class="works-item__impression">3000万PV突破！</span>
+        <span class="works-item__impression">Direct-booking luxury stays</span>
       </div>
-      <h3 class="works-item__title"><a href="./works/">Matsuken SambaⅡ Rise Up the World</a></h3>
-      <p class="works-item__ja">マツケンサンバⅡ Rise Up the World</p>
-      <ul class="works-item__cats"><li>fortnite</li><li>metaverse</li><li>In-Game-Concert</li></ul>
+      <h3 class="works-item__title"><a href="./works/">SB Luxury Rentals</a></h3>
+      <p class="works-item__ja">Booking-driven rental showcase</p>
+      <ul class="works-item__cats"><li>web-design</li><li>booking</li></ul>
     </article>
     <article class="works-item" data-work-item="4">
       <div class="works-item__info">
         <span class="works-item__date">2024 07.29</span>
-        <span class="works-item__impression">同時接続人数世界Top3(2.2万人)を達成</span>
+        <span class="works-item__impression">Custom automotive brand build</span>
       </div>
-      <h3 class="works-item__title"><a href="./works/">run for money CREATED IN FORTNITE</a></h3>
-      <p class="works-item__ja">逃走中 CREATED IN FORTNITE</p>
-      <ul class="works-item__cats"><li>fortnite</li><li>metaverse</li></ul>
+      <h3 class="works-item__title"><a href="./works/">Eye Candy Customs</a></h3>
+      <p class="works-item__ja">Showroom site &amp; enquiry funnel</p>
+      <ul class="works-item__cats"><li>web-design</li><li>e-commerce</li></ul>
     </article>
     <article class="works-item" data-work-item="5">
       <div class="works-item__info">
         <span class="works-item__date">2021 07.16</span>
-        <span class="works-item__impression">RADWIMPSとのコラボレーションによる「リアル」と「ヴァーチャル」を行き来する世界初の音楽体験</span>
+        <span class="works-item__impression">Healthcare practice, bookings online</span>
       </div>
-      <h3 class="works-item__title"><a href="./works/">RADWIMPS ROLE PLAYING MUSIC</a></h3>
-      <p class="works-item__ja">SHIN SEKAI “nowhere” RADWIMPS ROLE PLAYING MUSIC</p>
-      <ul class="works-item__cats"><li>metaverse</li><li>unreal_engine</li><li>mobile</li><li>In-Game-Concert</li></ul>
+      <h3 class="works-item__title"><a href="./works/">Cajee Botes</a></h3>
+      <p class="works-item__ja">Orthotics, prosthetics &amp; compression care</p>
+      <ul class="works-item__cats"><li>healthcare</li><li>web-design</li><li>booking</li></ul>
     </article>
     <div class="works-more">
       <a href="./works/"><span>More Works</span><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 12 12 2M4 2h8v8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
@@ -241,12 +236,12 @@
       <svg class="mv__ttl" viewBox="0 0 437 99" aria-hidden="true">
         <text x="0" y="78" class="mv__ttl-text">MISSION</text>
       </svg>
-      <p class="mv__text" lang="ja">
-        <span class="mv__line"><span class="mv__marker" data-marker="0">これまでにない</span></span>
-        <span class="mv__line"><span class="mv__marker" data-marker="1">没入型・体験型のエンターテインメントを</span></span>
-        <span class="mv__line"><span class="mv__marker" data-marker="2">生み出す</span></span>
+      <p class="mv__text">
+        <span class="mv__line"><span class="mv__marker" data-marker="0">Most agencies send reports.</span></span>
+        <span class="mv__line"><span class="mv__marker" data-marker="1">We send leads.</span></span>
+        <span class="mv__line"><span class="mv__marker" data-marker="2">Results, not vanity metrics.</span></span>
       </p>
-      <p class="mv__en">Pioneering immersive<br />and experiential entertainment like no other.</p>
+      <p class="mv__en">Lead generation, SEO and paid ads<br />for service businesses across the US and South Africa.</p>
     </div>
   </div>
   <div class="mv mv--vision" data-visible="false">
@@ -254,30 +249,29 @@
       <svg class="mv__ttl" viewBox="0 0 398 98" aria-hidden="true">
         <text x="0" y="78" class="mv__ttl-text">VISION</text>
       </svg>
-      <p class="mv__text mv__text--right" lang="ja">
-        <span class="mv__line"><span class="mv__marker" data-marker="0">心を揺さぶり、希望を持てる</span></span>
-        <span class="mv__line"><span class="mv__marker" data-marker="1">"世界"を作る</span></span>
+      <p class="mv__text mv__text--right">
+        <span class="mv__line"><span class="mv__marker" data-marker="0">Be found on Google,</span></span>
+        <span class="mv__line"><span class="mv__marker" data-marker="1">recommended by AI.</span></span>
       </p>
-      <p class="mv__en">Architect worlds<br />that move hearts and spark hope.</p>
+      <p class="mv__en">Rank in search and get cited by<br />ChatGPT, Perplexity and Gemini.</p>
     </div>
   </div>
 
   <!-- Service fixed layer -->
   <div class="service-layer" data-visible="false">
     <div class="service-item" data-service-item="0">
-      <div class="service-item__icon service-item__icon--sm" aria-hidden="true">CREATED IN<br />FORTNITE</div>
-      <h3 class="service-item__title">Fortnite Creative Works</h3>
-      <p class="service-item__desc" lang="ja">Fortnite上での体験制作に強みを持ち、エンターテイメント性と拡張性のある空間を企画・制作。ブランドやIP、アーティストの世界観を表現し、世界中のユーザーに向けて新たな参加型イベントやインタラクティブコンテンツを展開します。</p>
-      <p class="service-item__en">We specialize in creating experiences in Fortnite - planning and producing entertaining and scalable works.
-We express the worldviews of brands, IPs, and artists from unique perspectives, delivering new experiences to users worldwide!</p>
+      <div class="service-item__icon service-item__icon--sm" aria-hidden="true">GOOGLE + META<br />ADS</div>
+      <h3 class="service-item__title">Performance Ads</h3>
+      <p class="service-item__desc">Search, Display, Shopping and YouTube on Google; Facebook and Instagram on Meta. Campaigns targeted to your exact buyer and managed on the numbers that matter — cost per lead, ROAS and revenue, not impressions.</p>
+      <p class="service-item__en">Every dollar optimised for ROI through data-driven campaign management.
+Turn scrollers into qualified leads.</p>
     </div>
     <div class="service-item" data-service-item="1">
-      <div class="service-item__icon service-item__icon--lg" aria-hidden="true">UNREAL ENGINE</div>
-      <h3 class="service-item__title">Unreal Engine Works</h3>
-      <p class="service-item__desc" lang="ja">クラウドレンダリングから各デバイス向けのコンテンツを制作。ゲームエンジンの可能性を従来の枠組みを超えたエンターテインメント領域に展開し、没入感のある世界創造を通じてデジタル空間の新たな体験価値を拡張します。</p>
-      <p class="service-item__en">From Cloud Rendering, to devices including iOS, Android and PC, we create content for many platforms!
-Expanding a game engine's potential beyond traditional frameworks into entertainment.
-Design new experiences in digital spaces by creating immersive worlds.</p>
+      <div class="service-item__icon service-item__icon--lg" aria-hidden="true">AI + TRADITIONAL SEO</div>
+      <h3 class="service-item__title">AI &amp; Traditional SEO</h3>
+      <p class="service-item__desc">Rank on Google and get cited by ChatGPT, Perplexity and Gemini. We do both, because the future of search is already here — and your brand should be the recommended choice in AI-generated answers.</p>
+      <p class="service-item__en">On-page, technical and content SEO built for 2026 and beyond.
+LLM SEO: optimise your brand for AI answers.</p>
     </div>
   </div>
 
@@ -297,18 +291,18 @@ Design new experiences in digital spaces by creating immersive worlds.</p>
     <div class="stellla__content">
       <div class="stellla__main">
         <a class="stellla__logo" href="./stellla/">
-          <span class="stellla__wordmark">stellla</span>
+          <span class="stellla__wordmark">Cognexa</span>
           <svg class="stellla__arrow" viewBox="0 0 80 60" aria-hidden="true">
             <path d="M14 4 Q4 4 4 30 Q4 56 14 56" fill="none" stroke="currentColor" stroke-width="3"/>
             <path d="M66 4 Q76 4 76 30 Q76 56 66 56" fill="none" stroke="currentColor" stroke-width="3"/>
             <path d="M30 42 50 22M34 22h16v16" fill="none" stroke="currentColor" stroke-width="3"/>
           </svg>
         </a>
-        <p class="stellla__text" lang="ja">メタバース構築基盤として、ライブイベント、ファッションショー、<br />そして工場・都市計画など産業系デジタル空間まで幅広く対応。<br />多人数同時接続・アバターカスタマイズなど基本機能を、<br />PC/モバイル/VR向けに提供。Unreal Engineのビジュアルとコスト効率を両立。</p>
+        <p class="stellla__text">The AI edge comes from our second company, Cognexa,<br />where we build AI business solutions.<br />It&#39;s why optimising for AI search — ChatGPT, Perplexity,<br />Google AI Overviews — is standard here, not an add-on.</p>
       </div>
-      <p class="stellla__en">A metaverse platform for diverse digital applications from live events to industrial environments.
-Supports multi-user access, avatars, e-commerce, and 3D audio.
-Multi-platform support is possible with Unreal Engine.</p>
+      <p class="stellla__en">AI business solutions —
+automation, AI search optimisation
+and custom AI builds.</p>
     </div>
   </div>
 
@@ -318,7 +312,7 @@ Multi-platform support is possible with Unreal Engine.</p>
       <canvas class="outro__glow" id="outro-glow"></canvas>
       <canvas class="outro__lottie" id="outro-canvas"></canvas>
       <svg class="outro__mark" id="outro-mark" viewBox="0 0 237 206" aria-hidden="true">
-        <path d="M118.5 0 237 206 H0 Z M118.5 66 L172 160 H65 Z" fill="#fff" fill-rule="evenodd" />
+        <polygon points="0,0 71,0 118.5,70 166,0 237,0 154,103 237,206 166,206 118.5,136 71,206 0,206 83,103" fill="#fff" />
       </svg>
     </div>
   </div>
@@ -333,23 +327,23 @@ Multi-platform support is possible with Unreal Engine.</p>
         </div>
         <div class="footer__col">
           <a href="./about/">About</a>
-          <a href="./stellla/">stellla</a>
+          <a href="./stellla/">Cognexa</a>
           <a href="./contact/">Contact</a>
         </div>
         <div class="footer__col footer__col--links">
           <p class="footer__links-title">Links <span aria-hidden="true">▾</span></p>
-          <a class="footer__sub" href="#" rel="noopener">TECH BLOG</a>
-          <a class="footer__sub" href="#" rel="noopener">note</a>
+          <a class="footer__sub" href="#" rel="noopener">Blog</a>
+          <a class="footer__sub" href="#" rel="noopener">Free Audit</a>
           <div class="footer__social">
             <a class="footer__sub" href="#" rel="noopener">X</a>
-            <a class="footer__sub" href="#" rel="noopener">YouTube</a>
+            <a class="footer__sub" href="#" rel="noopener">LinkedIn</a>
           </div>
         </div>
       </div>
       <div class="footer__contact">
         <div class="footer__contact-buttons">
           <a class="footer__contact-btn" href="./contact/"><span>Contact</span><span class="footer__contact-icon"><svg viewBox="0 0 14 14"><path d="M2 12 12 2M4 2h8v8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
-          <a class="footer__contact-btn" href="./contact/"><span>Recruit</span><span class="footer__contact-icon"><svg viewBox="0 0 14 14"><path d="M2 12 12 2M4 2h8v8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
+          <a class="footer__contact-btn" href="./contact/"><span>Book Audit</span><span class="footer__contact-icon"><svg viewBox="0 0 14 14"><path d="M2 12 12 2M4 2h8v8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
         </div>
         <div class="footer__privacy">
           <a href="./about/">Privacy Policy</a>
@@ -357,7 +351,7 @@ Multi-platform support is possible with Unreal Engine.</p>
         </div>
       </div>
     </div>
-    <p class="footer__copyright">©2025 Alche, inc.</p>
+    <p class="footer__copyright">©2026 Position Xero</p>
   </footer>
 
   <script type="module" src="/src/js/main.js"></script>

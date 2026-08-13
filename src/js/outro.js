@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
  * Scrolling back reverses/re-arms. All drawing is original canvas work.
  */
 
-const LETTERS = 'LCHE'; // the A arrives as the sliding mark
+const LETTERS = 'ERO'; // the X arrives as the sliding mark, completing XERO
 
 export class Outro {
   constructor() {
@@ -109,7 +109,7 @@ export class Outro {
       const by = (b.y + Math.cos(t * 0.19 + b.phase * 1.7) * 0.05) * H;
       const br = b.r * Math.min(W, H) * (1 + Math.sin(t * 0.31 + b.phase) * 0.15);
       const g = ctx.createRadialGradient(bx, by, 0, bx, by, br);
-      g.addColorStop(0, `hsla(${b.hue}, 80%, 38%, ${0.16 * this._glowVis})`);
+      g.addColorStop(0, `hsla(${b.hue}, 85%, 42%, ${0.26 * this._glowVis})`);
       g.addColorStop(1, 'hsla(220, 80%, 30%, 0)');
       ctx.fillStyle = g;
       ctx.beginPath();
@@ -143,15 +143,15 @@ export class Outro {
     const tFill = stage(0.48, 0.66);      // letters fill white
     const guideDim = 1 - stage(0.6, 0.78); // guides fade out
 
-    // wordmark box: the A-mark sits at left 17.1% width 20.4%; letters follow
+    // wordmark box: the X-mark centres at left 17.1%, width 20.4%;
+    // E R O follow at the same cap height, spanning most of the frame
     const markW = W * 0.204;
-    const markCx = W * 0.171 + 0; // mark element is centered at 17.1%+half? approximate left anchor
-    const letterH = H * 0.34;
+    const markCx = W * 0.171;
+    const letterH = H * 0.40;
     const y0 = H / 2 - letterH / 2;
-    const totalLettersW = W * 0.56;
-    const x0 = markCx + markW * 0.62;
-    const letterW = totalLettersW / 4.6;
-    const gap = letterW * 0.18;
+    const x0 = markCx + markW * 0.58;
+    const letterW = W * 0.165;
+    const gap = letterW * 0.22;
 
     ctx.save();
     ctx.globalAlpha = Math.min(1, guideDim + 0.001) * 0.9;
@@ -190,9 +190,9 @@ export class Outro {
     ctx.restore();
 
     // letters: outline then fill
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < LETTERS.length; i++) {
       const lx = x0 + i * (letterW + gap);
-      const local = Math.max(0, Math.min(1, tOutline * 4.6 - i * 0.9));
+      const local = Math.max(0, Math.min(1, tOutline * (LETTERS.length + 0.8) - i * 0.9));
       if (local > 0) {
         this._letterPath(ctx, LETTERS[i], lx, y0, letterW, letterH);
         ctx.save();
@@ -201,12 +201,12 @@ export class Outro {
         ctx.stroke();
         ctx.restore();
       }
-      const fillLocal = Math.max(0, Math.min(1, tFill * 4.6 - i * 0.9));
+      const fillLocal = Math.max(0, Math.min(1, tFill * (LETTERS.length + 0.8) - i * 0.9));
       if (fillLocal > 0) {
         this._letterPath(ctx, LETTERS[i], lx, y0, letterW, letterH);
         ctx.save();
         ctx.fillStyle = `rgba(255,255,255,${fillLocal})`;
-        ctx.fill('evenodd');
+        ctx.fill('nonzero');   // bars overlap — even-odd would punch holes
         ctx.restore();
       }
     }
@@ -216,25 +216,30 @@ export class Outro {
     const s = w * 0.26;
     ctx.beginPath();
     switch (ch) {
-      case 'L':
-        ctx.rect(x, y, s, h);
-        ctx.rect(x, y + h - s, w, s);
-        break;
-      case 'C':
-        ctx.rect(x, y, w, s);
-        ctx.rect(x, y, s, h);
-        ctx.rect(x, y + h - s, w, s);
-        break;
-      case 'H':
-        ctx.rect(x, y, s, h);
-        ctx.rect(x + w - s, y, s, h);
-        ctx.rect(x, y + (h - s) / 2, w, s);
-        break;
       case 'E':
         ctx.rect(x, y, s, h);
         ctx.rect(x, y, w, s);
         ctx.rect(x, y + (h - s) / 2, w * 0.82, s);
         ctx.rect(x, y + h - s, w, s);
+        break;
+      case 'R': {
+        ctx.rect(x, y, s, h);
+        ctx.rect(x, y, w, s);
+        ctx.rect(x + w - s, y, s, h * 0.5);
+        ctx.rect(x, y + h * 0.5 - s / 2, w, s);
+        // diagonal leg
+        ctx.moveTo(x + w * 0.45, y + h * 0.5 + s / 2);
+        ctx.lineTo(x + w * 0.45 + s, y + h * 0.5 + s / 2);
+        ctx.lineTo(x + w, y + h);
+        ctx.lineTo(x + w - s, y + h);
+        ctx.closePath();
+        break;
+      }
+      case 'O':
+        ctx.rect(x, y, w, s);
+        ctx.rect(x, y + h - s, w, s);
+        ctx.rect(x, y, s, h);
+        ctx.rect(x + w - s, y, s, h);
         break;
       default:
         break;

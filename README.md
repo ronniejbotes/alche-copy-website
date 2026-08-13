@@ -1,14 +1,16 @@
-# ALCHE rebuild study
+# POSITION XERO — immersive site (design study rebuild)
 
-A from-scratch rebuild of the interaction design of [alche.studio](https://alche.studio/) —
-the screen-space-refraction glass "A", the Tweakpane debug HUD, the instanced LED-wall
-quadtree, and the fully scroll-driven top page — as an editable, hostable Vite project.
+A from-scratch rebuild of the interaction design of [alche.studio](https://alche.studio/),
+rebranded to **Position Xero**: the screen-space-refraction glass "X", the Tweakpane debug
+HUD, the instanced LED-wall quadtree, and the fully scroll-driven top page — as an
+editable, hostable Vite project.
 
-**This is a design study.** All code is original, every asset (geometry, textures,
-environment map, artwork, loader/outro animations) is generated procedurally at runtime —
-no files from the original site ship with this project. Work/reel artwork is original
-placeholder art. If you deploy this publicly, replace the ALCHE branding and content —
-publishing it as-is would misrepresent a real company.
+**Origin note.** The interaction design is studied from alche.studio; all code is original
+and every asset (geometry, textures, environment map, artwork, loader/outro animations) is
+generated procedurally at runtime — nothing from the reference site ships here. Branding
+and copy are Position Xero's own. Before deploying publicly, run the full SEO engagement
+process (titles, URLs, schema, content structure) — this build is an interaction demo, not
+a launch-ready site.
 
 Reference material used during development (screen recordings, scroll-ladder screenshots,
 extracted parameter notes) lives in `reference/` and is gitignored.

@@ -177,9 +177,10 @@ export class StelllaController {
     this.root = document.querySelector('.stellla');
   }
 
-  update(progress) {
-    const p = Math.min(1, progress * 1.5);
+  update(progress, section) {
     if (!this.root) return;
+    // hide entirely once the outro/footer takes over
+    const p = section === 'footer' ? 0 : Math.min(1, progress * 1.5);
     this.root.style.opacity = String(p);
     this.root.setAttribute('data-visible', String(p > 0.01));
     const frame = this.root.querySelector('.stellla__frame');

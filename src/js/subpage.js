@@ -1,36 +1,19 @@
+import '@fontsource/google-sans-code/400.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-sans-jp/400.css';
+import '@fontsource/inter/500.css';
 import '../styles/main.css';
-import { AlcheGL } from './gl/scene.js';
 import { initHeader } from './ui.js';
 
 /**
- * Subpage boot: shared header + the dimmed background wall (no logo).
+ * Subpage boot: shared header + a static dark backdrop.
+ * (The heavy top-page scene stays off subpages in this rebuild;
+ * the reference runs a dimmed wall here, which we approximate in CSS.)
  */
 
 document.body.classList.add('js-enabled');
+document.body.classList.add('no-3d');
 initHeader();
-
-const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const container = document.getElementById('gl-canvas');
-
-if (reduced || !container) {
-  document.body.classList.add('no-3d');
-} else {
-  try {
-    const gl = new AlcheGL();
-    if (!gl.init(container, { mode: 'sub' })) {
-      document.body.classList.add('no-3d');
-    } else {
-      let resizeId;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeId);
-        resizeId = setTimeout(() => gl.resize(), 200);
-      });
-    }
-  } catch (err) {
-    console.error('[alche] subpage scene failed, falling back', err);
-    document.body.classList.add('no-3d');
-  }
-}
 
 // Category filter rows (works page): client-side filter over list items.
 const filterRow = document.querySelector('[data-filter-row]');

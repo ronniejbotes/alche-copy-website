@@ -1,28 +1,37 @@
 # ALCHE rebuild study
 
 A from-scratch rebuild of the interaction design of [alche.studio](https://alche.studio/) —
-the WebGL glass-triangle logo, the live debug-panel HUD (Tweakpane), the curved LED-wall
-background, and the scroll-driven top page — as an editable, hostable Vite project.
+the screen-space-refraction glass "A", the Tweakpane debug HUD, the instanced LED-wall
+quadtree, and the fully scroll-driven top page — as an editable, hostable Vite project.
 
-**This is a design study.** All code is original, all 3D assets and textures are generated
-procedurally at runtime (no files were taken from the original site), and all copy is
-placeholder text. If you deploy this publicly, replace the ALCHE branding and placeholder
-content with your own — publishing it as-is would misrepresent a real company.
+**This is a design study.** All code is original, every asset (geometry, textures,
+environment map, artwork, loader/outro animations) is generated procedurally at runtime —
+no files from the original site ship with this project. Work/reel artwork is original
+placeholder art. If you deploy this publicly, replace the ALCHE branding and content —
+publishing it as-is would misrepresent a real company.
 
-## How it works
+Reference material used during development (screen recordings, scroll-ladder screenshots,
+extracted parameter notes) lives in `reference/` and is gitignored.
+
+## Architecture
 
 | Piece | Where | What it does |
 | --- | --- | --- |
-| Background wall | `src/js/gl/background.js` | Inverted sphere + fragment shader: domain-warped fbm zebra stripes, LED panel grid, glitch rows. All procedural. |
-| Glass logo | `src/js/gl/logo.js` | Extruded triangle (with triangular hole), `MeshPhysicalMaterial` with `transmission: 1` so the wordmark refracts through it. Noise normal map drives the liquid distortion (`noiseScale`). Drag to rotate (quaternion + inertia + spring return). |
-| Wordmark | `src/js/gl/logo.js` | "ALCHE" drawn on a canvas (custom block letterforms), placed behind the glass. |
-| Debug HUD | `src/js/panels.js` | Real Tweakpane panels — *MainLogo Material* (roughness / noiseScale / color) and *MainLogo Quaternion* (live readout + Reset) — wired to the live scene, like the original site. |
-| Axis gizmo | `src/js/gl/gizmo.js` | Tiny standalone renderer showing the logo's orientation as an XYZ triad. |
-| Scroll | `src/js/scroll.js` | GSAP ScrollTrigger. Sections kv → works_intro → works → mission → vision → service drive `gl.setSection(float)`; everything scrubs, so scrolling back rewinds. |
-| Boot gate | `src/js/main.js` | Reduced-motion / no-WebGL / init failure → `body.no-3d` static fallback; content stays readable. |
+| Boot + loader | `src/js/main.js`, `src/js/loader.js` | Canvas blueprint loader (guide grid draw-in, triangle outline trace, ALCHE-charset scramble tagline), then a composite-shader handoff: scene starts 2× zoomed and pulls back over 3 s with a radial ripple. |
+| Render pipeline | `src/js/gl/scene.js` | Three scenes to render targets (dark main / light mission-vision / dark service) + a transparent works-screens scene, mixed with a bottom-up arced wipe and a hard service cut, then bloom and the final composite. |
+| Glass logo | `src/js/gl/main-logo.js`, `logo-geometry.js` | Procedural A-prism (hole ≈ 43.7 % of side, foot slot, rounded bevel). Custom refraction shader: 8-tap chromatic samples of a backbuffer copy, GGX highlight, fresnel + procedural studio cubemap. Pointer *movement* (no drag) applies euler impulses; quaternion slerps home per-section. |
+| LED wall | `src/js/gl/bg-wall.js` | Instanced quadtree of box tiles bent onto a half-cylinder. Three flow-noise patterns (blue clouds / B-W zebra / purple-cyan-orange) hard-cut every 1–2 s, tile blackouts + UV-shift glitches, ALCHE wordmark tiling in three modes, WORKS band burn-in, per-work blurred art wipes. |
+| Works carousel | `src/js/gl/works-thumbs.js` | Six rounded 16:9 slabs on a spiral (x=sin·11, z=cos·5−6, y=−k, rotY=0.6k) with chromatic lens distortion. |
+| Service + stellla | `src/js/gl/service-scene.js` | Reel panels riding a sine wave that un-curls on entry, ghost SERVICES band, and the third panel peeling left-to-right into a fullscreen cover-fit quad. |
+| Scroll | `src/js/scroll-manager.js` | Lenis (defaults) + plain ScrollTriggers as progress trackers — no scrub; the scene smooths every channel through a 10/s exponential lerper. Snap arrays per section. |
+| DOM sections | `src/js/dom-sections.js` | Works item swap (SplitText chars), mission/vision draw-on with black marker swipes + rising mask, service items, stellla frame, left rail indicator. |
+| HUD | `src/js/panels.js` | Real Tweakpane panes: MainLogo Material / Screen / Quaternion (rotation-gizmo plugin) + Reset. |
+| Outro | `src/js/outro.js` | 200 vh sticky screen: glow canvas, guides → letter outlines → fill wordmark construction, A-mark slide. |
 
-Scene tuning lives at the top of `src/js/gl/scene.js` (`SECTION_CONFIGS` — logo position,
-scale, and background dim per section).
+Scroll proportions match the reference exactly: kv 100svh+100px, works_intro 100lvh,
+works 6×100lvh, works_outro 150lvh, mission_in 100lvh, mission 160vh, vision 200vh,
+vision_out 150lvh, service_in 100lvh, service 3×170lvh, stellla 150lvh, outro 200vh
+(27,316 px total at 1920×1080).
 
 ## Develop
 
@@ -32,7 +41,7 @@ npm run dev        # http://localhost:5173
 ```
 
 Pages: `/` (top), `/works/`, `/about/`, `/news/`, `/stellla/`, `/contact/`.
-Subpage content is plain HTML in each folder's `index.html`.
+Subpages are static HTML with a shared header.
 
 ## Build & host
 
@@ -41,16 +50,14 @@ npm run build      # outputs static site to dist/
 npm run preview    # sanity-check the build locally
 ```
 
-`dist/` is fully static — host it anywhere:
+## Capture / comparison tooling
 
-- **Vercel**: `npx vercel` in the repo root (framework: Vite, output: `dist`), or connect the GitHub repo in the dashboard.
-- **Netlify**: drag `dist/` into the dashboard, or connect the repo with build command `npm run build`, publish dir `dist`.
-- **GitHub Pages**: `npm run build`, push `dist/` to a `gh-pages` branch (the relative `base: './'` in `vite.config.js` makes subpath hosting work out of the box).
+`tools/capture/capture-live.mjs` — Playwright rig that screenshots a fixed scroll ladder
+(and mirrors assets) from any URL; used to diff this rebuild against the reference
+frame-by-frame. `tools/capture/record-screen.ps1` — 60 fps ffmpeg desktop capture.
 
-## Placeholders to replace before any real use
+## Before any real use
 
-- All "Placeholder …" copy (works entries, news items, about profile, service cards, contact links)
-- Social links in header/side-menu/footer (`href="#"`)
-- The loading-screen tagline in `index.html`
-- The sound toggle is visual-only (no audio track is shipped)
-- The ALCHE name/mark itself if deploying publicly
+- Replace the ALCHE name/mark, all Japanese copy, news items, and work titles
+- The sound toggle is visual-only (no audio is shipped)
+- Works/reel artwork is placeholder — swap in real key visuals

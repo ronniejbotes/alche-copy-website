@@ -1,149 +1,466 @@
 import * as THREE from 'three';
-import { BackgroundWall } from './background.js';
-import { MainLogo } from './logo.js';
-import { AxisGizmo } from './gizmo.js';
-import { WorksScreens } from './works-screens.js';
+import { Lerper, Animator, easeOutCubic } from '../core/lerper.js';
+import { createFlowNoise } from './flow-noise.js';
+import { createStudioEnvMap } from './env-map.js';
+import { createAlcheWordmarkTexture, createWorksTitleTexture, createServicesTitleTexture } from './wordmark-textures.js';
+import { WorksMedia } from './works-media.js';
+import { BGWall } from './bg-wall.js';
+import { GridOverlay } from './grid-overlay.js';
+import { MainLogo } from './main-logo.js';
+import { WorksThumbs } from './works-thumbs.js';
+import { ServiceScene } from './service-scene.js';
+import { PointerTrail } from './pointer-trail.js';
+import { GLSL_CONSTANTS, GLSL_QUAD_VERT, GLSL_ROTATE2 } from './shader-lib.js';
 
 /**
- * AlcheGL — scene orchestrator.
+ * Scene orchestrator + render pipeline.
  *
- * Modes:
- *  - 'top': background wall + interactive glass logo + wordmark (homepage)
- *  - 'sub': background wall only, dimmed (subpages)
+ * Scenes:
+ *  - main (dark): LED wall, grid, 2D wordmark plane, glass logo, WORKS band
+ *  - missionVision (light): #D7DBDC bg, dark grid, logo outline set
+ *  - service (dark): reel wall + SERVICES ghost band
+ *  - thumbs (transparent): works screens, drawn over the composite
  *
- * Scroll choreography talks to this class only through setSection(float),
- * where the integer part is the section index (kv=0 … service=5) and the
- * fraction is the transition progress. Everything is scrub-driven, so
- * scrolling back rewinds the scene.
+ * Per frame: main scene renders WITHOUT the logo → copied to a 512 buffer →
+ * logo renders on top sampling that copy (screen-space refraction) → the
+ * three scene RTs mix (bottom-up arced wipe into light, hard cut into
+ * service) → bloom-ish boost → final composite applies the intro zoom /
+ * ripple / loader crossfade → works screens render on top.
  */
 
-const SECTION_CONFIGS = [
-  // kv
-  { logoZ: 0, logoScale: 1, logoX: 0, dim: 0.0, wordOpacity: 1 },
-  // works_intro
-  { logoZ: -6, logoScale: 0.55, logoX: 0, dim: 0.4, wordOpacity: 0 },
-  // works — logo recedes behind the key-visual screens
-  { logoZ: -14, logoScale: 0.3, logoX: 0, dim: 0.55, wordOpacity: 0 },
-  // mission
-  { logoZ: -4, logoScale: 0.6, logoX: -3.2, dim: 0.82, wordOpacity: 0 },
-  // vision
-  { logoZ: -2.5, logoScale: 0.8, logoX: 2.8, dim: 0.7, wordOpacity: 0 },
-  // service
-  { logoZ: -6, logoScale: 0.42, logoX: 0, dim: 0.88, wordOpacity: 0 }
-];
+const mixFrag = /* glsl */ `
+${GLSL_CONSTANTS}
+uniform sampler2D uMainTex;
+uniform sampler2D uMissionTex;
+uniform sampler2D uServiceTex;
+uniform sampler2D uPointerTex;
+uniform vec2 uResolution;
+uniform float uVisibleMission;
+uniform float uMissionBlur;
+uniform float uVisibleService;
+varying vec2 vUv;
 
-const lerp = (a, b, t) => a + (b - a) * t;
+void main() {
+  vec2 cuv = vUv - 0.5;
+  float len = length(cuv);
+  vec4 pointer = texture2D(uPointerTex, vUv);
+  float pl = length(pointer.xy);
+
+  vec3 mainCol = texture2D(uMainTex, vUv + pointer.xy * 0.01).rgb;
+  mainCol *= smoothstep(1.2, 0.0, len);
+  mainCol *= 1.0 + pl * 0.8;
+  vec3 o = mainCol;
+
+  // bottom-up wipe into the light scene, edge arced by wipe velocity
+  vec3 mission = texture2D(uMissionTex, vUv - pointer.xy * 0.01).rgb;
+  float range = 1.0 / uResolution.y + abs(uMissionBlur) * 0.2;
+  float arc = -cos((vUv.x - 0.5) * PI) * uMissionBlur;
+  float sel = smoothstep(0.0, range, -vUv.y + uVisibleMission * (1.0 + range) + arc);
+  mission *= smoothstep(1.5, 0.3, len);
+  o = mix(o, mission, sel);
+
+  vec3 service = texture2D(uServiceTex, vUv + pointer.xy * 0.01).rgb;
+  service *= 1.0 + pl * 0.8;
+  service *= smoothstep(1.5, 0.3, len);
+  o = mix(o, service, step(0.9999, uVisibleService));
+
+  gl_FragColor = vec4(o, 1.0);
+}
+`;
+
+const bloomThresholdFrag = /* glsl */ `
+uniform sampler2D uTex;
+varying vec2 vUv;
+void main() {
+  vec3 c = texture2D(uTex, vUv).rgb;
+  float l = max(c.r, max(c.g, c.b));
+  gl_FragColor = vec4(c * smoothstep(0.95, 1.2, l), 1.0);
+}
+`;
+
+const blurFrag = /* glsl */ `
+uniform sampler2D uTex;
+uniform vec2 uDir;
+varying vec2 vUv;
+void main() {
+  vec3 acc = vec3(0.0);
+  float ws[5];
+  ws[0] = 0.227; ws[1] = 0.194; ws[2] = 0.121; ws[3] = 0.054; ws[4] = 0.016;
+  acc += texture2D(uTex, vUv).rgb * ws[0];
+  for (int i = 1; i < 5; i++) {
+    vec2 off = uDir * float(i);
+    acc += texture2D(uTex, vUv + off).rgb * ws[i];
+    acc += texture2D(uTex, vUv - off).rgb * ws[i];
+  }
+  gl_FragColor = vec4(acc, 1.0);
+}
+`;
+
+const finalFrag = /* glsl */ `
+${GLSL_CONSTANTS}
+uniform sampler2D uSceneTex;
+uniform sampler2D uBloomTex;
+uniform sampler2D uThumbsTex;
+uniform sampler2D uLoaderTex;
+uniform float uLoaded;
+uniform float uScreenAspectRatio;
+varying vec2 vUv;
+
+void main() {
+  vec2 uv = vUv;
+  vec2 cuv = vUv - 0.5;
+  vec3 col;
+
+  if (uLoaded < 0.999) {
+    if (uScreenAspectRatio > 1.0) { cuv.y /= uScreenAspectRatio; }
+    else { cuv.x *= uScreenAspectRatio; }
+
+    float r = smoothstep(0.0, 0.2 + uLoaded * 0.7, -length(cuv) + uLoaded * 1.4);
+    vec2 ripple = sin(r * PI) * normalize(cuv + 1e-6) * 0.1;
+
+    vec2 sceneUv = (uv - 0.5) * (0.5 + uLoaded * 0.5) + 0.5 - ripple;
+    vec3 scene = texture2D(uSceneTex, sceneUv).rgb
+               + texture2D(uBloomTex, sceneUv).rgb * 0.25;
+    vec4 thumbs = texture2D(uThumbsTex, sceneUv);
+    scene = mix(scene, thumbs.rgb, thumbs.a);
+
+    vec2 luv = uv - ripple;
+    luv -= 0.5;
+    float mask = 1.0;
+    if (uScreenAspectRatio > 1.0) {
+      luv.y /= uScreenAspectRatio;
+      luv *= 1.0 / 0.8;
+      mask = smoothstep(0.5, 0.4, abs(luv.x));
+    } else {
+      luv.x *= uScreenAspectRatio;
+    }
+    luv += 0.5;
+    vec3 loader = texture2D(uLoaderTex, luv).rgb * mask;
+
+    col = mix(loader, scene * 1.3, smoothstep(0.0, 0.5, r));
+  } else {
+    col = texture2D(uSceneTex, uv).rgb + texture2D(uBloomTex, uv).rgb * 0.25;
+    vec4 thumbs = texture2D(uThumbsTex, uv);
+    col = mix(col, thumbs.rgb, thumbs.a);
+    col *= 1.3;
+  }
+
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+
+const wordmark2DVert = /* glsl */ `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+const wordmark2DFrag = /* glsl */ `
+uniform sampler2D uTex;
+uniform float uAlpha;
+varying vec2 vUv;
+void main() {
+  vec4 t = texture2D(uTex, vUv);
+  gl_FragColor = vec4(vec3(1.5), t.a * uAlpha);
+}
+`;
+
+const worksTitleVert = /* glsl */ `
+${GLSL_CONSTANTS}
+${GLSL_ROTATE2}
+uniform float uProgress;
+varying vec2 vUv;
+varying float vAlpha;
+void main() {
+  float rotMul = TPI * 1.3;
+  float theta = rotMul + position.x * TPI - uProgress * 3.0 * rotMul;
+  float clamped = clamp(theta, -TPI - PI, PI);
+  float rad = 3.0;
+  vec3 pos = vec3(sin(clamped + PI) * rad, position.y, cos(clamped + PI) * rad);
+  float viewIn = max(0.0, theta - PI);
+  float viewOut = min(0.0, theta + TPI + PI);
+  pos.x += viewIn * 2.0 + viewOut * 2.0;
+  pos.xy *= rot2(0.2);
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+  vUv = uv;
+  vAlpha = smoothstep(2.5, 0.0, viewIn) * smoothstep(-2.5, 0.0, viewOut);
+}
+`;
+
+const worksTitleFrag = /* glsl */ `
+uniform sampler2D uTex;
+uniform float uTime;
+uniform float uProgress;
+varying vec2 vUv;
+varying float vAlpha;
+void main() {
+  vec4 t = texture2D(uTex, vUv * vec2(4.0, 1.0) + vec2(uTime * 0.1 - uProgress * 13.0, 0.0));
+  float p3 = uProgress * 3.0;
+  float edges = smoothstep(1.0, 0.0, p3) + smoothstep(2.0, 3.0, p3);
+  float a = t.a;
+  a *= smoothstep(0.0, 0.2 * edges, vUv.x);
+  a *= smoothstep(1.0, 1.0 - 0.2 * edges, vUv.x);
+  gl_FragColor = vec4(vec3(1.0), a * vAlpha);
+}
+`;
+
+function makeQuadScene(fragmentShader, uniforms) {
+  const scene = new THREE.Scene();
+  const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([-1, -1, 0, 3, -1, 0, -1, 3, 0]), 3));
+  geo.setAttribute('uv', new THREE.BufferAttribute(new Float32Array([0, 0, 2, 0, 0, 2]), 2));
+  const mesh = new THREE.Mesh(geo, new THREE.ShaderMaterial({
+    vertexShader: GLSL_QUAD_VERT,
+    fragmentShader,
+    uniforms,
+    depthTest: false,
+    depthWrite: false
+  }));
+  mesh.frustumCulled = false;
+  scene.add(mesh);
+  return { scene, cam, mesh };
+}
 
 export class AlcheGL {
-  /**
-   * @returns {boolean} false if WebGL is unavailable (caller applies .no-3d)
-   */
-  init(container, { mode = 'top' } = {}) {
-    this.mode = mode;
+  init(container) {
     this.container = container;
     try {
-      this.renderer = new THREE.WebGLRenderer({
-        antialias: false,
-        powerPreference: 'high-performance'
-      });
+      this.renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
     } catch {
       return false;
     }
-
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const dpr = Math.min(window.devicePixelRatio, 1.5);
+    this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(container.clientWidth, container.clientHeight);
-    // The refracted image behind rough glass is low-frequency; half-res
-    // transmission halves the most expensive per-frame pass.
-    if ('transmissionResolutionScale' in this.renderer) {
-      this.renderer.transmissionResolutionScale = 0.5;
-    }
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.1;
+    this.renderer.autoClear = true;
     container.appendChild(this.renderer.domElement);
     this.renderer.domElement.setAttribute('aria-hidden', 'true');
 
+    this.lerper = new Lerper();
+    this.animator = new Animator();
+    this.animator.register('loaded', 0);
+    this.animator.register('kvZoom', 1);
+    this.animator.register('wordmark2D', 1);
+
+    /* ---- shared resources ---- */
+    this.noise = createFlowNoise(this.renderer);
+    this.envMap = createStudioEnvMap();
+    this.media = new WorksMedia();
+    this.pointerTrail = new PointerTrail(this.renderer);
+    this._alcheTex = createAlcheWordmarkTexture();
+    this._worksTitleTex = createWorksTitleTexture();
+    this._servicesTex = createServicesTitleTexture();
+    this._loaderTex = null; // set by the loader once its canvas is final
+
+    /* ---- main (dark) scene ---- */
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(
-      42,
-      container.clientWidth / container.clientHeight,
-      0.1,
-      100
+    this.scene.background = new THREE.Color('#000');
+    this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+    this.camera.position.set(0, 0, 10);
+
+    this.wall = new BGWall(this.renderer, {
+      noiseTexture: this.noise.texture,
+      logoTexture: this._alcheTex,
+      worksTitleTexture: this._worksTitleTex,
+      pointerTexture: this.pointerTrail.texture,
+      media: this.media
+    });
+    this.scene.add(this.wall.mesh);
+
+    this.grid = new GridOverlay({ dark: false, cylinder: true });
+    this.scene.add(this.grid.group);
+
+    // 2D wordmark plane behind the glass (kv only)
+    this.wordmark2D = new THREE.Mesh(
+      new THREE.PlaneGeometry(28, 28 * (250 / 1204)),
+      new THREE.ShaderMaterial({
+        vertexShader: wordmark2DVert,
+        fragmentShader: wordmark2DFrag,
+        uniforms: { uTex: { value: this._alcheTex }, uAlpha: { value: 1 } },
+        transparent: true,
+        depthWrite: false,
+        depthTest: false          // sits past the wall cylinder; draw over it
+      })
     );
-    this.camera.position.set(0, 0, 8);
+    this.wordmark2D.position.set(0, 1, -15);
+    this.wordmark2D.renderOrder = -900;
+    this.scene.add(this.wordmark2D);
 
-    this.background = new BackgroundWall();
-    this.scene.add(this.background.mesh);
+    // WORKS ribbon
+    this.worksTitle = new THREE.Mesh(
+      new THREE.PlaneGeometry(1, 1, 64, 1),
+      new THREE.ShaderMaterial({
+        vertexShader: worksTitleVert,
+        fragmentShader: worksTitleFrag,
+        uniforms: {
+          uTex: { value: this._worksTitleTex },
+          uTime: { value: 0 },
+          uProgress: { value: 0 }
+        },
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        side: THREE.DoubleSide
+      })
+    );
+    this.worksTitle.scale.set(14, 1.6, 1);
+    this.worksTitle.renderOrder = 999;
+    this.worksTitle.frustumCulled = false;
+    this.scene.add(this.worksTitle);
 
-    if (mode === 'top') {
-      this.logo = new MainLogo();
-      this.scene.add(this.logo);
-      const worksCount = document.querySelectorAll('[data-top-section="works"] .works-item').length || 4;
-      this.works = new WorksScreens(worksCount);
-      this.scene.add(this.works.group);
-      this._worksProgress = 0;
-    } else {
-      this.background.setDim(0.62);
-    }
+    this.logo = new MainLogo({ noiseTexture: this.noise.texture, envMap: this.envMap });
+    this.scene.add(this.logo);
 
-    // Environment for glass reflections: PMREM of the background itself.
-    // Only the top page has a PBR material to consume it.
-    if (mode === 'top') {
-      const pmrem = new THREE.PMREMGenerator(this.renderer);
-      const envScene = new THREE.Scene();
-      envScene.add(this.background.mesh.clone());
-      this.scene.environment = pmrem.fromScene(envScene, 0.04).texture;
-      pmrem.dispose();
-    }
+    /* ---- light mission/vision scene ---- */
+    this.missionScene = new THREE.Scene();
+    this.missionScene.background = new THREE.Color('#D7DBDC');
+    this.missionCamera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+    this.missionCamera.position.set(0, 0, 8);
+    this.orthoCamera = new THREE.OrthographicCamera(-4, 4, 4, -4, 0.1, 100);
+    this.orthoCamera.position.set(0, 0, 8);
+    this.missionGrid = new GridOverlay({ dark: true, cylinder: false });
+    this.missionScene.add(this.missionGrid.group);
+    this.missionScene.add(this.logo.outlineGroup);
 
-    this._sectionFloat = 0;
-    this._pointer = new THREE.Vector2();
-    this._pointerTarget = new THREE.Vector2();
+    /* ---- service scene ---- */
+    this.service = new ServiceScene(this.media, { servicesTitleTexture: this._servicesTex });
+
+    /* ---- thumbs scene (works screens over everything) ---- */
+    this.thumbsScene = new THREE.Scene();
+    this.thumbs = new WorksThumbs(this.media, {});
+    this.thumbsScene.add(this.thumbs.group);
+
+    /* ---- render targets ---- */
+    const rt = (opts = {}) => new THREE.WebGLRenderTarget(1, 1, {
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      type: THREE.HalfFloatType,
+      ...opts
+    });
+    this.rtMain = rt({ depthBuffer: true });
+    this.rtMission = rt({ depthBuffer: true });
+    this.rtService = rt({ depthBuffer: true });
+    this.rtThumbs = rt({ depthBuffer: true });
+    this.rtMixed = rt();
+    this.rtBack = rt();          // 512 copy the glass refracts
+    this.rtBloomA = rt();
+    this.rtBloomB = rt();
+    this.rtBack.setSize(512, 512);
+
+    this.logo.uniforms.uBackTex.value = this.rtBack.texture;
+    this.logo.screenUniforms.uSceneTex.value = this.rtService.texture;
+
+    /* ---- post passes ---- */
+    this.mixPass = makeQuadScene(mixFrag, {
+      uMainTex: { value: this.rtMain.texture },
+      uMissionTex: { value: this.rtMission.texture },
+      uServiceTex: { value: this.rtService.texture },
+      uPointerTex: { value: this.pointerTrail.texture },
+      uResolution: { value: new THREE.Vector2(1, 1) },
+      uVisibleMission: { value: 0 },
+      uMissionBlur: { value: 0 },
+      uVisibleService: { value: 0 }
+    });
+    this.thresholdPass = makeQuadScene(bloomThresholdFrag, {
+      uTex: { value: this.rtMixed.texture }
+    });
+    this.blurPassH = makeQuadScene(blurFrag, {
+      uTex: { value: this.rtBloomA.texture },
+      uDir: { value: new THREE.Vector2(1 / 256, 0) }
+    });
+    this.blurPassV = makeQuadScene(blurFrag, {
+      uTex: { value: this.rtBloomB.texture },
+      uDir: { value: new THREE.Vector2(0, 1 / 256) }
+    });
+    this.finalPass = makeQuadScene(finalFrag, {
+      uSceneTex: { value: this.rtMixed.texture },
+      uBloomTex: { value: this.rtBloomA.texture },
+      uThumbsTex: { value: this.rtThumbs.texture },
+      uLoaderTex: { value: new THREE.Texture() },
+      uLoaded: { value: 0 },
+      uScreenAspectRatio: { value: 16 / 9 }
+    });
+
+    // copy pass for the 512 backbuffer
+    this.copyPass = makeQuadScene(
+      'uniform sampler2D uTex; varying vec2 vUv; void main(){ gl_FragColor = texture2D(uTex, vUv); }',
+      { uTex: { value: this.rtMain.texture } }
+    );
+
+    /* ---- state ---- */
+    this._pointerNdc = new THREE.Vector2();
+    this._cameraOffset = new THREE.Vector2();
+    this._missionVisible = 0;
+    this._missionBlur = 0;
+    this._section = 'kv';
     this._clock = new THREE.Clock();
     this._running = true;
     this._raf = 0;
+    this._scroll = {
+      worksTitle: 0, worksProgress: 0, worksOutro: 0, missionIn: 0,
+      vision: 0, serviceIn: 0, serviceProgress: 0, stelllaIn: 0, page: 0
+    };
+    this._projA = new THREE.Matrix4();
 
     this._bindEvents();
+    this.resize();
     this._loop();
     return true;
   }
 
-  attachGizmo(container) {
-    if (this.mode !== 'top') return;
-    this.gizmo = new AxisGizmo(container);
+  /* ---------- external API ---------- */
+
+  onLoadingComplete() {
+    this.animator.animate('loaded', 1, 3, easeOutCubic);
   }
 
-  /* ---------- events ---------- */
+  setLoaderTexture(tex) {
+    this.finalPass.mesh.material.uniforms.uLoaderTex.value = tex;
+  }
+
+  /** name ∈ section list; drives logo mode, kv zoom, wordmark visibility */
+  changeSection(name) {
+    if (this._section === name) return;
+    this._section = name;
+    const logoSection =
+      name === 'kv' ? 'kv'
+      : name === 'works_intro' ? 'works_intro'
+      : name === 'works' || name === 'works_outro' ? 'works'
+      : name === 'mission_in' || name === 'mission' ? 'mission'
+      : name === 'vision' || name === 'vision_out' ? 'vision'
+      : name.startsWith('service') || name === 'stellla' ? 'service'
+      : 'default';
+    this.logo.setSection(logoSection);
+    this.animator.animate('kvZoom', name === 'kv' ? 1 : 0, 1);
+    this.animator.animate('wordmark2D', name === 'kv' ? 1 : 0, 0.5);
+  }
+
+  /** Raw trigger progress, every frame from the scroll manager. */
+  setScrollState(s) {
+    Object.assign(this._scroll, s);
+  }
+
+  setPointer(clientX, clientY) {
+    this._pointerNdc.set(
+      (clientX / window.innerWidth) * 2 - 1,
+      -(clientY / window.innerHeight) * 2 + 1
+    );
+    this.pointerTrail.setPointer(clientX / window.innerWidth, 1 - clientY / window.innerHeight);
+  }
+
+  /* ---------- internals ---------- */
 
   _bindEvents() {
-    const el = this.renderer.domElement;
-    this._onDown = (e) => {
-      if (this.mode !== 'top' || this._sectionFloat > 0.5) return;
-      this._dragLast = { x: e.clientX, y: e.clientY };
-      this.logo.pointerDown();
-      try { el.setPointerCapture(e.pointerId); } catch { /* synthetic events */ }
-    };
-    this._onMove = (e) => {
-      this._pointerTarget.set(
-        (e.clientX / window.innerWidth) * 2 - 1,
-        -(e.clientY / window.innerHeight) * 2 + 1
-      );
-      if (this._dragLast && this.logo) {
-        this.logo.pointerMove(e.clientX - this._dragLast.x, e.clientY - this._dragLast.y);
-        this._dragLast = { x: e.clientX, y: e.clientY };
-      }
-    };
-    this._onUp = () => {
-      this._dragLast = null;
-      this.logo?.pointerUp();
-    };
-    el.addEventListener('pointerdown', this._onDown);
+    this._onMove = (e) => this.setPointer(e.clientX, e.clientY);
     window.addEventListener('pointermove', this._onMove, { passive: true });
-    window.addEventListener('pointerup', this._onUp, { passive: true });
 
     this._onVis = () => {
       this._running = !document.hidden;
       if (this._running) {
-        this._clock.getDelta(); // swallow the hidden gap
+        this._clock.getDelta();
         this._loop();
       } else {
         cancelAnimationFrame(this._raf);
@@ -152,94 +469,219 @@ export class AlcheGL {
     document.addEventListener('visibilitychange', this._onVis);
 
     this._onLost = (e) => e.preventDefault();
-    el.addEventListener('webglcontextlost', this._onLost);
+    this.renderer.domElement.addEventListener('webglcontextlost', this._onLost);
   }
 
-  /* ---------- scroll API ---------- */
+  resize() {
+    const w = this.container.clientWidth;
+    const h = this.container.clientHeight;
+    const aspect = w / h;
+    this.renderer.setSize(w, h);
 
-  setSection(f) {
-    this._sectionFloat = Math.max(0, Math.min(SECTION_CONFIGS.length - 1, f));
+    this.camera.aspect = aspect;
+    this._baseFov = 35 + (1 / aspect) * 18;
+    this.camera.fov = this._baseFov;
+    this.camera.updateProjectionMatrix();
+
+    this.missionCamera.aspect = aspect;
+    this.missionCamera.updateProjectionMatrix();
+    const halfH = 4;
+    this.orthoCamera.left = -halfH * aspect;
+    this.orthoCamera.right = halfH * aspect;
+    this.orthoCamera.top = halfH;
+    this.orthoCamera.bottom = -halfH;
+    this.orthoCamera.updateProjectionMatrix();
+
+    const pw = Math.round(w * Math.min(window.devicePixelRatio, 1.5));
+    const ph = Math.round(h * Math.min(window.devicePixelRatio, 1.5));
+    for (const rt of [this.rtMain, this.rtMission, this.rtService, this.rtThumbs, this.rtMixed]) {
+      rt.setSize(pw, ph);
+    }
+    this.rtBloomA.setSize(pw / 4, ph / 4);
+    this.rtBloomB.setSize(pw / 4, ph / 4);
+
+    this.wall.resize(pw, ph, this.camera);
+    this.grid.resize(this.camera);
+    this.service.resize(w, h);
+    this.mixPass.mesh.material.uniforms.uResolution.value.set(pw, ph);
+    this.finalPass.mesh.material.uniforms.uScreenAspectRatio.value = aspect;
+    // refraction samples are addressed by gl_FragCoord over the main RT
+    this.logo.uniforms.uBackRes.value.set(pw, ph);
+    this.logo.uniforms.uScreenAspectRatio.value = aspect;
+    this.logo.screenUniforms.uScreenResolution.value.set(pw, ph);
+    this.pointerTrail.setAspect(aspect);
+    this.noise.uniforms.uScreenAspectRatio.value = aspect;
   }
 
-  /** 0..N-1 — which works screen is centered (fractional while sliding). */
-  setWorksProgress(p) {
-    this._worksProgress = p;
+  _renderQuad(pass, target) {
+    this.renderer.setRenderTarget(target);
+    this.renderer.render(pass.scene, pass.cam);
   }
-
-  /* ---------- frame loop ---------- */
 
   _loop = () => {
     if (!this._running) return;
     this._raf = requestAnimationFrame(this._loop);
 
-    const dt = Math.min(this._clock.getDelta(), 0.05);
+    const dt = Math.min(this._clock.getDelta(), 1 / 30);
     const t = this._clock.elapsedTime;
+    const s = this._scroll;
+    const lp = this.lerper;
 
-    this.background.update(t);
+    this.animator.update(dt);
+    lp.update(dt);
 
-    // eased pointer parallax
-    this._pointer.lerp(this._pointerTarget, 1 - Math.pow(0.94, dt * 60));
-    this.camera.position.x = this._pointer.x * 0.35;
-    this.camera.position.y = this._pointer.y * 0.25;
+    /* --- smoothed scroll channels --- */
+    const worksTitle = lp.set('worksTitle', s.worksTitle, 0.3);
+    const worksProg = lp.set('worksProgress', s.worksProgress, 1);
+    const carouselO = worksProg * (this.media.count + 1);
+    const magnet = Math.round(carouselO) - (Math.round(carouselO) - carouselO) * 0.4;
+    const carouselU = lp.set('worksIndex', magnet, 0.5);
+    const carouselVel = lp.velocity('worksProgress') * 8;
+    const bgU = lp.set('bgQuadProgress', s.worksProgress, 0.7) * (this.media.count + 1);
+    const worksOutro = lp.set('worksOutro', s.worksOutro, 1);
+    const parallaxKill = 1 - lp.set('camWorksOutro', s.worksOutro, 0.5);
+    const missionVis = lp.set('missionVis', s.missionIn, 1.5);
+    const serviceVis = lp.set('serviceVis', s.serviceIn, 0.5);
+    const visionRot = lp.set('visionRot', s.vision, 0.5);
+    const serviceRot = lp.set('serviceRot', s.serviceIn, 1);
+    const serviceIn = lp.set('serviceListIn', s.serviceIn, 0.3);
+    const thumbO = (lp.set('thumbScroll', s.serviceProgress, 1) * 7 + 1) / 2;
+    const thumbMag = Math.round(thumbO) - (Math.round(thumbO) - thumbO) * 0.4;
+    const thumbU = Math.min(4, lp.set('thumbIndex', thumbMag, 0.5));
+    const stelllaIn = lp.set('stelllaIn', s.stelllaIn, 0.7);
+    const stelllaView = lp.set('stelllaView', Math.max(0, Math.min(1, thumbU - 2.5)), 0.7) + stelllaIn * 0.5;
+    const scrollVel = lp.set('lenisVel', Math.max(-30, Math.min(30, s.lenisVelocity ?? 0)), 0.5);
+    const missionScroll = lp.set('missionScroll', s.pageScroll ?? 0, 0.5);
+
+    /* --- procedural textures --- */
+    this.noise.render(t);
+    this.pointerTrail.update();
+
+    /* --- camera --- */
+    const kvZoom = this.animator.get('kvZoom');
+    this._cameraOffset.lerp(
+      new THREE.Vector2(
+        this._pointerNdc.x * 0.5 * parallaxKill,
+        this._pointerNdc.y * 0.5 * parallaxKill
+      ),
+      Math.min(3 * dt, 1)
+    );
+    this.camera.position.set(this._cameraOffset.x, this._cameraOffset.y, 10 - kvZoom * 0.5);
+    this.camera.fov = this._baseFov - kvZoom * 4;
+    this.camera.updateProjectionMatrix();
     this.camera.lookAt(0, 0, 0);
 
-    if (this.logo) {
-      const i = Math.floor(this._sectionFloat);
-      const frac = this._sectionFloat - i;
-      const a = SECTION_CONFIGS[i];
-      const b = SECTION_CONFIGS[Math.min(i + 1, SECTION_CONFIGS.length - 1)];
-
-      this.logo.update(dt, t);
-      this.logo.position.x = lerp(a.logoX, b.logoX, frac);
-      this.logo.position.z = lerp(a.logoZ, b.logoZ, frac);
-      const s = lerp(a.logoScale, b.logoScale, frac);
-      this.logo.scale.setScalar(s);
-      this.background.setDim(lerp(a.dim, b.dim, frac));
-      this.logo.screen.material.opacity = lerp(a.wordOpacity, b.wordOpacity, frac);
-      this.logo.screen.visible = this.logo.screen.material.opacity > 0.01;
-
-      // Gizmo HUD is only visible on the hero section
-      if (this._sectionFloat < 1) this.gizmo?.update(this.logo.mesh.quaternion);
-
-      // Works screens: fade in through works_intro, out entering mission
-      const f = this._sectionFloat;
-      const sstep = (a, b, x) => {
-        const u = Math.max(0, Math.min(1, (x - a) / (b - a)));
-        return u * u * (3 - 2 * u);
-      };
-      const reveal = sstep(1.25, 1.85, f) * (1 - sstep(2.8, 3.25, f));
-      this.works.setReveal(reveal);
-      this.works.setProgress(this._worksProgress);
-      this.works.update(t);
+    // flatten perspective → ortho during works_outro
+    if (worksOutro > 0.001) {
+      const a = this.camera.projectionMatrix.elements;
+      const b = this.orthoCamera.projectionMatrix.elements;
+      const m = this._projA.elements;
+      for (let i = 0; i < 16; i++) m[i] = a[i] + (b[i] - a[i]) * worksOutro;
+      this.camera.projectionMatrix.copy(this._projA);
+      this.camera.projectionMatrixInverse.copy(this._projA).invert();
     }
 
-    this.renderer.render(this.scene, this.camera);
+    /* --- logo + hover --- */
+    this.logo.hover(this._pointerNdc.x, this._pointerNdc.y);
+    this.logo.update(dt, scrollVel);
+    this.logo.uniforms.uVisionRotate.value = visionRot;
+    this.logo.uniforms.uServiceRotate.value = serviceRot;
+    this.logo.screenUniforms.uServiceIn.value = serviceIn;
+    this.logo.screenUniforms.uVisionRotate.value = visionRot;
+
+    /* --- scene pieces --- */
+    this.media.update(t);
+    this.wall.setWorksTitleProgress(worksTitle);
+    this.wall.setWorksProgress(worksProg, bgU);
+    this.wall.update(t);
+    this.grid.setScroll(missionScroll * 0.1);
+    this.worksTitle.material.uniforms.uProgress.value = worksTitle;
+    this.worksTitle.material.uniforms.uTime.value = t;
+    this.wordmark2D.material.uniforms.uAlpha.value = this.animator.get('wordmark2D');
+    this.missionGrid.setScroll(missionScroll);
+    this.thumbs.update(carouselU, carouselVel);
+    this.service.update(t, thumbU, serviceIn, stelllaIn, stelllaView);
+
+    /* --- mission wipe smoothing (edge arc from wipe velocity) --- */
+    const dv = missionVis - this._missionVisible;
+    this._missionBlur += (dv - this._missionBlur) * 0.5;
+    this._missionVisible += dv * 0.5;
+    this.mixPass.mesh.material.uniforms.uVisibleMission.value = this._missionVisible;
+    this.mixPass.mesh.material.uniforms.uMissionBlur.value = this._missionBlur;
+    this.mixPass.mesh.material.uniforms.uVisibleService.value = serviceVis;
+
+    /* ============ render ============ */
+    const r = this.renderer;
+
+    // 1. main scene without the logo
+    this.logo.mesh.visible = false;
+    r.setRenderTarget(this.rtMain);
+    r.render(this.scene, this.camera);
+
+    // 2. 512 copy for refraction
+    this.copyPass.mesh.material.uniforms.uTex.value = this.rtMain.texture;
+    this._renderQuad(this.copyPass, this.rtBack);
+
+    // 3. logo over the main scene (no clear)
+    this.logo.mesh.visible = true;
+    r.setRenderTarget(this.rtMain);
+    r.autoClear = false;
+    r.render(this.logo, this.camera);
+    r.autoClear = true;
+
+    // 4. light scene (outline follows the logo pose) — ortho matches the flattened cam
+    if (this._missionVisible > 0.002 || visionRot > 0.002) {
+      r.setRenderTarget(this.rtMission);
+      r.render(this.missionScene, worksOutro > 0.5 ? this.orthoCamera : this.camera);
+    }
+
+    // 5. service scene
+    if (serviceVis > 0.002 || serviceRot > 0.002 || visionRot > 0.3) {
+      r.setRenderTarget(this.rtService);
+      r.render(this.service.scene, this.service.camera);
+    }
+
+    // 6. thumbs scene
+    r.setRenderTarget(this.rtThumbs);
+    r.setClearColor(0x000000, 0);
+    r.clear();
+    r.render(this.thumbsScene, this.camera);
+    r.setClearColor(0x000000, 1);
+
+    // 7. mix the three scenes
+    this._renderQuad(this.mixPass, this.rtMixed);
+
+    // 8. bloom
+    this.thresholdPass.mesh.material.uniforms.uTex.value = this.rtMixed.texture;
+    this._renderQuad(this.thresholdPass, this.rtBloomA);
+    this.blurPassH.mesh.material.uniforms.uTex.value = this.rtBloomA.texture;
+    this._renderQuad(this.blurPassH, this.rtBloomB);
+    this.blurPassV.mesh.material.uniforms.uTex.value = this.rtBloomB.texture;
+    this._renderQuad(this.blurPassV, this.rtBloomA);
+
+    // 9. final composite to screen (intro zoom + loader crossfade)
+    this.finalPass.mesh.material.uniforms.uLoaded.value = this.animator.get('loaded');
+    r.setRenderTarget(null);
+    r.render(this.finalPass.scene, this.finalPass.cam);
   };
-
-  /* ---------- lifecycle ---------- */
-
-  resize() {
-    const w = this.container.clientWidth;
-    const h = this.container.clientHeight;
-    this.camera.aspect = w / h;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(w, h);
-  }
 
   destroy() {
     this._running = false;
     cancelAnimationFrame(this._raf);
-    const el = this.renderer.domElement;
-    el.removeEventListener('pointerdown', this._onDown);
     window.removeEventListener('pointermove', this._onMove);
-    window.removeEventListener('pointerup', this._onUp);
     document.removeEventListener('visibilitychange', this._onVis);
-    el.removeEventListener('webglcontextlost', this._onLost);
-    this.logo?.dispose();
-    this.works?.dispose();
-    this.background.dispose();
-    this.gizmo?.dispose();
+    this.renderer.domElement.removeEventListener('webglcontextlost', this._onLost);
+    this.logo.dispose();
+    this.wall.dispose();
+    this.grid.dispose();
+    this.missionGrid.dispose();
+    this.thumbs.dispose();
+    this.service.dispose();
+    this.media.dispose();
+    this.noise.dispose();
+    this.pointerTrail.dispose();
+    for (const rt of [this.rtMain, this.rtMission, this.rtService, this.rtThumbs, this.rtMixed, this.rtBack, this.rtBloomA, this.rtBloomB]) rt.dispose();
     this.renderer.dispose();
-    el.remove();
+    this.renderer.domElement.remove();
   }
 }

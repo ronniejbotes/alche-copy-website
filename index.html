@@ -10,20 +10,26 @@
   <meta name="theme-color" content="#000000" />
   <noscript><style>.loading { display: none; }</style></noscript>
 </head>
-<body data-page="top" data-menu-open="false">
+<body data-page="top" data-menu-open="false" data-section="kv" data-gl-ready="false">
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <!-- Loading overlay -->
+  <!-- Loading overlay: blueprint guide grid + triangle outline draw + scramble tagline.
+       All drawn at runtime on canvas — original re-creation of the reference loader. -->
   <div class="loading" id="loading" aria-hidden="true">
-    <svg class="loading__mark" viewBox="0 0 100 88" role="presentation">
-      <polygon points="50,4 96,84 4,84" />
-      <polygon points="50,40 68,72 32,72" />
-    </svg>
-    <div class="loading__text">Placeholder tagline line one<br />and line two.</div>
+    <div class="loading__stage">
+      <canvas class="loading__canvas" id="loading-canvas"></canvas>
+    </div>
+    <div class="loading__text" id="loading-text" aria-label="Architect worlds that move hearts and spark hope."></div>
   </div>
 
-  <!-- GL layer -->
-  <div id="gl-canvas" aria-hidden="true"></div>
+  <!-- GL layer: sticky inside a wrapper that spans only the scrolled content
+       (see .content-wrap), so the scene scrolls away when the outro takes over. -->
+  <div class="content-wrap">
+  <div class="gl-stage" id="gl-stage" aria-hidden="true">
+    <div class="gl-stage__inner">
+      <div id="gl-canvas"></div>
+    </div>
+  </div>
 
   <svg class="fallback-mark" viewBox="0 0 100 88" aria-hidden="true">
     <polygon points="50,4 96,84 4,84" fill="none" stroke="#fff" stroke-width="1.5" />
@@ -34,15 +40,22 @@
   <header class="header">
     <div class="header__logo">
       <a href="./" aria-label="ALCHE home">
-        <svg viewBox="0 0 100 88" aria-hidden="true"><polygon points="50,4 96,84 4,84" fill="none" stroke="#fff" stroke-width="6" /><polygon points="50,42 66,70 34,70" fill="#fff" /></svg>
-        <span>ALCHE</span>
+        <!-- Wordmark drawn as inline SVG polygons (original letterforms) -->
+        <svg viewBox="0 0 500 104" aria-hidden="true" class="wordmark-svg">
+          <polygon points="52,0 104,104 88,104 52,32 16,104 0,104" />
+          <polygon points="52,58 74,104 30,104" />
+          <polygon points="124,0 138,0 138,90 196,90 196,104 124,104" />
+          <polygon points="216,0 288,0 288,14 230,14 230,90 288,90 288,104 216,104 216,0" />
+          <polygon points="312,0 326,0 326,45 384,45 384,0 398,0 398,104 384,104 384,59 326,59 326,104 312,104" />
+          <polygon points="422,0 494,0 494,14 436,14 436,45 488,45 488,59 436,59 436,90 494,90 494,104 422,104" />
+        </svg>
       </a>
     </div>
     <nav class="header__nav" aria-label="Primary">
-      <a href="./news/">News</a>
-      <a href="./works/">Works</a>
-      <a href="./about/">About</a>
-      <a href="./stellla/">stellla</a>
+      <a href="./news/"><span>News</span></a>
+      <a href="./works/"><span>Works</span></a>
+      <a href="./about/"><span>About</span></a>
+      <a href="./stellla/"><span>stellla</span></a>
     </nav>
     <div class="header__right">
       <a class="btn-contact" href="./contact/">
@@ -71,7 +84,7 @@
         <a href="./contact/">Contact / Recruit</a>
       </nav>
       <div class="side-menu__social">
-        <a href="#" rel="noopener">TECHBLOG</a>
+        <a href="#" rel="noopener">TECH BLOG</a>
         <a href="#" rel="noopener">note</a>
         <a href="#" rel="noopener">X</a>
         <a href="#" rel="noopener">YouTube</a>
@@ -79,201 +92,272 @@
     </div>
   </div>
 
-  <!-- Left rail scroll indicator -->
+  <!-- Left scroll indicator: 5 sections × 2 subsection ticks, mix-blend difference -->
   <div class="rail" aria-hidden="true">
-    <div class="rail__item" data-rail="top" data-active="true"><span class="rail__line"></span><span class="rail__label">TOP</span></div>
-    <div class="rail__item" data-rail="works" data-active="false"><span class="rail__line"></span><span class="rail__label">WORKS</span></div>
-    <div class="rail__item" data-rail="about" data-active="false"><span class="rail__line"></span><span class="rail__label">ABOUT</span></div>
-    <div class="rail__item" data-rail="vision" data-active="false"><span class="rail__line"></span><span class="rail__label">VISION</span></div>
-    <div class="rail__item" data-rail="service" data-active="false"><span class="rail__line"></span><span class="rail__label">SERVICE</span></div>
+    <div class="rail__item" data-rail="kv" data-active="true">
+      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">TOP</span></div>
+      <div class="rail__subs"><span class="rail__sub"></span><span class="rail__sub"></span></div>
+    </div>
+    <div class="rail__item" data-rail="works" data-active="false">
+      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">WORKS</span></div>
+      <div class="rail__subs"><span class="rail__sub"></span><span class="rail__sub"></span></div>
+    </div>
+    <div class="rail__item" data-rail="mission" data-active="false">
+      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">ABOUT</span></div>
+      <div class="rail__subs"><span class="rail__sub"></span><span class="rail__sub"></span></div>
+    </div>
+    <div class="rail__item" data-rail="vision" data-active="false">
+      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">VISION</span></div>
+      <div class="rail__subs"><span class="rail__sub"></span><span class="rail__sub"></span></div>
+    </div>
+    <div class="rail__item" data-rail="service" data-active="false">
+      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">SERVICE</span></div>
+      <div class="rail__subs"><span class="rail__sub"></span><span class="rail__sub"></span></div>
+    </div>
   </div>
 
-  <!-- HUD: tweakpane containers + gizmo -->
-  <div class="hud hud--material"></div>
-  <div class="hud hud--quaternion"></div>
-  <div class="hud hud--gizmo" aria-hidden="true"></div>
+  <!-- Tweakpane containers (positions per reference) -->
+  <div class="hud hud--material" id="pane-material" data-visible="true"></div>
+  <div class="hud hud--screen" id="pane-screen" data-visible="false"></div>
+  <div class="hud hud--quaternion" id="pane-quaternion" data-visible="true"></div>
 
   <!-- News HUD (kv only) -->
-  <aside class="news-hud" data-hidden="false" aria-label="Latest news">
+  <aside class="news-hud" aria-label="Latest news">
     <div class="news-hud__title">News</div>
     <div class="news-hud__item">
       <span class="news-hud__date">2025 06.26</span>
-      <a href="./news/">Placeholder news headline — conference talk announcement</a>
+      <a href="./news/">Unreal Fest Bali 2025で登壇しました</a>
     </div>
     <div class="news-hud__item">
       <span class="news-hud__date">2025 05.16</span>
-      <a href="./news/">Placeholder news headline — product launch with partner studio</a>
+      <a href="./news/">丸紅が提供する次世代ファッションメタバースアプリ「WEAR GO LAND」をAlche Studioが開発</a>
     </div>
     <div class="news-hud__item">
       <span class="news-hud__date">2024 10.29</span>
-      <a href="./news/">Placeholder news headline — new creative team formation</a>
+      <a href="./news/">博報堂DYメディアパートナーズとクリエイティブチーム「ReIMAGINE」を結成</a>
     </div>
   </aside>
 
-  <div class="scroll-hint" data-hidden="false" aria-hidden="true">scroll to explore →</div>
+  <div class="scroll-hint" aria-hidden="true">scroll to explore →</div>
 
-  <!-- Main scroll content -->
+  <!-- ============ scroll runways ============ -->
   <main class="main" id="main">
-
-    <section class="section kv" data-top-section="kv">
-      <span class="section__label" aria-hidden="true">kv</span>
-      <h1>ALCHE — a creative studio building immersive entertainment. Design-study rebuild.</h1>
+    <section class="runway runway--kv" data-top-section="kv">
+      <h1 class="visually-hidden">ALCHE — a creative studio building immersive entertainment. Design-study rebuild.</h1>
     </section>
-
-    <section class="section works-intro" data-top-section="works_intro">
-      <span class="section__label" aria-hidden="true">works_intro</span>
-      <h2 aria-label="Works">WORKS</h2>
-    </section>
-
-    <section class="section" data-top-section="works">
-      <span class="section__label" aria-hidden="true">works</span>
-      <div class="works-list">
-        <article class="works-item">
-          <div class="works-item__inner">
-          <div class="works-item__info">
-            <time class="works-item__date" datetime="2026-01">2026 01.17</time>
-          </div>
-          <div>
-            <h3 class="works-item__title"><a href="./works/">Tiny Homes SA</a></h3>
-            <p class="works-item__sub">Prefab modular tiny homes, quoted and sold online</p>
-            <ul class="works-item__cats">
-              <li><a href="./works/">web-design</a></li>
-              <li><a href="./works/">e-commerce</a></li>
-              <li><a href="./works/">lead-gen</a></li>
-            </ul>
-          </div>
-        </div>
-        </article>
-        <article class="works-item">
-          <div class="works-item__inner">
-          <div class="works-item__info">
-            <time class="works-item__date" datetime="2025-05">2025 05.16</time>
-          </div>
-          <div>
-            <h3 class="works-item__title"><a href="./works/">Cognexa</a></h3>
-            <p class="works-item__sub">AI automation agency — immersive 3D landing experience</p>
-            <ul class="works-item__cats">
-              <li><a href="./works/">3d-web</a></li>
-              <li><a href="./works/">threejs</a></li>
-              <li><a href="./works/">ai-automation</a></li>
-            </ul>
-          </div>
-        </div>
-        </article>
-        <article class="works-item">
-          <div class="works-item__inner">
-          <div class="works-item__info">
-            <time class="works-item__date" datetime="2024-10">2024 10.18</time>
-          </div>
-          <div>
-            <h3 class="works-item__title"><a href="./works/">Position Xero</a></h3>
-            <p class="works-item__sub">Lead generation & performance marketing agency</p>
-            <ul class="works-item__cats">
-              <li><a href="./works/">marketing</a></li>
-              <li><a href="./works/">lead-gen</a></li>
-              <li><a href="./works/">web-design</a></li>
-            </ul>
-          </div>
-        </div>
-        </article>
-        <article class="works-item">
-          <div class="works-item__inner">
-          <div class="works-item__info">
-            <time class="works-item__date" datetime="2021-07">2021 07.16</time>
-          </div>
-          <div>
-            <h3 class="works-item__title"><a href="./works/">Cajee Botes</a></h3>
-            <p class="works-item__sub">Orthotics, prosthetics & compression care practice</p>
-            <ul class="works-item__cats">
-              <li><a href="./works/">healthcare</a></li>
-              <li><a href="./works/">web-design</a></li>
-              <li><a href="./works/">booking</a></li>
-            </ul>
-          </div>
-        </div>
-        </article>
-        <div class="works-more"><a href="./works/">More Works</a></div>
+    <section class="runway runway--works-intro" data-top-section="works_intro"></section>
+    <section class="runway runway--works" data-top-section="works">
+      <div class="works-scroll">
+        <div class="works-scroll__item" data-work="0"></div>
+        <div class="works-scroll__item" data-work="1"></div>
+        <div class="works-scroll__item" data-work="2"></div>
+        <div class="works-scroll__item" data-work="3"></div>
+        <div class="works-scroll__item" data-work="4"></div>
+        <div class="works-scroll__item" data-work="5"></div>
       </div>
     </section>
-
-    <section class="section statement" data-top-section="mission">
-      <span class="section__label" aria-hidden="true">mission</span>
-      <div class="statement__inner">
-        <p class="statement__eyebrow">Mission</p>
-        <p>
-          <span class="statement__line"><span class="statement__marker">Immersive, experiential</span></span>
-          <span class="statement__line"><span class="statement__marker">entertainment</span></span>
-          <span class="statement__line"><span class="statement__marker">beyond the expected</span></span>
-        </p>
-        <p class="statement__en">Building immersive and experiential<br />entertainment beyond the expected.</p>
+    <section class="runway runway--works-outro" data-top-section="works_outro"></section>
+    <section class="runway runway--mission-in" data-top-section="mission_in"></section>
+    <section class="runway runway--mission" data-top-section="mission"></section>
+    <section class="runway runway--vision" data-top-section="vision"></section>
+    <section class="runway runway--vision-out" data-top-section="vision_out"></section>
+    <section class="runway runway--service-in" data-top-section="service_in"></section>
+    <section class="runway runway--service" data-top-section="service">
+      <div class="service-scroll">
+        <div class="service-scroll__item" data-service="0"></div>
+        <div class="service-scroll__item" data-service="1"></div>
+        <div class="service-scroll__item" data-service="2"></div>
       </div>
     </section>
-
-    <section class="section statement" data-top-section="vision">
-      <span class="section__label" aria-hidden="true">vision</span>
-      <div class="statement__inner">
-        <p class="statement__eyebrow">Vision</p>
-        <p>
-          <span class="statement__line"><span class="statement__marker">Worlds that stir hearts</span></span>
-          <span class="statement__line"><span class="statement__marker">and carry hope</span></span>
-        </p>
-        <p class="statement__en">Designing worlds that stir hearts<br />and carry hope.</p>
-      </div>
-    </section>
-
-    <section class="section service" data-top-section="service">
-      <span class="section__label" aria-hidden="true">service</span>
-      <h2 class="service__title" aria-label="Service">SERVICE</h2>
-      <div class="service__grid">
-        <article class="service-card">
-          <span class="service-card__num">01</span>
-          <h3 class="service-card__title">In-Game &amp; Metaverse Experiences</h3>
-          <p class="service-card__body">Placeholder copy — planning and production of virtual live events, branded islands, and playable worlds inside game platforms.</p>
-        </article>
-        <article class="service-card">
-          <span class="service-card__num">02</span>
-          <h3 class="service-card__title">Real-Time 3D Production</h3>
-          <p class="service-card__body">Placeholder copy — real-time engine development, cloud rendering, and interactive 3D content for web and mobile.</p>
-        </article>
-        <article class="service-card">
-          <span class="service-card__num">03</span>
-          <h3 class="service-card__title">Creative Direction</h3>
-          <p class="service-card__body">Placeholder copy — concept design, art direction, and technical direction for entertainment experiences end to end.</p>
-        </article>
-      </div>
-    </section>
-
+    <section class="runway runway--stellla" data-top-section="stellla"></section>
   </main>
+  </div><!-- /.content-wrap -->
 
-  <!-- Footer -->
+  <!-- ============ fixed content layers (visibility driven by section) ============ -->
+
+  <!-- Works: all items stacked bottom-left; JS swaps the active one -->
+  <div class="works-layer" data-visible="false">
+    <article class="works-item" data-work-item="0">
+      <div class="works-item__info">
+        <span class="works-item__date">2026 01.17</span>
+      </div>
+      <h3 class="works-item__title"><a href="./works/">KizunaAI “Hello, Fortnite”</a></h3>
+      <p class="works-item__ja">KizunaAI “Hello, Fortnite”</p>
+      <ul class="works-item__cats"><li>In-Game-Concert</li><li>fortnite</li><li>metaverse</li></ul>
+    </article>
+    <article class="works-item" data-work-item="1">
+      <div class="works-item__info">
+        <span class="works-item__date">2025 05.16</span>
+        <span class="works-item__impression">15ブランド以上が参加、「IS:SUE」がアンバサダーに就任！</span>
+      </div>
+      <h3 class="works-item__title"><a href="./works/">WEAR GO LAND</a></h3>
+      <p class="works-item__ja">WEAR GO LAND</p>
+      <ul class="works-item__cats"><li>stellla</li><li>unreal_engine</li><li>metaverse</li><li>mobile</li></ul>
+    </article>
+    <article class="works-item" data-work-item="2">
+      <div class="works-item__info">
+        <span class="works-item__date">2025 02.20</span>
+        <span class="works-item__impression">人気ブランドDISCOAT(ディスコート)のファションショーを開催！</span>
+      </div>
+      <h3 class="works-item__title"><a href="./works/">DISCOAT 2025SS EXHIBITION in virtual</a></h3>
+      <p class="works-item__ja">DISCOAT 2025SS EXHIBITION in virtual</p>
+      <ul class="works-item__cats"><li>stellla</li><li>unreal_engine</li><li>metaverse</li><li>cloud rendering</li></ul>
+    </article>
+    <article class="works-item" data-work-item="3">
+      <div class="works-item__info">
+        <span class="works-item__date">2024 10.18</span>
+        <span class="works-item__impression">3000万PV突破！</span>
+      </div>
+      <h3 class="works-item__title"><a href="./works/">Matsuken SambaⅡ Rise Up the World</a></h3>
+      <p class="works-item__ja">マツケンサンバⅡ Rise Up the World</p>
+      <ul class="works-item__cats"><li>fortnite</li><li>metaverse</li><li>In-Game-Concert</li></ul>
+    </article>
+    <article class="works-item" data-work-item="4">
+      <div class="works-item__info">
+        <span class="works-item__date">2024 07.29</span>
+        <span class="works-item__impression">同時接続人数世界Top3(2.2万人)を達成</span>
+      </div>
+      <h3 class="works-item__title"><a href="./works/">run for money CREATED IN FORTNITE</a></h3>
+      <p class="works-item__ja">逃走中 CREATED IN FORTNITE</p>
+      <ul class="works-item__cats"><li>fortnite</li><li>metaverse</li></ul>
+    </article>
+    <article class="works-item" data-work-item="5">
+      <div class="works-item__info">
+        <span class="works-item__date">2021 07.16</span>
+        <span class="works-item__impression">RADWIMPSとのコラボレーションによる「リアル」と「ヴァーチャル」を行き来する世界初の音楽体験</span>
+      </div>
+      <h3 class="works-item__title"><a href="./works/">RADWIMPS ROLE PLAYING MUSIC</a></h3>
+      <p class="works-item__ja">SHIN SEKAI “nowhere” RADWIMPS ROLE PLAYING MUSIC</p>
+      <ul class="works-item__cats"><li>metaverse</li><li>unreal_engine</li><li>mobile</li><li>In-Game-Concert</li></ul>
+    </article>
+    <div class="works-more">
+      <a href="./works/"><span>More Works</span><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 12 12 2M4 2h8v8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
+    </div>
+  </div>
+
+  <!-- Mission / Vision fixed layers -->
+  <div class="mv mv--mission" data-visible="false">
+    <div class="mv__inner">
+      <svg class="mv__ttl" viewBox="0 0 437 99" aria-hidden="true">
+        <text x="0" y="78" class="mv__ttl-text">MISSION</text>
+      </svg>
+      <p class="mv__text" lang="ja">
+        <span class="mv__line"><span class="mv__marker" data-marker="0">これまでにない</span></span>
+        <span class="mv__line"><span class="mv__marker" data-marker="1">没入型・体験型のエンターテインメントを</span></span>
+        <span class="mv__line"><span class="mv__marker" data-marker="2">生み出す</span></span>
+      </p>
+      <p class="mv__en">Pioneering immersive<br />and experiential entertainment like no other.</p>
+    </div>
+  </div>
+  <div class="mv mv--vision" data-visible="false">
+    <div class="mv__inner">
+      <svg class="mv__ttl" viewBox="0 0 398 98" aria-hidden="true">
+        <text x="0" y="78" class="mv__ttl-text">VISION</text>
+      </svg>
+      <p class="mv__text mv__text--right" lang="ja">
+        <span class="mv__line"><span class="mv__marker" data-marker="0">心を揺さぶり、希望を持てる</span></span>
+        <span class="mv__line"><span class="mv__marker" data-marker="1">"世界"を作る</span></span>
+      </p>
+      <p class="mv__en">Architect worlds<br />that move hearts and spark hope.</p>
+    </div>
+  </div>
+
+  <!-- Service fixed layer -->
+  <div class="service-layer" data-visible="false">
+    <div class="service-item" data-service-item="0">
+      <div class="service-item__icon service-item__icon--sm" aria-hidden="true">CREATED IN<br />FORTNITE</div>
+      <h3 class="service-item__title">Fortnite Creative Works</h3>
+      <p class="service-item__desc" lang="ja">Fortnite上での体験制作に強みを持ち、エンターテイメント性と拡張性のある空間を企画・制作。ブランドやIP、アーティストの世界観を表現し、世界中のユーザーに向けて新たな参加型イベントやインタラクティブコンテンツを展開します。</p>
+      <p class="service-item__en">We specialize in creating experiences in Fortnite - planning and producing entertaining and scalable works.
+We express the worldviews of brands, IPs, and artists from unique perspectives, delivering new experiences to users worldwide!</p>
+    </div>
+    <div class="service-item" data-service-item="1">
+      <div class="service-item__icon service-item__icon--lg" aria-hidden="true">UNREAL ENGINE</div>
+      <h3 class="service-item__title">Unreal Engine Works</h3>
+      <p class="service-item__desc" lang="ja">クラウドレンダリングから各デバイス向けのコンテンツを制作。ゲームエンジンの可能性を従来の枠組みを超えたエンターテインメント領域に展開し、没入感のある世界創造を通じてデジタル空間の新たな体験価値を拡張します。</p>
+      <p class="service-item__en">From Cloud Rendering, to devices including iOS, Android and PC, we create content for many platforms!
+Expanding a game engine's potential beyond traditional frameworks into entertainment.
+Design new experiences in digital spaces by creating immersive worlds.</p>
+    </div>
+  </div>
+
+  <!-- Stellla fixed layer -->
+  <div class="stellla" data-visible="false">
+    <div class="stellla__shade"></div>
+    <div class="stellla__frame" style="--progress: 0">
+      <span class="stellla__cross stellla__cross--tl"></span>
+      <span class="stellla__cross stellla__cross--tr"></span>
+      <span class="stellla__cross stellla__cross--bl"></span>
+      <span class="stellla__cross stellla__cross--br"></span>
+      <span class="stellla__rect-line stellla__rect-line--top"></span>
+      <span class="stellla__rect-line stellla__rect-line--right"></span>
+      <span class="stellla__rect-line stellla__rect-line--bottom"></span>
+      <span class="stellla__rect-line stellla__rect-line--left"></span>
+    </div>
+    <div class="stellla__content">
+      <div class="stellla__main">
+        <a class="stellla__logo" href="./stellla/">
+          <span class="stellla__wordmark">stellla</span>
+          <svg class="stellla__arrow" viewBox="0 0 80 60" aria-hidden="true">
+            <path d="M14 4 Q4 4 4 30 Q4 56 14 56" fill="none" stroke="currentColor" stroke-width="3"/>
+            <path d="M66 4 Q76 4 76 30 Q76 56 66 56" fill="none" stroke="currentColor" stroke-width="3"/>
+            <path d="M30 42 50 22M34 22h16v16" fill="none" stroke="currentColor" stroke-width="3"/>
+          </svg>
+        </a>
+        <p class="stellla__text" lang="ja">メタバース構築基盤として、ライブイベント、ファッションショー、<br />そして工場・都市計画など産業系デジタル空間まで幅広く対応。<br />多人数同時接続・アバターカスタマイズなど基本機能を、<br />PC/モバイル/VR向けに提供。Unreal Engineのビジュアルとコスト効率を両立。</p>
+      </div>
+      <p class="stellla__en">A metaverse platform for diverse digital applications from live events to industrial environments.
+Supports multi-user access, avatars, e-commerce, and 3D audio.
+Multi-platform support is possible with Unreal Engine.</p>
+    </div>
+  </div>
+
+  <!-- ============ outro + footer ============ -->
+  <div class="outro" id="outro">
+    <div class="outro__screen">
+      <canvas class="outro__glow" id="outro-glow"></canvas>
+      <canvas class="outro__lottie" id="outro-canvas"></canvas>
+      <svg class="outro__mark" id="outro-mark" viewBox="0 0 237 206" aria-hidden="true">
+        <path d="M118.5 0 237 206 H0 Z M118.5 66 L172 160 H65 Z" fill="#fff" fill-rule="evenodd" />
+      </svg>
+    </div>
+  </div>
+
   <footer class="footer">
     <div class="footer__top">
-      <div class="footer__brand">
-        <svg viewBox="0 0 100 88" aria-hidden="true"><polygon points="50,4 96,84 4,84" fill="none" stroke="#fff" stroke-width="6" /><polygon points="50,42 66,70 34,70" fill="#fff" /></svg>
-        ALCHE
-      </div>
-      <div class="footer__cols">
+      <div class="footer__links">
         <div class="footer__col">
-          <p class="footer__label">Menu</p>
+          <a href="./">Top</a>
           <a href="./news/">News</a>
           <a href="./works/">Works</a>
-          <a href="./about/">About</a>
-          <a href="./stellla/">stellla</a>
-          <a href="./contact/">Contact / Recruit</a>
         </div>
         <div class="footer__col">
-          <p class="footer__label">Social</p>
-          <a href="#" rel="noopener">TECHBLOG</a>
-          <a href="#" rel="noopener">note</a>
-          <a href="#" rel="noopener">X</a>
-          <a href="#" rel="noopener">YouTube</a>
+          <a href="./about/">About</a>
+          <a href="./stellla/">stellla</a>
+          <a href="./contact/">Contact</a>
+        </div>
+        <div class="footer__col footer__col--links">
+          <p class="footer__links-title">Links <span aria-hidden="true">▾</span></p>
+          <a class="footer__sub" href="#" rel="noopener">TECH BLOG</a>
+          <a class="footer__sub" href="#" rel="noopener">note</a>
+          <div class="footer__social">
+            <a class="footer__sub" href="#" rel="noopener">X</a>
+            <a class="footer__sub" href="#" rel="noopener">YouTube</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer__contact">
+        <div class="footer__contact-buttons">
+          <a class="footer__contact-btn" href="./contact/"><span>Contact</span><span class="footer__contact-icon"><svg viewBox="0 0 14 14"><path d="M2 12 12 2M4 2h8v8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
+          <a class="footer__contact-btn" href="./contact/"><span>Recruit</span><span class="footer__contact-icon"><svg viewBox="0 0 14 14"><path d="M2 12 12 2M4 2h8v8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span></a>
+        </div>
+        <div class="footer__privacy">
+          <a href="./about/">Privacy Policy</a>
+          <a href="./about/">License</a>
         </div>
       </div>
     </div>
-    <div class="footer__bottom">
-      <span>© ALCHE rebuild study — not affiliated with Alche, Inc.</span>
-      <span><a href="./about/">Privacy Policy</a> · <a href="./about/">License</a></span>
-    </div>
+    <p class="footer__copyright">©2025 Alche, inc.</p>
   </footer>
 
   <script type="module" src="/src/js/main.js"></script>

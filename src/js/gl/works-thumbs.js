@@ -22,11 +22,19 @@ varying vec3 vViewDir;
 
 void main() {
   vec3 pos = position;
-  // keep some slab thickness and bow it like a curved LED panel —
-  // horizontal cylinder bend plus a slight vertical barrel
-  pos.z *= 0.6;
-  pos.z += cos(pos.x / 4.0 * PI * 0.35) * 2.2 - 1.6;
-  pos.z += cos(pos.y / 2.24 * PI * 0.3) * 0.5 - 0.42;
+  vec3 nrm = normal;
+  // thin LED sheet, wrapped onto a vertical cylinder (arc-length preserving)
+  // so the panel silhouette itself arcs — edges swing back, centre bows
+  // toward the camera, and side-on panels read as curved displays
+  pos.z *= 0.25;
+  const float R = 5.0;
+  const float ARC = 1.1;   // inflate arc length so the chord stays ~full width
+  float ang = pos.x * ARC / R;
+  float ca = cos(ang), sa = sin(ang);
+  float rr = R + pos.z;
+  pos = vec3(sa * rr, pos.y, ca * rr - R);
+  pos.z += R * (1.0 - cos(3.973 * ARC / R)) * 0.55; // recentre the bow depth
+  nrm = vec3(ca * nrm.x + sa * nrm.z, nrm.y, ca * nrm.z - sa * nrm.x);
 
   vec4 mv = modelViewMatrix * vec4(pos, 1.0);
   gl_Position = projectionMatrix * mv;
@@ -41,7 +49,7 @@ void main() {
     t.x = (t.x - 0.5) / (uTexAspect / MESH_ASPECT) + 0.5;
   }
   vUv = t;
-  vNormal = normalize(normalMatrix * normal);
+  vNormal = normalize(normalMatrix * nrm);
   vViewDir = normalize(-mv.xyz);
 }
 `;
@@ -88,7 +96,7 @@ export class WorksThumbs {
     this.media = media;
     this.count = media.count;
     this.group = new THREE.Group();
-    this.group.position.set(0, 0.8, 0);
+    this.group.position.set(0, 0.05, 0);
     // 0.6 is the portrait/mobile layout value — desktop runs full size so the
     // active screen dominates (~half the viewport) and neighbours clip at the edges
     this.group.scale.setScalar(1.0);

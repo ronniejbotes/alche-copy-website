@@ -96,6 +96,7 @@ uniform sampler2D uVideoTex;
 uniform float uTime;
 uniform float uThumbnailScroll;
 uniform float uServiceIn;
+uniform float uStelllaIn;
 varying vec2 vUv;
 void main() {
   vec2 t = vUv;
@@ -166,6 +167,7 @@ export class ServiceScene {
       uTime: { value: 0 },
       uThumbnailScroll: this.uniformsShared.uThumbnailScroll,
       uServiceIn: this.uniformsShared.uServiceIn,
+      uStelllaIn: this.uniformsShared.uStelllaIn,
       uScale: this.uniformsShared.uScale
     };
     this.titleMesh = new THREE.Mesh(

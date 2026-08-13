@@ -1,20 +1,25 @@
 import * as THREE from 'three';
-import { buildLogoGeometry, buildLogoOutlineGeometry, buildSideScreenGeometry } from './logo-geometry.js';
+import {
+  buildLogoHalfGeometries, buildLogoOutlineGeometries,
+  buildCutPlaneGeometry, cutPerpendicular
+} from './logo-geometry.js';
 import { GLSL_CONSTANTS, GLSL_HASH, GLSL_ROTATE2 } from './shader-lib.js';
 
 /**
- * The glass "A" prism.
+ * The glass "X" prism — built as TWO HALVES sliced corner-to-corner
+ * (top-left → bottom-right). Closed, they read as one mark with a faint
+ * diagonal seam. Through the vision→service transition the halves pull
+ * apart along the cut normal and a prism of light (the cut plane, running
+ * the hologram shader) blazes out of the gap; the camera then dives into
+ * the light, which dissolves into the service scene.
  *
- * Look: screen-space refraction — the already-rendered scene is copied to a
- * small backbuffer texture, and the prism bends/chromatically splits it,
- * with a patchy animated frost mask, a GGX highlight from one fixed light,
- * a Schlick fresnel and a studio cubemap reflection.
+ * Look: screen-space refraction — the already-rendered scene is copied to
+ * a backbuffer texture and the prism bends/chromatically splits it, with a
+ * patchy animated frost mask, a GGX highlight, fresnel and a studio cubemap.
  *
- * Feel: no dragging. Pointer *movement* near screen centre applies small
- * euler impulses (pitch from vertical motion, yaw from horizontal). The
- * impulse decays each frame and the quaternion slerps home at a
- * per-section return force, so a flick sends the prism tumbling and it
- * settles back upright.
+ * Feel: no dragging. Pointer movement near screen centre applies small
+ * euler impulses; the impulse decays and the quaternion slerps home at a
+ * per-section return force.
  */
 
 const SECTION_ROTATION = {
@@ -30,8 +35,8 @@ const SECTION_ROTATION = {
 const vert = /* glsl */ `
 ${GLSL_CONSTANTS}
 ${GLSL_ROTATE2}
-uniform float uVisionRotate;   // vision tilt (shows the hologram band)
-uniform float uServiceRotate;  // morph toward a fullscreen sheet
+uniform float uVisionRotate;   // vision: lock upright with a slight turn
+uniform float uServiceRotate;  // service_in: ease a touch further
 uniform float uScreenAspectRatio;
 varying vec2 vUv;
 varying vec3 vNormal;
@@ -41,12 +46,11 @@ void main() {
   vec3 pos = position;
   vec3 nml = normal;
 
-  // vision: the X locks upright and yaws to present its left side wall;
-  // service_in: it keeps turning while the camera dives into that wall
-  // (the X travels with the move — no detached sheet morph)
-  float tiltA = (uVisionRotate * 0.3 + uServiceRotate * 0.35) * HPI;
+  // gentle presentation tilt — the cut stays facing the camera so the
+  // split and the light inside it read clearly
+  float tiltA = (uVisionRotate * 0.12 + uServiceRotate * 0.1) * HPI;
   pos.xz *= rot2(tiltA);
-  pos.yz *= rot2(uVisionRotate * -0.1 - uServiceRotate * 0.1);
+  pos.yz *= rot2(uVisionRotate * -0.08 - uServiceRotate * 0.05);
 
   vec4 mv = modelViewMatrix * vec4(pos, 1.0);
   gl_Position = projectionMatrix * mv;
@@ -128,7 +132,6 @@ void main() {
   col += mix(col, env, F * 0.9) * (1.0 - F);
   col += env * 0.06;   // faint ambient sparkle so the glass never goes dead
 
-
   col *= 1.2;
   col *= uMaterialColor / 255.0;
   gl_FragColor = vec4(col, 1.0);
@@ -153,40 +156,49 @@ uniform sampler2D uNoiseTex;
 uniform vec2 uScreenResolution;
 uniform float uServiceIn;
 uniform float uVisionRotate;
+uniform float uSplit;              // 0 sealed … 1 fully open
+uniform float uCover;              // 0 until the light owns the screen
 uniform float uScreenNoiseScale;
 varying vec2 vUv;
 
 vec2 lensWarp(vec2 r, float a) { return r * (1.0 - a * dot(r, r)); }
 
 void main() {
-  // the hologram band spans the X's whole left limb — use its full uv
+  // the light plane spans the whole cut — use its full uv
   vec2 geoUv = vUv;
   vec2 fullUv = gl_FragCoord.xy / uScreenResolution;
-  vec2 uv = mix(geoUv, fullUv, pow(uServiceIn, 0.2));
+  vec2 uv = mix(geoUv, fullUv, pow(uCover, 0.2));
 
-  // holographic shimmer: tri-channel warped noise, kept bright and airy
+  // holographic shimmer: tri-channel warped noise, brightening as it opens
   vec4 h1 = texture2D(uNoiseTex, geoUv * uScreenNoiseScale);
   vec4 h2 = texture2D(uNoiseTex, geoUv * 0.3 * uScreenNoiseScale + h1.xy * (2.3 + hash21(fullUv) * 0.2));
-  vec3 shimmer = pow(h2.xyz, vec3(0.8)) * 1.25 + 0.08;
+  vec3 shimmer = pow(h2.xyz, vec3(0.8)) * (1.25 + uSplit * 1.1) + 0.08;
 
-  // scene sample warps hard early, settles as the sheet fills the screen
-  float inv = 1.0 - uServiceIn;
-  vec3 scene = vec3(0.0);
-  for (int i = 0; i < 5; i++) {
-    float fi = float(i) / 5.0;
-    vec2 wuv = uv + (h2.xy - 0.5) * inv;
-    float power = inv * 5.0 + fi * 0.2 * inv;
-    scene.r += texture2D(uSceneTex, lensWarp(wuv - 0.5, 1.00 * power) + 0.5).r;
-    scene.g += texture2D(uSceneTex, lensWarp(wuv - 0.5, 1.05 * power) + 0.5).g;
-    scene.b += texture2D(uSceneTex, lensWarp(wuv - 0.5, 1.10 * power) + 0.5).b;
+  // NOTHING of the next section leaks until the light covers the screen —
+  // only then does the surface dissolve through to the service scene
+  vec3 col = shimmer;
+  if (uCover > 0.001) {
+    float inv = 1.0 - uCover;
+    vec3 scene = vec3(0.0);
+    for (int i = 0; i < 5; i++) {
+      float fi = float(i) / 5.0;
+      vec2 wuv = uv + (h2.xy - 0.5) * inv;
+      float power = inv * 5.0 + fi * 0.2 * inv;
+      scene.r += texture2D(uSceneTex, lensWarp(wuv - 0.5, 1.00 * power) + 0.5).r;
+      scene.g += texture2D(uSceneTex, lensWarp(wuv - 0.5, 1.05 * power) + 0.5).g;
+      scene.b += texture2D(uSceneTex, lensWarp(wuv - 0.5, 1.10 * power) + 0.5).b;
+    }
+    scene /= 5.0;
+    scene *= 1.0 + inv * 3.0;
+    scene *= mix(0.5 + shimmer, vec3(1.0), uCover);
+
+    float w = smoothstep(0.0, smoothstep(0.0, 1.0, h2.z), -h2.y + uCover * 2.0);
+    col = mix(shimmer, scene, w);
   }
-  scene /= 5.0;
-  scene *= 1.0 + inv * 3.0;
-  scene *= mix(0.5 + shimmer, vec3(1.0), uServiceIn);
 
-  float w = smoothstep(0.0, smoothstep(0.0, 1.0, h2.z), -h2.y + uServiceIn * 2.0);
-  vec3 col = mix(shimmer, scene, w);
-  gl_FragColor = vec4(col, smoothstep(0.0, 0.1, uVisionRotate));
+  // sealed inside the closed prism until the halves part
+  float alpha = smoothstep(0.05, 0.35, uSplit);
+  gl_FragColor = vec4(col, alpha);
 }
 `;
 
@@ -201,8 +213,6 @@ export class MainLogo extends THREE.Object3D {
       color: { r: 255, g: 255, b: 255 },
       quat: { x: 0, y: 0, z: 0, w: 1 }
     };
-
-    this.geometry = buildLogoGeometry();
 
     this.uniforms = {
       uBackTex: { value: null },
@@ -224,13 +234,24 @@ export class MainLogo extends THREE.Object3D {
       transparent: true
     });
 
-    this.mesh = new THREE.Mesh(this.geometry, this.material);
+    // ---- glass halves (dark scene) ----
+    const halves = buildLogoHalfGeometries();
+    this._geoUpper = halves.upper;
+    this._geoLower = halves.lower;
+
+    this.mesh = new THREE.Group();           // physics target (quaternion)
     this.mesh.scale.setScalar(3);
-    this.mesh.renderOrder = 101;
+    this._halfUpper = new THREE.Mesh(this._geoUpper, this.material);
+    this._halfLower = new THREE.Mesh(this._geoLower, this.material);
+    this._halfUpper.renderOrder = 101;
+    this._halfLower.renderOrder = 101;
+    this.mesh.add(this._halfUpper, this._halfLower);
     this.add(this.mesh);
 
     // ---- outline set for the light (mission/vision) scene ----
     this.outlineGroup = new THREE.Group();
+    const outlines = buildLogoOutlineGeometries();
+    const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
     const baseMat = new THREE.ShaderMaterial({
       vertexShader: vert,
       fragmentShader: outlineFrag,
@@ -238,26 +259,41 @@ export class MainLogo extends THREE.Object3D {
       defines: { IS_BASE: 1 },
       transparent: true
     });
-    this._outlineBase = new THREE.Mesh(this.geometry, baseMat);
-    this._outlineBase.renderOrder = 10;
-    this.outlineGroup.add(this._outlineBase);
 
-    const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
-    this._outlineLines = new THREE.LineSegments(buildLogoOutlineGeometry(this.geometry), lineMat);
-    this._outlineLines.renderOrder = 11;
-    this.outlineGroup.add(this._outlineLines);
+    this._outUpper = new THREE.Group();
+    this._outUpper.scale.setScalar(3);
+    const baseU = new THREE.Mesh(this._geoUpper, baseMat);
+    baseU.renderOrder = 10;
+    const linesU = new THREE.LineSegments(outlines.upper, lineMat);
+    linesU.renderOrder = 11;
+    this._outUpper.add(baseU, linesU);
 
-    // side screen (drawn in the light scene group too, over the outline)
+    this._outLower = new THREE.Group();
+    this._outLower.scale.setScalar(3);
+    const baseL = new THREE.Mesh(this._geoLower, baseMat);
+    baseL.renderOrder = 10;
+    const linesL = new THREE.LineSegments(outlines.lower, lineMat);
+    linesL.renderOrder = 11;
+    this._outLower.add(baseL, linesL);
+
+    this.outlineGroup.add(this._outUpper, this._outLower);
+    this._baseMat = baseMat;
+    this._lineMat = lineMat;
+    this._outlineGeos = outlines;
+
+    // ---- the prism of light inside the cut ----
     this.screenUniforms = {
       uSceneTex: { value: null },
       uNoiseTex: { value: noiseTexture },
       uScreenResolution: { value: new THREE.Vector2(1, 1) },
       uServiceIn: { value: 0 },
       uVisionRotate: { value: 0 },
+      uSplit: { value: 0 },
+      uCover: { value: 0 },
       uScreenNoiseScale: { value: 1 }
     };
     this.screenMesh = new THREE.Mesh(
-      buildSideScreenGeometry(),
+      buildCutPlaneGeometry(),
       new THREE.ShaderMaterial({
         vertexShader: vert,
         fragmentShader: screenFrag,
@@ -265,10 +301,11 @@ export class MainLogo extends THREE.Object3D {
         transparent: true,
         side: THREE.DoubleSide,
         depthWrite: false,
-        depthTest: false      // the flank quad must not lose to the base mesh depth
+        depthTest: false
       })
     );
     this.screenMesh.renderOrder = 12;
+    this.screenMesh.scale.setScalar(3);
     this.outlineGroup.add(this.screenMesh);
 
     this.scale.setScalar(4.0);
@@ -281,14 +318,34 @@ export class MainLogo extends THREE.Object3D {
     this._spinQ = new THREE.Quaternion();
     this._yAxis = new THREE.Vector3(0, 1, 0);
     this._section = 'kv';
-    this._worksRotate = 0;        // animated toward section intensity
+    this._worksRotate = 0;
     this._worksRotateTarget = 0;
     this._pointer = { x: 0, y: 0, px: 0, py: 0, has: false };
+
+    // split / dive state
+    this._split = 0;
+    this._dive = 0;
+    this.planeHalfWidthWorld = 0;
+    this.planeUnfold = 0;
+    this._perp = cutPerpendicular();         // geometry units, upper side
+    // the cut line's direction — the axis the light sheet unfolds around
+    this._diagAxis = new THREE.Vector3(this._perp.y, -this._perp.x, 0).normalize();
+    this._unfoldQ = new THREE.Quaternion();
   }
 
   setSection(name) {
     this._section = SECTION_ROTATION[name] ? name : 'default';
     this._worksRotateTarget = SECTION_ROTATION[this._section].intensity;
+  }
+
+  /**
+   * Dive progress 0..1. Phase 1 (0→0.45): the seam cracks open.
+   * Phase 2 (0.4→1): the halves keep flying apart while the light plane
+   * grows until it envelops the screen. `planeHalfWidthWorld` reports the
+   * light's world half-width so the scene can verify true coverage.
+   */
+  setDive(d) {
+    this._dive = Math.max(0, Math.min(1, d));
   }
 
   /** Latest pointer NDC (+y up). Called every frame with the last event. */
@@ -315,7 +372,6 @@ export class MainLogo extends THREE.Object3D {
   update(dt, scrollVelocity) {
     const s = SECTION_ROTATION[this._section];
 
-    // section intensity approaches its target over ~1s
     this._worksRotate += (this._worksRotateTarget - this._worksRotate) * Math.min(1, dt * 3);
 
     // pointer impulse acts as decaying angular velocity
@@ -337,16 +393,40 @@ export class MainLogo extends THREE.Object3D {
       Math.min(1, dt * s.returnForce * (1 - this._worksRotate * 0.8))
     );
 
-    // sync outline set pose to the glass mesh
-    this.updateWorldMatrix(true, false);
+    // halves part along the cut normal — a crack first, then they keep
+    // separating right off the screen while the light grows
+    const d = this._dive;
+    const sstep = (a, b, x) => {
+      const u = Math.max(0, Math.min(1, (x - a) / (b - a)));
+      return u * u * (3 - 2 * u);
+    };
+    const seam = sstep(0, 0.45, d) * 0.085 + Math.pow(sstep(0.4, 1, d), 1.5) * 1.15;
+    const gap = seam;                        // geometry units
+    this._split = sstep(0, 0.45, d);         // drives the light's alpha/brightness
+    this._halfUpper.position.set(this._perp.x * gap, this._perp.y * gap, 0);
+    this._halfLower.position.set(-this._perp.x * gap, -this._perp.y * gap, 0);
+
+    // the prism of light swells with the separation AND unfolds out of the
+    // cut to face the camera — its width swings into the screen plane, so
+    // it visibly grows until it envelops the view
+    const grow = sstep(0.35, 1, d);
+    const planeScaleZ = 3 * (1 + grow * 40);         // width (across the cut)
+    const planeScaleXY = 3 * (1 + grow * 1.5);       // length (along the cut)
+    this.screenMesh.scale.set(planeScaleXY, planeScaleXY, planeScaleZ);
+    this.planeUnfold = sstep(0.45, 0.85, d);
+    this._unfoldQ.setFromAxisAngle(this._diagAxis, this.planeUnfold * Math.PI / 2);
+    // world half-width of the light band (0.0716 = plane z half-extent)
+    this.planeHalfWidthWorld = 0.0716 * planeScaleZ * this.scale.x;
+
+    // sync the light-scene set to the glass pose + split
     this.outlineGroup.position.copy(this.position);
     this.outlineGroup.scale.copy(this.scale);
-    this._outlineBase.quaternion.copy(this.mesh.quaternion);
-    this._outlineBase.scale.setScalar(3);
-    this._outlineLines.quaternion.copy(this.mesh.quaternion);
-    this._outlineLines.scale.setScalar(3);
-    this.screenMesh.quaternion.copy(this.mesh.quaternion);
-    this.screenMesh.scale.setScalar(3);
+    for (const g of [this._outUpper, this._outLower]) {
+      g.quaternion.copy(this.mesh.quaternion);
+    }
+    this.screenMesh.quaternion.copy(this.mesh.quaternion).multiply(this._unfoldQ);
+    this._outUpper.position.set(this._perp.x * gap * 3, this._perp.y * gap * 3, 0);
+    this._outLower.position.set(-this._perp.x * gap * 3, -this._perp.y * gap * 3, 0);
 
     // HUD params → uniforms
     this.uniforms.uRoughness.value = this.params.roughness;
@@ -355,9 +435,9 @@ export class MainLogo extends THREE.Object3D {
       this.params.color.r, this.params.color.g, this.params.color.b
     );
     this.screenUniforms.uScreenNoiseScale.value = this.params.screenNoiseScale;
+    this.screenUniforms.uSplit.value = this._split;
 
     const q = this.mesh.quaternion;
-    // keep the readout in the +w hemisphere (same rotation, tidier numbers)
     if (q.w < 0) q.set(-q.x, -q.y, -q.z, -q.w);
     this.params.quat.x = q.x;
     this.params.quat.y = q.y;
@@ -366,11 +446,13 @@ export class MainLogo extends THREE.Object3D {
   }
 
   dispose() {
-    this.geometry.dispose();
+    this._geoUpper.dispose();
+    this._geoLower.dispose();
     this.material.dispose();
-    this._outlineBase.material.dispose();
-    this._outlineLines.geometry.dispose();
-    this._outlineLines.material.dispose();
+    this._baseMat.dispose();
+    this._lineMat.dispose();
+    this._outlineGeos.upper.dispose();
+    this._outlineGeos.lower.dispose();
     this.screenMesh.geometry.dispose();
     this.screenMesh.material.dispose();
   }

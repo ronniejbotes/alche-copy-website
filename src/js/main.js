@@ -78,6 +78,8 @@ async function boot() {
   new Outro();
   buildPanels(gl);
 
+  if (import.meta.env.DEV) window.__px = { sm, gl };   // dev-only debug handle
+
   /* ---- shared frame loop: lenis → controllers → GL ---- */
   let lastVision = 0;
   const frame = (timeMs) => {
@@ -108,7 +110,8 @@ async function boot() {
     // uses, and text held back until the dark tunnel has settled
     const reelO = (p.serviceProgress * 7 + 1) / 2;
     const reelIdx = Math.max(0, Math.min(2, Math.round(reelO) - 1));
-    if ((sm.section === 'service' || sm.section === 'service_in') && p.serviceIn > 0.85) {
+    // the first service card appears only after the light has fully passed
+    if ((sm.section === 'service' || sm.section === 'service_in') && p.serviceIn > 0.9 && gl.cover > 0.97) {
       if (reelIdx === 2) service.hideAll();
       else service.show(reelIdx);
     }

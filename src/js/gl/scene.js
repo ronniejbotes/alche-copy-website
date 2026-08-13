@@ -63,7 +63,8 @@ void main() {
   vec3 service = texture2D(uServiceTex, vUv + pointer.xy * 0.01).rgb;
   service *= 1.0 + pl * 0.8;
   service *= smoothstep(1.5, 0.3, len);
-  o = mix(o, service, step(0.9999, uVisibleService));
+  // quick crossfade — completes while the light blade dominates the frame
+  o = mix(o, service, uVisibleService);
 
   gl_FragColor = vec4(o, 1.0);
 }
@@ -322,6 +323,9 @@ export class AlcheGL {
     this.missionCamera.position.set(0, 0, 8);
     this.orthoCamera = new THREE.OrthographicCamera(-4, 4, 4, -4, 0.1, 100);
     this.orthoCamera.position.set(0, 0, 8);
+    // the dive gets its own camera so the works→mission projection lerp
+    // (which copies orthoCamera) never inherits the dive zoom
+    this.diveCamera = this.orthoCamera.clone();
     this.missionGrid = new GridOverlay({ dark: true, cylinder: false });
     this.missionScene.add(this.missionGrid.group);
     this.missionScene.add(this.logo.outlineGroup);
@@ -445,6 +449,11 @@ export class AlcheGL {
     Object.assign(this._scroll, s);
   }
 
+  /** 1 only when the light band fully covers the screen. */
+  get cover() {
+    return this._cover ?? 0;
+  }
+
   setPointer(clientX, clientY) {
     this._pointerNdc.set(
       (clientX / window.innerWidth) * 2 - 1,
@@ -543,10 +552,9 @@ export class AlcheGL {
     const worksOutro = lp.set('worksOutro', s.worksOutro, 1);
     const parallaxKill = 1 - lp.set('camWorksOutro', s.worksOutro, 0.5);
     const missionVis = lp.set('missionVis', s.missionIn, 1.5);
-    const serviceVis = lp.set('serviceVis', s.serviceIn, 0.5);
     const visionRot = lp.set('visionRot', s.vision, 0.5);
     const serviceRot = lp.set('serviceRot', s.serviceIn, 1);
-    const serviceIn = lp.set('serviceListIn', s.serviceIn, 0.3);
+    const serviceIn = lp.set('serviceListIn', s.serviceIn, 0.6);
     const thumbO = (lp.set('thumbScroll', s.serviceProgress, 1) * 7 + 1) / 2;
     const thumbMag = Math.round(thumbO) - (Math.round(thumbO) - thumbO) * 0.4;
     const thumbU = Math.min(4, lp.set('thumbIndex', thumbMag, 0.5));
@@ -590,6 +598,28 @@ export class AlcheGL {
     this.logo.uniforms.uServiceRotate.value = serviceRot;
     this.logo.screenUniforms.uServiceIn.value = serviceIn;
     this.logo.screenUniforms.uVisionRotate.value = visionRot;
+    // dive: seam cracks, halves fly apart, the light swells
+    this.logo.setDive(serviceRot);
+
+    // TRUE-coverage gate: the next section exists only once the light band
+    // is geometrically wider than everything the camera can see
+    const diveZoom = 1 + Math.pow(serviceRot, 1.2) * 7;
+    const visHalfW = (4 * this.camera.aspect) / diveZoom;
+    const visHalfH = 4 / diveZoom;
+    const perp = this.logo._perp;
+    const required = visHalfW * Math.abs(perp.x) + visHalfH * Math.abs(perp.y);
+    // only the width PROJECTED into the screen plane counts — edge-on the
+    // sheet is a sliver; as it unfolds toward the camera it truly widens
+    const projected = this.logo.planeHalfWidthWorld *
+      Math.max(0.2, Math.sin(this.logo.planeUnfold * Math.PI / 2));
+    const ratio = required > 0 ? projected / required : 0;
+    // geometric coverage is the hard precondition; the time term holds the
+    // pure-light moment for a beat before the dissolve-through begins
+    const coverGeom = THREE.MathUtils.smoothstep(ratio, 1.05, 1.35);
+    const cover = Math.min(coverGeom, THREE.MathUtils.smoothstep(serviceRot, 0.65, 0.85));
+    this._cover = cover;
+    this.logo.screenUniforms.uCover.value = cover;
+    const serviceVis = cover;
 
     /* --- scene pieces --- */
     this.media.update(t);
@@ -632,16 +662,17 @@ export class AlcheGL {
     r.autoClear = true;
 
     // 4. light scene (outline follows the logo pose) — ortho matches the
-    // flattened cam; during service_in the camera dives INTO the X's side
-    // wall (zoom + pan), carrying the whole mark with the move
+    // flattened cam; during service_in the X splits open and the camera
+    // dives INTO the light in the cut, carrying the whole mark with it
     if (this._missionVisible > 0.002 || visionRot > 0.002) {
-      const dive = serviceRot;
-      this.orthoCamera.zoom = 1 + Math.pow(dive, 1.5) * 14;
-      this.orthoCamera.position.x = -1.7 * dive;
-      this.orthoCamera.position.y = -0.15 * dive;
-      this.orthoCamera.updateProjectionMatrix();
+      // moderate dive — the growing light does the enveloping, the camera
+      // just leans in so the move still reads as travelling into it
+      this.diveCamera.copy(this.orthoCamera);
+      this.diveCamera.zoom = 1 + Math.pow(serviceRot, 1.2) * 7;
+      this.diveCamera.position.y = -0.15 * serviceRot;
+      this.diveCamera.updateProjectionMatrix();
       r.setRenderTarget(this.rtMission);
-      r.render(this.missionScene, worksOutro > 0.5 ? this.orthoCamera : this.camera);
+      r.render(this.missionScene, worksOutro > 0.5 ? this.diveCamera : this.camera);
     }
 
     // 5. service scene
@@ -650,12 +681,17 @@ export class AlcheGL {
       r.render(this.service.scene, this.service.camera);
     }
 
-    // 6. thumbs scene
-    r.setRenderTarget(this.rtThumbs);
-    r.setClearColor(0x000000, 0);
-    r.clear();
-    r.render(this.thumbsScene, this.camera);
-    r.setClearColor(0x000000, 1);
+    // 6. thumbs scene — only while the carousel is actually in range;
+    // outside it the RT stays cleared so nothing can leak into the dive
+    const thumbsActive = carouselU > 0.05 && carouselU < this.media.count + 0.95;
+    if (thumbsActive || !this._thumbsCleared) {
+      r.setRenderTarget(this.rtThumbs);
+      r.setClearColor(0x000000, 0);
+      r.clear();
+      if (thumbsActive) r.render(this.thumbsScene, this.camera);
+      r.setClearColor(0x000000, 1);
+      this._thumbsCleared = !thumbsActive;
+    }
 
     // 7. mix the three scenes
     this._renderQuad(this.mixPass, this.rtMixed);

@@ -156,7 +156,7 @@ export function buildCutPlaneGeometry() {
   const hw = GLB_WIDTH / 2;
   const hh = GLB_HEIGHT / 2;
   const zHalf = (GLB_DEPTH / 2) * 1.35;
-  const over = 1.06;                         // reach a touch past the tips
+  const over = 1.15;                         // reach a touch past the tips
 
   const a = [hw * over, -hh * over];         // bottom-right tip
   const b = [-hw * over, hh * over];         // top-left tip

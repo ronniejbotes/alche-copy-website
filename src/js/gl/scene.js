@@ -559,7 +559,10 @@ export class AlcheGL {
     const thumbMag = Math.round(thumbO) - (Math.round(thumbO) - thumbO) * 0.4;
     const thumbU = Math.min(4, lp.set('thumbIndex', thumbMag, 0.5));
     const stelllaIn = lp.set('stelllaIn', s.stelllaIn, 0.7);
-    const stelllaView = lp.set('stelllaView', Math.max(0, Math.min(1, thumbU - 2.5)), 0.7) + stelllaIn * 0.5;
+    // thumbU must be clamped to the reel count first: the two terms are designed
+    // to sum to exactly 1, so feeding the unclamped value drove the peel to 1.5
+    // and finished it a full viewport before the stellla runway starts
+    const stelllaView = lp.set('stelllaView', Math.max(0, Math.min(1, Math.min(3, thumbU) - 2.5)), 0.7) + stelllaIn * 0.5;
     const scrollVel = lp.set('lenisVel', Math.max(-30, Math.min(30, s.lenisVelocity ?? 0)), 0.5);
     const missionScroll = lp.set('missionScroll', s.pageScroll ?? 0, 0.5);
 

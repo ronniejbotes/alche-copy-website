@@ -183,28 +183,16 @@ export function buildCutPlaneGeometry() {
 }
 
 /**
- * Rounded-corner 16:9 slab for the works screens (unchanged).
+ * 16:9 slab for the works screens.
+ *
+ * Segmented across the face because works-thumbs.js bends it onto a cylinder in
+ * the vertex shader: an ExtrudeGeometry face is triangulated from its outline
+ * only, so a bend would move the corners and leave the span between them a
+ * straight line — the panel would render flat.
  */
 export function buildThumbnailScreenGeometry() {
-  const W = 7.9462, H = 4.4698, D = 0.1947, R = 0.05;
-  const shape = new THREE.Shape();
-  const x = -W / 2, y = -H / 2;
-  shape.moveTo(x + R, y);
-  shape.lineTo(x + W - R, y);
-  shape.quadraticCurveTo(x + W, y, x + W, y + R);
-  shape.lineTo(x + W, y + H - R);
-  shape.quadraticCurveTo(x + W, y + H, x + W - R, y + H);
-  shape.lineTo(x + R, y + H);
-  shape.quadraticCurveTo(x, y + H, x, y + H - R);
-  shape.lineTo(x, y + R);
-  shape.quadraticCurveTo(x, y, x + R, y);
-  const geo = new THREE.ExtrudeGeometry(shape, {
-    depth: D,
-    bevelEnabled: false,
-    curveSegments: 6,
-    steps: 1
-  });
-  geo.center();
+  const W = 7.9462, H = 4.4698, D = 0.1947;
+  const geo = new THREE.BoxGeometry(W, H, D, 56, 32, 1);
   geo.computeBoundingBox();
   const bb = geo.boundingBox;
   const pos = geo.attributes.position;

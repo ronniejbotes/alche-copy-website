@@ -36,17 +36,21 @@ vec2 coverUv(vec2 uv, float canvasA, float videoA) {
 void main() {
   float x = uInstanceId - (uThumbnailScroll - 1.0);
 
-  // plane geometry already carries the 16:9 aspect — scale it uniformly
-  vec2 local = position.xy * 0.55;
-  local.x += x * 1.9;
+  // Geometry is a unit quad; the reel's 16:9 is applied here, once. uScale is
+  // isotropic (see resize), so x and y take the same world scale.
+  vec2 local = position.xy * 0.3;
+  local.x *= (16.0 / 9.0) * 0.85;
+  local.x += x * 0.95;
   local.x += -0.05 * (1.0 - uStelllaIn);
+#ifndef IS_STELLLA
+  local.x -= uStelllaView * 0.5;
+#endif
 
-  // phase scaled so one panel spans ~half a sine period (gentle bend,
-  // not an hourglass) while adjacent panels still sit a near-full phase apart
-  float theta = local.x * PI * 0.5 + (1.0 - uServiceIn) * 8.0 - uStelllaIn * 2.0;
+  // one panel spans a full sine period, so neighbours sit a phase apart
+  float theta = local.x * PI + (1.0 - uServiceIn) * 8.0 - uStelllaIn * 2.0;
   float wave = 4.0 * uServiceIn * (1.0 - uStelllaIn);
 
-  vec3 pos = vec3(local.x * uScale.x * 0.5, local.y * uScale.y * 0.5, -sin(theta) * wave);
+  vec3 pos = vec3(local.x * uScale.x, local.y * uScale.y, -sin(theta) * wave);
   vec4 clip = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 
   vUv = uv;
@@ -82,9 +86,17 @@ void main() {
 const titleVert = /* glsl */ `
 ${GLSL_CONSTANTS}
 uniform vec3 uScale;
+uniform float uServiceIn;
+uniform float uStelllaIn;
 varying vec2 vUv;
 void main() {
-  vec3 pos = vec3(position.x * uScale.x, position.y * uScale.y, -2.0);
+  // the ghost wall rides the same sine bend as the panels, 1.4x wider and 1.7x
+  // taller than a unit quad, which is what makes it full-bleed at every phase —
+  // a flat quad at a fixed z left a black frame on all four sides.
+  vec2 local = vec2(position.x * 1.4, position.y);
+  float theta = local.x * PI + (1.0 - uServiceIn) * 8.0 - uStelllaIn * 2.0;
+  float wave = 4.0 * uServiceIn * (1.0 - uStelllaIn);
+  vec3 pos = vec3(local.x * uScale.x, local.y * uScale.y * 1.7, -sin(theta) * wave);
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
   vUv = uv;
 }
@@ -100,18 +112,23 @@ uniform float uStelllaIn;
 varying vec2 vUv;
 void main() {
   vec2 t = vUv;
-  t.y *= 2.4;   // big letter rows — the tunnel fly-through reads as huge type
+  t.y *= 4.5;   // many small letter rows, not a few huge ones
   t.x *= 1.1;
   t.x += uThumbnailScroll * 0.2 + uTime * 0.015;
-  vec4 glyph = texture2D(uTitleTex, fract(t));
-  vec3 col = vec3(glyph.a) * 0.8 * (1.0 - smoothstep(0.4, 1.0, vUv.x) * uServiceIn);
-  // burn brighter while the tunnel is still opening (the sheet samples this)
-  col *= 1.0 + (1.0 - uServiceIn) * 1.6;
-  // blurred echo of the active reel lights the whole wall, stronger left
-  col += texture2D(uVideoTex, vUv).rgb * mix(0.38, 0.16, vUv.x);
+  t.x = fract(t.x) * 1.1;
+  t.y = fract(t.y);
+  // the band is an ENTRANCE effect: it burns across the wall while the tunnel
+  // un-curls and is gone by the time a card settles, which is why the live
+  // service section reads as near-black behind the reel.
+  float glyph = texture2D(uTitleTex, t).a * mix(0.8, 0.0, uServiceIn);
+
+  // blurred echo of the active reel, widened 1/0.7 and ramped to black rightward
+  vec2 texUv = vec2((vUv.x - 0.5) * 0.7 + 0.5, vUv.y);
+  vec3 col = texture2D(uVideoTex, texUv).rgb * (1.0 - vUv.x) * 0.4;
+  col += glyph;
   // the ghost wall clears out as stellla takes over
   col *= 1.0 - uStelllaIn * 0.92;
-  gl_FragColor = vec4(col * 0.7, 1.0);
+  gl_FragColor = vec4(col, 1.0);
 }
 `;
 
@@ -143,7 +160,9 @@ export class ServiceScene {
         ...this.uniformsShared
       };
       const mesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(2, 2 * (9 / 16), 16, 8),
+        // unit quad: the peel target below is `position.xy * 2.0`, which only
+        // lands on the +/-1 NDC box when position is +/-0.5
+        new THREE.PlaneGeometry(1, 1, 16, 8),
         new THREE.ShaderMaterial({
           vertexShader: panelVert,
           fragmentShader: panelFrag,
@@ -171,7 +190,8 @@ export class ServiceScene {
       uScale: this.uniformsShared.uScale
     };
     this.titleMesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(1, 1),
+      // segmented across x so the sine bend in titleVert has vertices to act on
+      new THREE.PlaneGeometry(1, 1, 64, 1),
       new THREE.ShaderMaterial({
         vertexShader: titleVert,
         fragmentShader: titleFrag,
@@ -191,9 +211,12 @@ export class ServiceScene {
   resize(w, h) {
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
-    const fh = 2 * 10 * Math.tan(THREE.MathUtils.degToRad(this.camera.fov) / 2);
+    const fh = 2 * Math.abs(this.camera.position.z) * Math.tan(THREE.MathUtils.degToRad(this.camera.fov) / 2);
     const fw = fh * this.camera.aspect;
-    this.uniformsShared.uScale.value.set(fw, fh, 1);
+    // isotropic: the shaders apply each mesh's own aspect themselves, so feeding
+    // a non-square uScale would apply the viewport's aspect a second time
+    const s = Math.max(fw, fh);
+    this.uniformsShared.uScale.value.set(s, s, 1);
     this.grid.resize(this.camera);
     for (const p of this.panels) {
       p.material.uniforms.uCanvasAspect.value = w / h;

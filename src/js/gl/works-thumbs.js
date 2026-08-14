@@ -27,13 +27,16 @@ void main() {
   // so the panel silhouette itself arcs — edges swing back, centre bows
   // toward the camera, and side-on panels read as curved displays
   pos.z *= 0.25;
-  const float R = 5.0;
-  const float ARC = 1.1;   // inflate arc length so the chord stays ~full width
-  float ang = pos.x * ARC / R;
+  // R is measured, not chosen: on the live site a face-on panel's top edge bows
+  // 1.14% of its own width, which is this radius at HALF_W. Arc-length
+  // preserving, so the wrap costs the panel no apparent width.
+  const float R = 21.1;
+  const float HALF_W = 3.9731;
+  float ang = pos.x / R;
   float ca = cos(ang), sa = sin(ang);
   float rr = R + pos.z;
   pos = vec3(sa * rr, pos.y, ca * rr - R);
-  pos.z += R * (1.0 - cos(3.973 * ARC / R)) * 0.55; // recentre the bow depth
+  pos.z += R * (1.0 - cos(HALF_W / R)) * 0.55; // recentre the bow depth
   nrm = vec3(ca * nrm.x + sa * nrm.z, nrm.y, ca * nrm.z - sa * nrm.x);
 
   vec4 mv = modelViewMatrix * vec4(pos, 1.0);
@@ -87,7 +90,14 @@ void main() {
   col *= smoothstep(0.9, 0.49, length(vMeshUv - 0.5));
   col = mix(col, vec3(smoothstep(0.0, 0.2, vViewDir.x)), 0.05);
 
-  gl_FragColor = vec4(col, uAlpha * uLoaded);
+  // the slab was a rounded rect before it needed segmenting for the cylinder
+  // bend; the box that replaced it has square corners, so mask the radius back
+  const vec2 HALF = vec2(3.9731, 2.2349);
+  const float CORNER = 0.05;
+  vec2 d = abs((vMeshUv - 0.5) * vec2(7.9462, 4.4698)) - (HALF - CORNER);
+  float sd = length(max(d, vec2(0.0))) + min(max(d.x, d.y), 0.0) - CORNER;
+
+  gl_FragColor = vec4(col, uAlpha * uLoaded * smoothstep(0.012, -0.012, sd));
 }
 `;
 

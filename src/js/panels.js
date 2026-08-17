@@ -1,64 +1,50 @@
 import { Pane } from 'tweakpane';
-import * as RotationPlugin from '@0b5vr/tweakpane-plugin-rotation';
+import { SOURCE_NOTE } from './telemetry.js';
 
 /**
- * The on-page debug HUD — real Tweakpane panels wired to the live scene,
- * shipped as a deliberate design element:
- *  - "MainLogo Material": roughness / noiseScale / color
- *  - "MainLogo Screen":   noiseScale (vision section)
- *  - "MainLogo Quaternion": live rotation gizmo + Reset button
+ * The on-page instrument panels — real Tweakpane, shipped as a deliberate
+ * design element, but reading out the business rather than the scene graph:
+ *  - "SIGNAL / live":  ad spend (the one live control) → leads, cost per
+ *                      lead, ROAS, impression share
+ *  - "ATTRIBUTION":    average position, featured snippets, AI citations
+ *
+ * Values come from Telemetry and are scrubbed by scroll depth. They are an
+ * illustrative model, which is why the source note ships with them.
  */
 
-export function buildPanels(gl) {
-  if (!gl.logo) return null;
-  const params = gl.logo.params;
+export function buildPanels(telemetry) {
+  if (!telemetry) return null;
+  const t = telemetry;
   const panes = [];
 
-  const matEl = document.getElementById('pane-material');
-  if (matEl) {
-    const pane = new Pane({ container: matEl, title: 'MainLogo Material' });
-    pane.addBinding(params, 'roughness', { min: 0, max: 1, step: 0.01 });
-    pane.addBinding(params, 'noiseScale', { min: 0.1, max: 20, step: 0.1 });
-    pane.addBinding(params, 'color', { view: 'color', picker: 'inline', expanded: false });
+  const signalEl = document.getElementById('pane-signal');
+  if (signalEl) {
+    const pane = new Pane({ container: signalEl, title: 'SIGNAL / live' });
+    pane
+      .addBinding(t.values, 'spend', { label: 'SPEND / MO', min: 1000, max: 50000, step: 500 })
+      .on('change', () => t.recompute());
+    pane.addBinding(t.values, 'leads', { label: 'LEADS', readonly: true, format: (v) => String(Math.round(v)) });
+    pane.addBinding(t.values, 'cpl', { label: 'CPL', readonly: true, format: (v) => `$${v.toFixed(0)}` });
+    pane.addBinding(t.values, 'roas', { label: 'ROAS', readonly: true, format: (v) => `${v.toFixed(2)}x` });
+    pane.addBinding(t.values, 'imprShare', { label: 'IMPR SH', readonly: true, format: (v) => `${(v * 100).toFixed(0)}%` });
     panes.push(pane);
   }
 
-  const screenEl = document.getElementById('pane-screen');
-  if (screenEl) {
-    const pane = new Pane({ container: screenEl, title: 'MainLogo Screen' });
-    pane.addBinding(params, 'screenNoiseScale', {
-      label: 'noiseScale', min: 0.1, max: 5, step: 0.1
-    });
+  const attrEl = document.getElementById('pane-attribution');
+  if (attrEl) {
+    const pane = new Pane({ container: attrEl, title: 'ATTRIBUTION' });
+    pane.addBinding(t.values, 'avgPosition', { label: 'AVG POS', readonly: true, format: (v) => v.toFixed(1) });
+    pane.addBinding(t.values, 'snippets', { label: 'SNIPPETS', readonly: true, format: (v) => String(v) });
+    pane.addBinding(t.values, 'aiCitations', { label: 'AI CITES', readonly: true, format: (v) => String(v) });
+    const note = document.createElement('p');
+    note.className = 'hud__note';
+    note.textContent = SOURCE_NOTE;
+    attrEl.appendChild(note);
     panes.push(pane);
   }
 
-  const quatEl = document.getElementById('pane-quaternion');
-  if (quatEl) {
-    const pane = new Pane({ container: quatEl, title: 'MainLogo Quaternion' });
-    pane.registerPlugin(RotationPlugin);
-    try {
-      pane.addBinding(params, 'quat', {
-        view: 'rotation',
-        rotationMode: 'quaternion',
-        picker: 'inline',
-        expanded: true,
-        step: 0.001
-      });
-    } catch {
-      // plugin API mismatch — fall back to numeric readouts
-      const fmt = { readonly: true, format: (v) => v.toFixed(2), interval: 60 };
-      pane.addBinding(params.quat, 'x', fmt);
-      pane.addBinding(params.quat, 'y', fmt);
-      pane.addBinding(params.quat, 'z', fmt);
-      pane.addBinding(params.quat, 'w', fmt);
-    }
-    pane.addButton({ title: 'Reset Quaternion' }).on('click', () => gl.logo.resetQuaternion());
-    panes.push(pane);
-  }
-
-  // keep the quaternion widget in sync with the live value
-  const quatPane = panes[panes.length - 1];
-  const sync = setInterval(() => quatPane?.refresh(), 100);
+  // readonly bindings are pull-based, so drive them off a timer
+  const sync = setInterval(() => panes.forEach((p) => p.refresh()), 100);
 
   return {
     dispose() {

@@ -12,7 +12,7 @@ export default defineConfig({
         works: resolve(__dirname, 'works/index.html'),
         about: resolve(__dirname, 'about/index.html'),
         news: resolve(__dirname, 'news/index.html'),
-        stellla: resolve(__dirname, 'stellla/index.html'),
+        cognexa: resolve(__dirname, 'cognexa/index.html'),
         contact: resolve(__dirname, 'contact/index.html')
       }
     }

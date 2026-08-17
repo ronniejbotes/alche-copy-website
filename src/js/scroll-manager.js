@@ -14,7 +14,7 @@ gsap.registerPlugin(ScrollTrigger);
  *  - mission/vision snapper (works_outro..vision): ratio-derived array
  *  - vision_service wrap: [0, 1]
  *  - service: [0, 0.4]
- *  - stellla: [0.9]
+ *  - cognexa: [0.9]
  */
 
 export class ScrollManager {
@@ -26,7 +26,7 @@ export class ScrollManager {
     this.progress = {
       worksTitle: 0, worksProgress: 0, worksOutro: 0, missionIn: 0,
       vision: 0, visionOut: 0, serviceIn: 0, serviceProgress: 0,
-      stelllaIn: 0, stellla: 0, missionRaw: 0
+      cognexaIn: 0, cognexa: 0, missionRaw: 0
     };
 
     // lenis is driven from the main rAF in main.js via update(t);
@@ -127,10 +127,11 @@ export class ScrollManager {
       ...enter('vision_out')
     });
 
-    // snapper across works_outro..vision — ratios [1.5, 1, 1, 1.8]
+    // snapper across works_outro..vision. The array is positional and must
+    // match the four runway heights in main.css — 140lvh / 100lvh / 210vh / 180vh.
     const snapper = [sec('works_outro'), sec('mission_in'), sec('mission'), sec('vision')];
     if (snapper.every(Boolean)) {
-      const ratios = [1.5, 1, 1, 1.8];
+      const ratios = [1.4, 1, 2.1, 1.8];
       const total = ratios.reduce((a, b) => a + b, 0) - 1;
       const points = [0.5 / total];
       let acc = 0;
@@ -170,34 +171,34 @@ export class ScrollManager {
       onUpdate: (self) => { this.progress.serviceProgress = self.progress; }
     });
     gsap.utils.toArray('.service-scroll__item').forEach((el, i) => {
-      const name = i === 2 ? 'stellla_item' : `service_${i}`;
+      const name = i === 2 ? 'cognexa_item' : `service_${i}`;
       reg(`service_item_${i}`, {
         trigger: el, start: 'top bottom', end: 'bottom bottom',
         onEnter: () => {
           this._emitItem('service', i, true);
-          this._enterSection(i === 2 ? 'stellla' : 'service');
+          this._enterSection(i === 2 ? 'cognexa' : 'service');
         },
         onEnterBack: () => {
           this._emitItem('service', i, true);
-          this._enterSection(i === 2 ? 'stellla' : 'service');
+          this._enterSection(i === 2 ? 'cognexa' : 'service');
         },
         onLeave: () => this._emitItem('service', i, false),
         onLeaveBack: () => this._emitItem('service', i, false)
       });
       if (i === 2) {
-        reg('stellla_in', {
+        reg('cognexa_in', {
           trigger: el, start: 'top bottom', end: 'bottom bottom',
-          onUpdate: (self) => { this.progress.stelllaIn = self.progress; }
+          onUpdate: (self) => { this.progress.cognexaIn = self.progress; }
         });
       }
     });
 
-    const stelllaEl = sec('stellla');
-    reg('stellla', {
-      trigger: stelllaEl, start: 'top bottom', end: 'bottom bottom',
+    const cognexaEl = sec('cognexa');
+    reg('cognexa', {
+      trigger: cognexaEl, start: 'top bottom', end: 'bottom bottom',
       snap: { snapTo: [0.9], duration: 1, directional: false },
-      onUpdate: (self) => { this.progress.stellla = self.progress; },
-      onEnterBack: () => this._enterSection('stellla'),
+      onUpdate: (self) => { this.progress.cognexa = self.progress; },
+      onEnterBack: () => this._enterSection('cognexa'),
       onLeave: () => this._enterSection('footer')
     });
 

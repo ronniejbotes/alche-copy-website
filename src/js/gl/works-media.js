@@ -1,27 +1,24 @@
 import * as THREE from 'three';
 
 /**
- * Procedural stand-in key visuals for the six works and three service
- * reels. The reference site streams client media; this design study ships
- * none of it, so each work gets an animated canvas artwork in a related
- * palette — enough to exercise the exact same texture pipeline
- * (thumbnails, blurred wall backgrounds, service reels).
+ * Each case gets a procedurally drawn key visual in the Position Xero
+ * palette — amber for the ads-led work, cyan for the search/AI-led work.
+ * Order here MUST match the .works-item order in index.html or the wall art
+ * desyncs from the card copy.
  */
 
 const WORKS = [
-  { title: 'TINY HOMES SA', sub: 'MODULAR HOMES ONLINE', pal: ['#ffd76a', '#ff9d2e', '#3aa0ff'] },
-  { title: 'COGNEXA', sub: 'AI BUSINESS SOLUTIONS', pal: ['#9be2ff', '#2e77ff', '#132b66'] },
-  { title: 'PEAK LEADS', sub: 'PIPELINE-FIRST AGENCY', pal: ['#b0ffe2', '#22c8a0', '#0d3a4a'] },
-  { title: 'SB LUXURY', sub: 'DIRECT-BOOKING STAYS', pal: ['#e8e6df', '#b9b4a5', '#6c675c'] },
-  { title: 'EYE CANDY', sub: 'CUSTOM AUTOMOTIVE', pal: ['#ff9ad5', '#7b2ff7', '#2ec4ff'] },
-  { title: 'CAJEE BOTES', sub: 'HEALTHCARE PRACTICE', pal: ['#cfd8ff', '#8090c0', '#26304e'] }
+  { title: 'TINY HOMES SA', sub: 'CONFIGURATOR + PAID SEARCH', pal: ['#FF6A1F', '#7A2E0C', '#05070A'] },
+  { title: 'PEAK LEADS', sub: 'PIPELINE-FIRST FUNNELS', pal: ['#2EE6FF', '#0E5C77', '#05070A'] },
+  { title: 'EYE CANDY', sub: 'SHOWROOM + ENQUIRY FUNNEL', pal: ['#FF6A1F', '#7A2E0C', '#05070A'] },
+  { title: 'CAJEE BOTES', sub: 'BOOKINGS + LOCAL SEARCH', pal: ['#2EE6FF', '#0E5C77', '#05070A'] }
 ];
 
 const SERVICE = [
-  { title: 'ADS', sub: 'GOOGLE + META', pal: ['#9be2ff', '#2e77ff', '#132b66'] },
-  { title: 'SEO', sub: 'AI + TRADITIONAL', pal: ['#ffd8b8', '#c86a3a', '#241a20'] },
-  // the Cognexa reel goes fullscreen — bright pastel field, no big title
-  { title: '', sub: '', pal: ['#ffd7e8', '#ffe9c9', '#9fc9ff'], bright: true }
+  { title: 'ADS', sub: 'GOOGLE + META', pal: ['#FF6A1F', '#7A2E0C', '#05070A'] },
+  { title: 'SEARCH', sub: 'AI + TRADITIONAL', pal: ['#2EE6FF', '#0E5C77', '#05070A'] },
+  // the Cognexa reel goes fullscreen — bright field, no big title
+  { title: '', sub: '', pal: ['#EAF2F5', '#BFE9F5', '#8FD8EE'], bright: true }
 ];
 
 function seeded(seed) {
@@ -80,10 +77,10 @@ function paintArt(ctx, W, H, spec, seed, t = 0) {
   ctx.fillStyle = '#ffffff';
   ctx.shadowColor = 'rgba(0,0,0,0.5)';
   ctx.shadowBlur = 26;
-  ctx.font = `600 ${Math.round(H * 0.18)}px "Inter", "Helvetica Neue", sans-serif`;
+  ctx.font = `700 ${Math.round(H * 0.18)}px "Archivo", "Helvetica Neue", sans-serif`;
   ctx.fillText(spec.title, W / 2, H * 0.52);
   ctx.globalAlpha = 0.85;
-  ctx.font = `400 ${Math.round(H * 0.055)}px "Google Sans Code", monospace`;
+  ctx.font = `400 ${Math.round(H * 0.055)}px "IBM Plex Mono", monospace`;
   ctx.fillText(spec.sub ?? '', W / 2, H * 0.62);
   ctx.restore();
 

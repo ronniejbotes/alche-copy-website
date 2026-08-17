@@ -5,14 +5,14 @@ import * as THREE from 'three';
  * loader: a construction grid (guide lines, dashed circles, dashed
  * cross-hairs) draws in as progress advances, the triangle "A" outline
  * traces on once loading completes, and the tagline scramble-types in
- * ALCHE letters. The finished sheet is also handed to the GL composite
+ * XERO letters. The finished sheet is also handed to the GL composite
  * as a texture for the reveal crossfade.
  *
  * Timing model:
  *  - guide drawing scrubbed by min(realProgress, elapsed/1s), smoothed 0.1
  *  - logo outline: 1.8 s, cubic-bezier(.53,.25,.3,.99)
  *  - tagline: starts at 400 ms; per-char reveal 300 ms + i*40 ms;
- *    unrevealed chars re-randomise from "ALCHE" every 32 ms at 30% opacity
+ *    unrevealed chars re-randomise from "XERO" every 32 ms at 30% opacity
  *  - hide: overlay fades 0.8 s, then the GL intro (uLoaded 0→1, 3 s) runs
  */
 

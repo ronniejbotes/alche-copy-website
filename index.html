@@ -45,20 +45,11 @@
         <span class="logo-word">POSITION&nbsp;XERO</span>
       </a>
     </div>
-    <nav class="header__nav" aria-label="Primary">
-      <a href="./news/"><span>News</span></a>
-      <a href="./works/"><span>Works</span></a>
-      <a href="./about/"><span>About</span></a>
-      <a href="./stellla/"><span>Cognexa</span></a>
-    </nav>
     <div class="header__right">
       <a class="btn-contact" href="./contact/">
         <span class="btn-contact__inner">Book Free Audit</span>
         <span class="btn-contact__hover" aria-hidden="true">Book Free Audit</span>
       </a>
-      <button class="sound-toggle" data-muted="true" aria-pressed="false" aria-label="Toggle sound">
-        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-      </button>
       <button class="hamburger" aria-expanded="false" aria-label="Open menu">
         <span></span><span></span><span></span>
       </button>
@@ -74,7 +65,7 @@
         <a href="./news/">News</a>
         <a href="./works/">Works</a>
         <a href="./about/">About</a>
-        <a href="./stellla/">Cognexa</a>
+        <a href="./cognexa/">Cognexa</a>
         <a href="./contact/">Book Free Audit</a>
       </nav>
       <div class="side-menu__social">
@@ -85,34 +76,66 @@
     </div>
   </div>
 
-  <!-- Left scroll indicator: 5 sections × 2 subsection ticks, mix-blend difference -->
+  <!-- Funnel bar: 5 beats × 2 subsection ticks, horizontal, bottom-left.
+       data-rail keys are looked up against live ScrollTrigger names — only
+       the visible labels change. -->
   <div class="rail" aria-hidden="true">
     <div class="rail__item" data-rail="kv" data-active="true">
-      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">TOP</span></div>
+      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">DEMAND</span></div>
       <div class="rail__subs"><span class="rail__sub"></span><span class="rail__sub"></span></div>
     </div>
     <div class="rail__item" data-rail="works" data-active="false">
-      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">WORKS</span></div>
+      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">PROOF</span></div>
       <div class="rail__subs"><span class="rail__sub"></span><span class="rail__sub"></span></div>
     </div>
     <div class="rail__item" data-rail="mission" data-active="false">
-      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">ABOUT</span></div>
+      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">POSITION ZERO</span></div>
       <div class="rail__subs"><span class="rail__sub"></span><span class="rail__sub"></span></div>
     </div>
     <div class="rail__item" data-rail="vision" data-active="false">
-      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">VISION</span></div>
+      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">METHOD</span></div>
       <div class="rail__subs"><span class="rail__sub"></span><span class="rail__sub"></span></div>
     </div>
     <div class="rail__item" data-rail="service" data-active="false">
-      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">SERVICE</span></div>
+      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">SERVICES</span></div>
       <div class="rail__subs"><span class="rail__sub"></span><span class="rail__sub"></span></div>
     </div>
   </div>
 
-  <!-- Tweakpane containers (positions per reference) -->
-  <div class="hud hud--material" id="pane-material" data-visible="true"></div>
-  <div class="hud hud--screen" id="pane-screen" data-visible="false"></div>
-  <div class="hud hud--quaternion" id="pane-quaternion" data-visible="true"></div>
+  <!-- Live campaign telemetry — real Tweakpane, monitor-only except the spend control -->
+  <div class="hud hud--signal" id="pane-signal" data-visible="true"></div>
+  <div class="hud hud--attribution" id="pane-attribution" data-visible="true"></div>
+
+  <!-- Two beats sharing the works_intro runway, in this order: the claim,
+       then the stakes. Both are opacity-scrubbed in the frame loop off the
+       existing works_intro progress channel — no extra ScrollTrigger. -->
+  <div class="hero-layer" aria-label="Introduction">
+    <div class="hero__inner">
+      <h1 class="hero__claim">
+        <span>Everyone fights for page one.</span>
+        <span>We take position zero.</span>
+      </h1>
+      <p class="hero__sub">Lead generation, SEO and paid ads for service businesses across the United States and South Africa.</p>
+      <ul class="hero__services">
+        <li>PERFORMANCE ADS</li>
+        <li>SEARCH &amp; AI VISIBILITY</li>
+        <li>LEAD SYSTEMS</li>
+      </ul>
+      <p class="hero__define">Position zero is the answer above the answers — the snippet Google reads out, the source ChatGPT names.</p>
+      <a class="hero__cta" href="./contact/">Book a free audit — 20 minutes, no pitch</a>
+    </div>
+  </div>
+
+  <!-- Stakes: opacity is scrubbed in the frame loop off the existing
+       works_intro progress channel — no extra ScrollTrigger. -->
+  <div class="stakes-layer" aria-hidden="true">
+    <div class="stakes__inner">
+      <span class="stakes__line">Right now, someone within ten miles of you is searching for exactly what you do.</span>
+      <span class="stakes__line">They will call whoever looks like the answer.</span>
+      <span class="stakes__line">Today that is an ad, a map pin, and increasingly a sentence an AI wrote about your competitor.</span>
+      <span class="stakes__kicker">POSITION ZERO IS WHERE THAT DECISION GETS MADE</span>
+    </div>
+  </div>
 
   <!-- News HUD (kv only) -->
   <aside class="news-hud" aria-label="Latest news">
@@ -136,9 +159,7 @@
 
   <!-- ============ scroll runways ============ -->
   <main class="main" id="main">
-    <section class="runway runway--kv" data-top-section="kv">
-      <h1 class="visually-hidden">Position Xero — lead generation, SEO and paid ads for service businesses. Immersive demo.</h1>
-    </section>
+    <section class="runway runway--kv" data-top-section="kv"></section>
     <section class="runway runway--works-intro" data-top-section="works_intro"></section>
     <section class="runway runway--works" data-top-section="works">
       <div class="works-scroll">
@@ -146,8 +167,6 @@
         <div class="works-scroll__item" data-work="1"></div>
         <div class="works-scroll__item" data-work="2"></div>
         <div class="works-scroll__item" data-work="3"></div>
-        <div class="works-scroll__item" data-work="4"></div>
-        <div class="works-scroll__item" data-work="5"></div>
       </div>
     </section>
     <section class="runway runway--works-outro" data-top-section="works_outro"></section>
@@ -163,146 +182,143 @@
         <div class="service-scroll__item" data-service="2"></div>
       </div>
     </section>
-    <section class="runway runway--stellla" data-top-section="stellla"></section>
+    <section class="runway runway--cognexa" data-top-section="cognexa"></section>
   </main>
   </div><!-- /.content-wrap -->
 
   <!-- ============ fixed content layers (visibility driven by section) ============ -->
 
-  <!-- Works: all items stacked bottom-left; JS swaps the active one -->
+  <!-- Case ledger, top-left; JS swaps the active one. Order MUST match the
+       WORKS array in src/js/gl/works-media.js or the wall art desyncs.
+       Cognexa is our own company, so it is not counted as a client here.
+       TODO(ron): the works-item__result values are outcome nouns, not
+       measured results. Replace with real, verifiable numbers before deploy —
+       "2021 / CLIENT SINCE" is the only figure here taken from real data. -->
   <div class="works-layer" data-visible="false">
     <article class="works-item" data-work-item="0">
       <div class="works-item__info">
-        <span class="works-item__date">2026 01.17</span>
-        <span class="works-item__impression">Prefab tiny homes, quoted and sold online</span>
+        <span class="works-item__result"><b>Online quotes</b> <i>CONFIGURATOR + PAID SEARCH</i></span>
       </div>
       <h3 class="works-item__title"><a href="./works/">Tiny Homes SA</a></h3>
-      <p class="works-item__ja">Modular homes configurator &amp; lead funnel</p>
-      <ul class="works-item__cats"><li>web-design</li><li>e-commerce</li><li>lead-gen</li></ul>
+      <p class="works-item__desc">Prefab homes specced, priced and enquired for without a showroom visit.</p>
+      <ul class="works-item__cats"><li>lead-gen</li><li>e-commerce</li><li>paid-ads</li></ul>
     </article>
     <article class="works-item" data-work-item="1">
       <div class="works-item__info">
-        <span class="works-item__date">2025 05.16</span>
-        <span class="works-item__impression">Immersive 3D landing experience</span>
+        <span class="works-item__result"><b>Booked calls</b> <i>PIPELINE-FIRST FUNNELS</i></span>
       </div>
-      <h3 class="works-item__title"><a href="./works/">Cognexa</a></h3>
-      <p class="works-item__ja">AI business solutions — our second company</p>
-      <ul class="works-item__cats"><li>3d-web</li><li>threejs</li><li>ai</li></ul>
+      <h3 class="works-item__title"><a href="./works/">Peak Leads Agency</a></h3>
+      <p class="works-item__desc">A founder-led agency rebuilt around the calls it needed, not the traffic it had.</p>
+      <ul class="works-item__cats"><li>lead-gen</li><li>seo</li><li>web-design</li></ul>
     </article>
     <article class="works-item" data-work-item="2">
       <div class="works-item__info">
-        <span class="works-item__date">2025 02.20</span>
-        <span class="works-item__impression">Founder-led lead generation build</span>
+        <span class="works-item__result"><b>Build enquiries</b> <i>SHOWROOM + META ADS</i></span>
       </div>
-      <h3 class="works-item__title"><a href="./works/">Peak Leads Agency</a></h3>
-      <p class="works-item__ja">Pipeline-first agency site &amp; funnels</p>
-      <ul class="works-item__cats"><li>lead-gen</li><li>web-design</li><li>seo</li></ul>
+      <h3 class="works-item__title"><a href="./works/">Eye Candy Customs</a></h3>
+      <p class="works-item__desc">Custom automotive work sold from the feed, qualified before the first phone call.</p>
+      <ul class="works-item__cats"><li>paid-ads</li><li>web-design</li></ul>
     </article>
     <article class="works-item" data-work-item="3">
       <div class="works-item__info">
-        <span class="works-item__date">2024 10.18</span>
-        <span class="works-item__impression">Direct-booking luxury stays</span>
-      </div>
-      <h3 class="works-item__title"><a href="./works/">SB Luxury Rentals</a></h3>
-      <p class="works-item__ja">Booking-driven rental showcase</p>
-      <ul class="works-item__cats"><li>web-design</li><li>booking</li></ul>
-    </article>
-    <article class="works-item" data-work-item="4">
-      <div class="works-item__info">
-        <span class="works-item__date">2024 07.29</span>
-        <span class="works-item__impression">Custom automotive brand build</span>
-      </div>
-      <h3 class="works-item__title"><a href="./works/">Eye Candy Customs</a></h3>
-      <p class="works-item__ja">Showroom site &amp; enquiry funnel</p>
-      <ul class="works-item__cats"><li>web-design</li><li>e-commerce</li></ul>
-    </article>
-    <article class="works-item" data-work-item="5">
-      <div class="works-item__info">
-        <span class="works-item__date">2021 07.16</span>
-        <span class="works-item__impression">Healthcare practice, bookings online</span>
+        <span class="works-item__result"><b>2021</b> <i>CLIENT SINCE</i></span>
       </div>
       <h3 class="works-item__title"><a href="./works/">Cajee Botes</a></h3>
-      <p class="works-item__ja">Orthotics, prosthetics &amp; compression care</p>
-      <ul class="works-item__cats"><li>healthcare</li><li>web-design</li><li>booking</li></ul>
+      <p class="works-item__desc">Orthotics, prosthetics and compression care — appointments booked online, found locally.</p>
+      <ul class="works-item__cats"><li>healthcare</li><li>local-seo</li><li>booking</li></ul>
     </article>
     <div class="works-more">
-      <a href="./works/"><span>More Works</span><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 12 12 2M4 2h8v8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
+      <a href="./works/"><span>ALL RESULTS</span><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 12 12 2M4 2h8v8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
     </div>
   </div>
 
-  <!-- Mission / Vision fixed layers -->
+  <!-- The two light beats. The headline draws as an outline then fills solid
+       (--fill is set per frame in dom-sections.js). -->
   <div class="mv mv--mission" data-visible="false">
     <div class="mv__inner">
-      <svg class="mv__ttl" viewBox="0 0 437 99" aria-hidden="true">
-        <text x="0" y="78" class="mv__ttl-text">MISSION</text>
+      <svg class="mv__ttl" viewBox="0 0 980 99" aria-hidden="true">
+        <text x="0" y="78" class="mv__ttl-text">POSITION ZERO</text>
       </svg>
       <p class="mv__text">
-        <span class="mv__line"><span class="mv__marker" data-marker="0">Most agencies send reports.</span></span>
-        <span class="mv__line"><span class="mv__marker" data-marker="1">We send leads.</span></span>
-        <span class="mv__line"><span class="mv__marker" data-marker="2">Results, not vanity metrics.</span></span>
+        <span class="mv__line"><i class="mv__rank">03</i><span class="mv__row">Most agencies send reports.</span></span>
+        <span class="mv__line"><i class="mv__rank">02</i><span class="mv__row">We send leads.</span></span>
+        <span class="mv__line"><i class="mv__rank">01</i><span class="mv__row">Results, not vanity metrics.</span></span>
       </p>
-      <p class="mv__en">Lead generation, SEO and paid ads<br />for service businesses across the US and South Africa.</p>
+      <p class="mv__en">Position zero is the answer above the answers. That is where we put service businesses.</p>
     </div>
   </div>
   <div class="mv mv--vision" data-visible="false">
     <div class="mv__inner">
-      <svg class="mv__ttl" viewBox="0 0 398 98" aria-hidden="true">
-        <text x="0" y="78" class="mv__ttl-text">VISION</text>
+      <svg class="mv__ttl" viewBox="0 0 1180 98" aria-hidden="true">
+        <text x="0" y="78" class="mv__ttl-text">THE FIRST 90 DAYS</text>
       </svg>
-      <p class="mv__text mv__text--right">
-        <span class="mv__line"><span class="mv__marker" data-marker="0">Be found on Google,</span></span>
-        <span class="mv__line"><span class="mv__marker" data-marker="1">recommended by AI.</span></span>
-      </p>
-      <p class="mv__en">Rank in search and get cited by<br />ChatGPT, Perplexity and Gemini.</p>
+      <div class="mv__cols">
+        <div class="mv__col">
+          <i>01 / AUDIT</i>
+          <p>We pull your search visibility, your ad accounts and the places your enquiries leak. You keep the findings whether you hire us or not.</p>
+        </div>
+        <div class="mv__col">
+          <i>02 / BUILD</i>
+          <p>Tracking, landing pages and campaigns live by week four. You approve every dollar and rand before it spends.</p>
+        </div>
+        <div class="mv__col">
+          <i>03 / COMPOUND</i>
+          <p>Ads bring leads this month. Search and AI visibility build behind them. By month three you are no longer paying for every click.</p>
+        </div>
+      </div>
+      <p class="mv__en">Written down before you sign. No twelve-month lock-in.</p>
     </div>
   </div>
 
-  <!-- Service fixed layer -->
+  <!-- Two cards, not three: the runway declares three reels but the THIRD reel
+       is the fullscreen Cognexa peel (works-media SERVICE[2], bright:true), and
+       its window coincides exactly with cognexaIn rising off zero. A card
+       bound to reel 3 is hidden the frame it appears. "Lead Systems" is
+       carried by the hero service list instead. -->
   <div class="service-layer" data-visible="false">
     <div class="service-item" data-service-item="0">
-      <div class="service-item__icon service-item__icon--sm" aria-hidden="true">GOOGLE + META<br />ADS</div>
+      <div class="service-item__icon service-item__icon--sm" aria-hidden="true">01 / GOOGLE + META ADS</div>
       <h3 class="service-item__title">Performance Ads</h3>
-      <p class="service-item__desc">Search, Display, Shopping and YouTube on Google; Facebook and Instagram on Meta. Campaigns targeted to your exact buyer and managed on the numbers that matter — cost per lead, ROAS and revenue, not impressions.</p>
-      <p class="service-item__en">Every dollar optimised for ROI through data-driven campaign management.
-Turn scrollers into qualified leads.</p>
+      <p class="service-item__desc">Search, Shopping, Display and YouTube on Google. Facebook and Instagram on Meta. Targeted to your exact buyer and managed on cost per lead, ROAS and booked revenue — never impressions.</p>
+      <p class="service-item__en">Money in, leads out. Reported weekly, in your numbers, not ours.</p>
     </div>
     <div class="service-item" data-service-item="1">
-      <div class="service-item__icon service-item__icon--lg" aria-hidden="true">AI + TRADITIONAL SEO</div>
-      <h3 class="service-item__title">AI &amp; Traditional SEO</h3>
-      <p class="service-item__desc">Rank on Google and get cited by ChatGPT, Perplexity and Gemini. We do both, because the future of search is already here — and your brand should be the recommended choice in AI-generated answers.</p>
-      <p class="service-item__en">On-page, technical and content SEO built for 2026 and beyond.
-LLM SEO: optimise your brand for AI answers.</p>
+      <div class="service-item__icon service-item__icon--lg" aria-hidden="true">02 / AI + TRADITIONAL SEO</div>
+      <h3 class="service-item__title">Search &amp; AI Visibility</h3>
+      <p class="service-item__desc">Rank on Google and get cited by ChatGPT, Perplexity and Google AI Overviews. Technical, on-page and content SEO plus AI-answer optimisation — because a growing share of your buyers ask a model before they ever open a search box.</p>
+      <p class="service-item__en">Position zero on Google. Named source in AI answers.</p>
     </div>
   </div>
 
-  <!-- Stellla fixed layer -->
-  <div class="stellla" data-visible="false">
-    <div class="stellla__shade"></div>
-    <div class="stellla__frame" style="--progress: 0">
-      <span class="stellla__cross stellla__cross--tl"></span>
-      <span class="stellla__cross stellla__cross--tr"></span>
-      <span class="stellla__cross stellla__cross--bl"></span>
-      <span class="stellla__cross stellla__cross--br"></span>
-      <span class="stellla__rect-line stellla__rect-line--top"></span>
-      <span class="stellla__rect-line stellla__rect-line--right"></span>
-      <span class="stellla__rect-line stellla__rect-line--bottom"></span>
-      <span class="stellla__rect-line stellla__rect-line--left"></span>
+  <!-- Cognexa fixed layer -->
+  <div class="cognexa" data-visible="false">
+    <div class="cognexa__shade"></div>
+    <div class="cognexa__frame" style="--progress: 0">
+      <span class="cognexa__cross cognexa__cross--tl"></span>
+      <span class="cognexa__cross cognexa__cross--tr"></span>
+      <span class="cognexa__cross cognexa__cross--bl"></span>
+      <span class="cognexa__cross cognexa__cross--br"></span>
+      <span class="cognexa__rect-line cognexa__rect-line--top"></span>
+      <span class="cognexa__rect-line cognexa__rect-line--right"></span>
+      <span class="cognexa__rect-line cognexa__rect-line--bottom"></span>
+      <span class="cognexa__rect-line cognexa__rect-line--left"></span>
     </div>
-    <div class="stellla__content">
-      <div class="stellla__main">
-        <a class="stellla__logo" href="./stellla/">
-          <span class="stellla__wordmark">Cognexa</span>
-          <svg class="stellla__arrow" viewBox="0 0 80 60" aria-hidden="true">
+    <div class="cognexa__content">
+      <div class="cognexa__main">
+        <p class="cognexa__lead">MOST AGENCIES ARE LEARNING AI SEARCH FROM BLOG POSTS</p>
+        <a class="cognexa__logo" href="./cognexa/">
+          <span class="cognexa__wordmark">Cognexa</span>
+          <svg class="cognexa__arrow" viewBox="0 0 80 60" aria-hidden="true">
             <path d="M14 4 Q4 4 4 30 Q4 56 14 56" fill="none" stroke="currentColor" stroke-width="3"/>
             <path d="M66 4 Q76 4 76 30 Q76 56 66 56" fill="none" stroke="currentColor" stroke-width="3"/>
             <path d="M30 42 50 22M34 22h16v16" fill="none" stroke="currentColor" stroke-width="3"/>
           </svg>
         </a>
-        <p class="stellla__text">The AI edge comes from our second company, Cognexa,<br />where we build AI business solutions.<br />It&#39;s why optimising for AI search — ChatGPT, Perplexity,<br />Google AI Overviews — is standard here, not an add-on.</p>
+        <p class="cognexa__text">We build AI systems for a living — that is our second company, Cognexa. It is why optimising for AI search (ChatGPT, Perplexity, Google AI Overviews) ships with every engagement here instead of appearing as a line item.</p>
       </div>
-      <p class="stellla__en">AI business solutions —
-automation, AI search optimisation
-and custom AI builds.</p>
+      <p class="cognexa__en">AUTOMATION
+AI SEARCH OPTIMISATION
+CUSTOM AI BUILDS</p>
     </div>
   </div>
 
@@ -311,8 +327,15 @@ and custom AI builds.</p>
     <div class="outro__screen">
       <canvas class="outro__glow" id="outro-glow"></canvas>
       <canvas class="outro__lottie" id="outro-canvas"></canvas>
+      <!-- the scroll ends on an ask, with the wordmark construction as backdrop -->
+      <div class="outro__offer">
+        <h2>Find out what position zero is worth to you.</h2>
+        <p>A free 20-minute audit. We show you what you rank for now, what your competitors are taking from you, and whether an AI assistant would cite you or someone else. No deck. No retainer talk.</p>
+        <a class="hero__cta" href="./contact/">Book the audit</a>
+        <p class="outro__reply">UNITED STATES AND SOUTH AFRICA · WE REPLY WITHIN ONE BUSINESS DAY</p>
+      </div>
       <svg class="outro__mark" id="outro-mark" viewBox="0 0 237 206" aria-hidden="true">
-        <polygon points="0,0 71,0 118.5,70 166,0 237,0 154,103 237,206 166,206 118.5,136 71,206 0,206 83,103" fill="#fff" />
+        <polygon points="0,0 71,0 118.5,70 166,0 237,0 154,103 237,206 166,206 118.5,136 71,206 0,206 83,103" fill="#F2F5F7" />
       </svg>
     </div>
   </div>
@@ -327,13 +350,13 @@ and custom AI builds.</p>
         </div>
         <div class="footer__col">
           <a href="./about/">About</a>
-          <a href="./stellla/">Cognexa</a>
+          <a href="./cognexa/">Cognexa</a>
           <a href="./contact/">Contact</a>
         </div>
         <div class="footer__col footer__col--links">
           <p class="footer__links-title">Links <span aria-hidden="true">▾</span></p>
           <a class="footer__sub" href="#" rel="noopener">Blog</a>
-          <a class="footer__sub" href="#" rel="noopener">Free Audit</a>
+          <a class="footer__sub" href="./contact/">Free Audit</a>
           <div class="footer__social">
             <a class="footer__sub" href="#" rel="noopener">X</a>
             <a class="footer__sub" href="#" rel="noopener">LinkedIn</a>
@@ -347,11 +370,10 @@ and custom AI builds.</p>
         </div>
         <div class="footer__privacy">
           <a href="./about/">Privacy Policy</a>
-          <a href="./about/">License</a>
         </div>
       </div>
     </div>
-    <p class="footer__copyright">©2026 Position Xero</p>
+    <p class="footer__copyright">© 2026 POSITION XERO · UNITED STATES &amp; SOUTH AFRICA</p>
   </footer>
 
   <script type="module" src="/src/js/main.js"></script>

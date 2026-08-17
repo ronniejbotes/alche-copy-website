@@ -1,14 +1,14 @@
-import '@fontsource/google-sans-code/400.css';
 import '@fontsource/ibm-plex-mono/400.css';
-import '@fontsource/ibm-plex-sans-jp/400.css';
+import '@fontsource/archivo/600.css';
+import '@fontsource/archivo/700.css';
+import '@fontsource/inter/400.css';
 import '@fontsource/inter/500.css';
 import '../styles/main.css';
 import { initHeader } from './ui.js';
 
 /**
  * Subpage boot: shared header + a static dark backdrop.
- * (The heavy top-page scene stays off subpages in this rebuild;
- * the reference runs a dimmed wall here, which we approximate in CSS.)
+ * The heavy top-page scene stays off subpages — a CSS gradient stands in.
  */
 
 document.body.classList.add('js-enabled');

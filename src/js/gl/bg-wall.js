@@ -5,13 +5,13 @@ import { GLSL_CONSTANTS, GLSL_HASH, GLSL_ROTATE2, GLSL_HSV } from './shader-lib.
 /**
  * The curved LED wall: an instanced quadtree of thin box tiles bent onto a
  * half-cylinder wrapping the camera. Three procedural patterns cycle with
- * hard cuts; tiles glitch (blackouts, UV shifts), the ALCHE wordmark tiles
- * over the wall in three display modes, the WORKS band burns in during the
- * works intro, and per-work art (blurred + oversaturated) wipes across
- * during the works section.
+ * hard cuts; tiles glitch (blackouts, UV shifts), the XERO wordmark tiles
+ * over the wall, the WORKS band burns in during the works intro, and
+ * per-work art (blurred + oversaturated) wipes across during the works
+ * section.
  */
 
-const WORKS_NUM = 6;
+const WORKS_NUM = 4;
 
 /* ---------------- patterns ---------------- */
 
@@ -25,7 +25,7 @@ void main() {
     smoothstep(0.2, 1.0, n.y),
     smoothstep(0.0, 1.0, n.z)
   );
-  o *= vec3(0.6, 0.8, 1.2);
+  o *= vec3(0.10, 0.66, 0.90);
   gl_FragColor = vec4(o, 1.0);
 }
 `;
@@ -45,9 +45,9 @@ uniform sampler2D uNoiseTex;
 varying vec2 vUv;
 void main() {
   vec4 n = texture2D(uNoiseTex, vUv);
-  vec3 c = vec3(0.207, 0.059, 0.992);            // deep blue-purple
-  c = mix(c, vec3(0.698, 0.929, 1.0), smoothstep(0.5, 0.9, n.w));    // pale cyan
-  c = mix(c, vec3(0.992, 0.373, 0.047), smoothstep(0.65, 1.0, n.y)); // sparse orange accents
+  vec3 c = vec3(0.020, 0.027, 0.039);                                  // ink ground (--bg)
+  c = mix(c, vec3(0.180, 0.902, 1.000), smoothstep(0.42, 0.92, n.w));  // signal cyan (--signal)
+  c = mix(c, vec3(1.000, 0.416, 0.122), smoothstep(0.82, 1.0, n.y));   // conversion amber (--heat), sparse
   gl_FragColor = vec4(c, 1.0);
 }
 `;
@@ -229,7 +229,7 @@ void main() {
   o.rgb *= 1.0 - bandVis * 0.5;
   o.rgb *= 1.0 - vBlackOut;
 
-  // ALCHE wordmark tiling — three display modes
+  // XERO wordmark tiling
   vec2 logoUv = vScreenUv;
   if (uLogoDisplayType < 0.5) {
     logoUv = vGlobalUv - 0.5;

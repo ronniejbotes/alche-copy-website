@@ -5,7 +5,7 @@ gsap.registerPlugin(SplitText);
 
 /**
  * DOM-side section controllers: works item swap, mission/vision text
- * choreography, service items, stellla frame, left rail indicator.
+ * choreography, service items, cognexa frame, left rail indicator.
  * Everything is driven per-frame from raw trigger progress so scrolling
  * back always rewinds.
  */
@@ -41,7 +41,7 @@ export class WorksItems {
       { y: 10, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.7, ease: 'power4.out', stagger: 0.01 }
     );
-    const desc = el.querySelectorAll('.works-item__ja, .works-item__cats, .works-item__info');
+    const desc = el.querySelectorAll('.works-item__desc, .works-item__cats, .works-item__info');
     gsap.fromTo(desc, { opacity: 0 }, { opacity: 1, duration: 0.5, delay: 0.3 });
   }
 
@@ -86,7 +86,11 @@ class MissionVisionBase {
     this._magnet += (target - this._magnet) * Math.min(1, dt * 8);
     const g = this._magnet;
 
-    if (this.ttl) this.ttl.style.strokeDashoffset = String(500 * (1 - g));
+    if (this.ttl) {
+      this.ttl.style.strokeDashoffset = String(500 * (1 - g));
+      // the word draws as an outline first, then fills solid over the back half
+      this.ttl.style.setProperty('--fill', String(Math.max(0, (g - 0.55) / 0.45)));
+    }
 
     const n = this.lines.length;
     this.lines.forEach((line, i) => {
@@ -170,11 +174,11 @@ export class ServiceItems {
   }
 }
 
-/* ---------------- stellla ---------------- */
+/* ---------------- cognexa ---------------- */
 
-export class StelllaController {
+export class CognexaController {
   constructor() {
-    this.root = document.querySelector('.stellla');
+    this.root = document.querySelector('.cognexa');
   }
 
   update(progress, section) {
@@ -183,19 +187,23 @@ export class StelllaController {
     const p = section === 'footer' ? 0 : Math.min(1, progress * 1.5);
     this.root.style.opacity = String(p);
     this.root.setAttribute('data-visible', String(p > 0.01));
-    const frame = this.root.querySelector('.stellla__frame');
+    const frame = this.root.querySelector('.cognexa__frame');
     if (frame) frame.style.setProperty('--progress', String(p));
   }
 }
 
 /* ---------------- left rail ---------------- */
 
+// values are live ScrollTrigger names; keys must stay in sync with the
+// data-rail attributes in index.html. service_in belongs to the services beat —
+// it starts 1.5 viewports early, so grouping it under vision lit the wrong
+// segment for the whole first service card.
 const RAIL_GROUPS = {
   kv: ['works_intro'],
   works: ['works', 'works_outro', 'mission_in'],
   mission: ['mission'],
-  vision: ['vision', 'vision_out', 'service_in'],
-  service: ['service', 'stellla']
+  vision: ['vision', 'vision_out'],
+  service: ['service_in', 'service', 'cognexa']
 };
 
 export class RailController {
@@ -215,8 +223,8 @@ export class RailController {
   }
 
   update(section) {
-    // hidden on kv / stellla / footer
-    const hidden = section === 'kv' || section === 'stellla' || section === 'footer';
+    // hidden on kv / cognexa / footer
+    const hidden = section === 'kv' || section === 'cognexa' || section === 'footer';
     this.rail?.setAttribute('data-hidden', String(hidden));
 
     // active = last group mid-progress, else last fully-passed group
@@ -249,9 +257,8 @@ export class HudVisibility {
   constructor() {
     this.news = document.querySelector('.news-hud');
     this.hint = document.querySelector('.scroll-hint');
-    this.paneMaterial = document.getElementById('pane-material');
-    this.paneScreen = document.getElementById('pane-screen');
-    this.paneQuat = document.getElementById('pane-quaternion');
+    this.paneSignal = document.getElementById('pane-signal');
+    this.paneAttribution = document.getElementById('pane-attribution');
   }
 
   update(section) {
@@ -259,17 +266,19 @@ export class HudVisibility {
     this.news?.setAttribute('data-hidden', String(!onKv));
     this.news?.toggleAttribute('inert', !onKv);
     this.hint?.setAttribute('data-hidden', String(!onKv));
+    // the hero claim and the stakes copy both live on the works_intro runway
+    // now, scrubbed per-frame in main.js — not gated by section
 
-    // material pane on the hero; screen pane on vision; quaternion pane
-    // stays up from the hero through the whole works block
+    // instruments only ride the dark beats — their translucent-black chrome is
+    // unreadable once the light scene wipes in
     const onWorks = section === 'works_intro' || section === 'works' || section === 'works_outro';
-    this.paneMaterial?.setAttribute('data-visible', String(section === 'kv'));
-    this.paneScreen?.setAttribute('data-visible', String(section === 'vision'));
-    this.paneQuat?.setAttribute('data-visible', String(section === 'kv' || onWorks));
+    const onService = section === 'service_in' || section === 'service';
+    this.paneSignal?.setAttribute('data-visible', String(onKv || onWorks));
+    this.paneAttribution?.setAttribute('data-visible', String(onKv || onService));
 
     const light = section === 'mission_in' || section === 'mission' || section === 'vision' || section === 'vision_out';
     document.body.setAttribute('data-light', String(light));
-    const headerHidden = section === 'stellla' || section === 'footer';
+    const headerHidden = section === 'cognexa' || section === 'footer';
     document.body.setAttribute('data-header-hidden', String(headerHidden));
   }
 }

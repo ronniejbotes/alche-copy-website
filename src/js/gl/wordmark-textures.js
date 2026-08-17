@@ -2,10 +2,10 @@ import * as THREE from 'three';
 
 /**
  * Canvas-drawn white-on-transparent title textures (our own letterforms):
- *  - ALCHE wordmark (1204:250 aspect) — tiled on the LED wall + 2D hero plane
+ *  - XERO wordmark (1204:250 aspect) — tiled on the LED wall + 2D hero plane
  *  - WORKS band (1136:256)
  *  - SERVICES band (1074:192)
- * All original drawings that echo the geometric grotesk of the reference.
+ * All original drawings — blocky geometric caps built from primitives.
  */
 
 function canvasTexture(c) {

@@ -17,13 +17,13 @@ import { GLSL_CONSTANTS, GLSL_QUAD_VERT, GLSL_ROTATE2 } from './shader-lib.js';
  *
  * Scenes:
  *  - main (dark): LED wall, grid, 2D wordmark plane, glass logo, WORKS band
- *  - missionVision (light): #D7DBDC bg, dark grid, logo outline set
+ *  - missionVision (light): #EAF2F5 bg, dark grid, logo outline set
  *  - service (dark): reel wall + SERVICES ghost band
  *  - thumbs (transparent): works screens, drawn over the composite
  *
  * Per frame: main scene renders WITHOUT the logo → copied to a 512 buffer →
  * logo renders on top sampling that copy (screen-space refraction) → the
- * three scene RTs mix (bottom-up arced wipe into light, hard cut into
+ * three scene RTs mix (diagonal sweep into light, hard cut into
  * service) → bloom-ish boost → final composite applies the intro zoom /
  * ripple / loader crossfade → works screens render on top.
  */
@@ -51,11 +51,12 @@ void main() {
   mainCol *= 1.0 + pl * 0.8;
   vec3 o = mainCol;
 
-  // bottom-up wipe into the light scene, edge arced by wipe velocity
+  // diagonal sweep into the light scene, bottom-left to top-right;
+  // edge softness still tracks wipe velocity through uMissionBlur
   vec3 mission = texture2D(uMissionTex, vUv - pointer.xy * 0.01).rgb;
   float range = 1.0 / uResolution.y + abs(uMissionBlur) * 0.2;
-  float arc = -cos((vUv.x - 0.5) * PI) * uMissionBlur;
-  float sel = smoothstep(0.0, range, -vUv.y + uVisibleMission * (1.0 + range) + arc);
+  float d = vUv.y * 0.78 + vUv.x * 0.22;
+  float sel = smoothstep(0.0, range, -d + uVisibleMission * (1.0 + range));
   mission *= smoothstep(1.5, 0.3, len);
   mission *= 1.0 + pl * 0.15;   // faint cursor wake on the light scene too
   o = mix(o, mission, sel);
@@ -226,7 +227,7 @@ function makeQuadScene(fragmentShader, uniforms) {
   return { scene, cam, mesh };
 }
 
-export class AlcheGL {
+export class PositionXeroGL {
   init(container) {
     this.container = container;
     try {
@@ -252,7 +253,7 @@ export class AlcheGL {
     this.envMap = createStudioEnvMap();
     this.media = new WorksMedia();
     this.pointerTrail = new PointerTrail(this.renderer);
-    this._alcheTex = createBrandWordmarkTexture();
+    this._wordmarkTex = createBrandWordmarkTexture();
     this._worksTitleTex = createWorksTitleTexture();
     this._servicesTex = createServicesTitleTexture();
     this._loaderTex = null; // set by the loader once its canvas is final
@@ -265,7 +266,7 @@ export class AlcheGL {
 
     this.wall = new BGWall(this.renderer, {
       noiseTexture: this.noise.texture,
-      logoTexture: this._alcheTex,
+      logoTexture: this._wordmarkTex,
       worksTitleTexture: this._worksTitleTex,
       pointerTexture: this.pointerTrail.texture,
       media: this.media
@@ -281,7 +282,7 @@ export class AlcheGL {
       new THREE.ShaderMaterial({
         vertexShader: wordmark2DVert,
         fragmentShader: wordmark2DFrag,
-        uniforms: { uTex: { value: this._alcheTex }, uAlpha: { value: 1 } },
+        uniforms: { uTex: { value: this._wordmarkTex }, uAlpha: { value: 1 } },
         transparent: true,
         depthWrite: false,
         depthTest: false          // sits past the wall cylinder; draw over it
@@ -318,7 +319,7 @@ export class AlcheGL {
 
     /* ---- light mission/vision scene ---- */
     this.missionScene = new THREE.Scene();
-    this.missionScene.background = new THREE.Color('#D7DBDC');
+    this.missionScene.background = new THREE.Color('#EAF2F5');
     this.missionCamera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
     this.missionCamera.position.set(0, 0, 8);
     this.orthoCamera = new THREE.OrthographicCamera(-4, 4, 4, -4, 0.1, 100);
@@ -406,7 +407,7 @@ export class AlcheGL {
     this._raf = 0;
     this._scroll = {
       worksTitle: 0, worksProgress: 0, worksOutro: 0, missionIn: 0,
-      vision: 0, serviceIn: 0, serviceProgress: 0, stelllaIn: 0, page: 0
+      vision: 0, serviceIn: 0, serviceProgress: 0, cognexaIn: 0, page: 0
     };
     this._projA = new THREE.Matrix4();
 
@@ -437,7 +438,7 @@ export class AlcheGL {
       : name === 'mission_in' || name === 'mission' ? 'mission'
       // stay locked (no hover wobble) through the dive into the side wall
       : name === 'vision' || name === 'vision_out' || name === 'service_in' ? 'vision'
-      : name === 'service' || name === 'stellla' ? 'service'
+      : name === 'service' || name === 'cognexa' ? 'service'
       : 'default';
     this.logo.setSection(logoSection);
     this.animator.animate('kvZoom', name === 'kv' ? 1 : 0, 1);
@@ -558,11 +559,11 @@ export class AlcheGL {
     const thumbO = (lp.set('thumbScroll', s.serviceProgress, 1) * 7 + 1) / 2;
     const thumbMag = Math.round(thumbO) - (Math.round(thumbO) - thumbO) * 0.4;
     const thumbU = Math.min(4, lp.set('thumbIndex', thumbMag, 0.5));
-    const stelllaIn = lp.set('stelllaIn', s.stelllaIn, 0.7);
+    const cognexaIn = lp.set('cognexaIn', s.cognexaIn, 0.7);
     // thumbU must be clamped to the reel count first: the two terms are designed
     // to sum to exactly 1, so feeding the unclamped value drove the peel to 1.5
-    // and finished it a full viewport before the stellla runway starts
-    const stelllaView = lp.set('stelllaView', Math.max(0, Math.min(1, Math.min(3, thumbU) - 2.5)), 0.7) + stelllaIn * 0.5;
+    // and finished it a full viewport before the cognexa runway starts
+    const cognexaView = lp.set('cognexaView', Math.max(0, Math.min(1, Math.min(3, thumbU) - 2.5)), 0.7) + cognexaIn * 0.5;
     const scrollVel = lp.set('lenisVel', Math.max(-30, Math.min(30, s.lenisVelocity ?? 0)), 0.5);
     const missionScroll = lp.set('missionScroll', s.pageScroll ?? 0, 0.5);
 
@@ -635,7 +636,7 @@ export class AlcheGL {
     this.wordmark2D.material.uniforms.uAlpha.value = this.animator.get('wordmark2D');
     this.missionGrid.setScroll(missionScroll);
     this.thumbs.update(carouselU, carouselVel);
-    this.service.update(t, thumbU, serviceIn, stelllaIn, stelllaView);
+    this.service.update(t, thumbU, serviceIn, cognexaIn, cognexaView);
 
     /* --- mission wipe smoothing (edge arc from wipe velocity) --- */
     const dv = missionVis - this._missionVisible;

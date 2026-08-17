@@ -32,7 +32,7 @@ export class Outro {
       x: 0.2 + Math.random() * 0.6,
       y: 0.25 + Math.random() * 0.5,
       r: 0.18 + Math.random() * 0.22,
-      hue: i % 2 ? 215 : 230,
+      hue: i % 2 ? 189 : 24,
       phase: Math.random() * Math.PI * 2
     }));
 
@@ -110,7 +110,7 @@ export class Outro {
       const br = b.r * Math.min(W, H) * (1 + Math.sin(t * 0.31 + b.phase) * 0.15);
       const g = ctx.createRadialGradient(bx, by, 0, bx, by, br);
       g.addColorStop(0, `hsla(${b.hue}, 85%, 42%, ${0.26 * this._glowVis})`);
-      g.addColorStop(1, 'hsla(220, 80%, 30%, 0)');
+      g.addColorStop(1, 'hsla(196, 90%, 18%, 0)');
       ctx.fillStyle = g;
       ctx.beginPath();
       ctx.arc(bx, by, br, 0, Math.PI * 2);

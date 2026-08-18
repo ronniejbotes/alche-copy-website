@@ -7,19 +7,28 @@
  * slow drift leaves a thin thread.
  *
  * Draws to its own 2D canvas layered above the GL composite and below the
- * copy, and fades itself out on the light mission/vision beats where a green-
- * screen effect would look wrong.
+ * copy. It runs on every beat, but the light mission/vision sections get an
+ * inverted palette — the cyan/white wake is invisible on #EAF2F5, so those
+ * beats use ink and a darkened teal/rust instead.
  */
 
 const TRAIL_SECTIONS = new Set([
-  'kv', 'works_intro', 'works', 'works_outro', 'service_in', 'service', 'cognexa'
+  'kv', 'works_intro', 'works', 'works_outro', 'mission_in', 'mission',
+  'calc', 'vision', 'vision_out', 'service_in', 'service', 'cognexa'
 ]);
+
+// beats where the scene wipes to #EAF2F5 — the trail flips to a dark palette
+const LIGHT_SECTIONS = new Set(['mission_in', 'mission', 'calc', 'vision', 'vision_out']);
 
 const MAX_GLYPHS = 620;
 const CELL = 13;          // vertical spacing inside a run
 const SIGNAL = '46, 230, 255';
 const HEAT = '255, 106, 31';
 const LEAD = '242, 245, 247';
+// same three roles, re-voiced for the light beats
+const SIGNAL_LT = '10, 116, 138';
+const HEAT_LT = '188, 68, 12';
+const LEAD_LT = '20, 27, 34';
 
 export class BinaryTrail {
   constructor(container) {
@@ -113,6 +122,7 @@ export class BinaryTrail {
   /** @param {string} section current body[data-section] */
   update(section, dt) {
     const want = TRAIL_SECTIONS.has(section) ? 1 : 0;
+    const light = LIGHT_SECTIONS.has(section);
     this.alpha += (want - this.alpha) * Math.min(1, dt * 4);
 
     const ctx = this.ctx;
@@ -142,7 +152,9 @@ export class BinaryTrail {
       // occasional flicker so the run keeps churning while it fades
       if (Math.random() < 0.06) g.ch = g.ch === '0' ? '1' : '0';
 
-      const rgb = g.lead ? LEAD : (g.heat ? HEAT : SIGNAL);
+      const rgb = light
+        ? (g.lead ? LEAD_LT : (g.heat ? HEAT_LT : SIGNAL_LT))
+        : (g.lead ? LEAD : (g.heat ? HEAT : SIGNAL));
       ctx.fillStyle = `rgba(${rgb}, ${a.toFixed(3)})`;
       ctx.fillText(g.ch, g.x, g.y + t * 9);
     }

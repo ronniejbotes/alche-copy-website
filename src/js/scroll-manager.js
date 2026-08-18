@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
  *
  * Snap points:
  *  - works: 1/(N-1)
- *  - mission/vision snapper (works_outro..vision): ratio-derived array
+ *  - mission/calc/vision snapper (works_outro..vision): ratio-derived array
  *  - vision_service wrap: [0, 1]
  *  - service: [0, 0.4]
  *  - cognexa: [0.9]
@@ -25,7 +25,7 @@ export class ScrollManager {
     this.triggers = new Map();
     this.progress = {
       worksTitle: 0, worksProgress: 0, worksOutro: 0, missionIn: 0,
-      vision: 0, visionOut: 0, serviceIn: 0, serviceProgress: 0,
+      calcIn: 0, vision: 0, visionOut: 0, serviceIn: 0, serviceProgress: 0,
       cognexaIn: 0, cognexa: 0, missionRaw: 0
     };
 
@@ -116,6 +116,11 @@ export class ScrollManager {
       onUpdate: (self) => { this.progress.missionRaw = self.progress; },
       ...enter('mission')
     });
+    reg('calc', {
+      trigger: sec('calc'), start: 'top bottom', end: 'top top',
+      onUpdate: (self) => { this.progress.calcIn = self.progress; },
+      ...enter('calc')
+    });
     reg('vision', {
       trigger: sec('vision'), start: 'top bottom', end: 'top top',
       onUpdate: (self) => { this.progress.vision = self.progress; },
@@ -128,10 +133,11 @@ export class ScrollManager {
     });
 
     // snapper across works_outro..vision. The array is positional and must
-    // match the four runway heights in main.css — 140lvh / 100lvh / 210vh / 180vh.
-    const snapper = [sec('works_outro'), sec('mission_in'), sec('mission'), sec('vision')];
+    // match the runway heights in main.css —
+    // 140lvh / 100lvh / 210vh / 120vh / 180vh.
+    const snapper = [sec('works_outro'), sec('mission_in'), sec('mission'), sec('calc'), sec('vision')];
     if (snapper.every(Boolean)) {
-      const ratios = [1.4, 1, 2.1, 1.8];
+      const ratios = [1.4, 1, 2.1, 1.2, 1.8];
       const total = ratios.reduce((a, b) => a + b, 0) - 1;
       const points = [0.5 / total];
       let acc = 0;
@@ -139,7 +145,7 @@ export class ScrollManager {
         acc += r;
         points.push(acc / total);
       }
-      const wrap = this._wrapRange(snapper[0], snapper[3]);
+      const wrap = this._wrapRange(snapper[0], snapper[snapper.length - 1]);
       reg('mv_snapper', {
         trigger: wrap.first, endTrigger: wrap.last,
         start: 'top top', end: 'bottom bottom',

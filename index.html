@@ -102,10 +102,6 @@
     </div>
   </div>
 
-  <!-- Live campaign telemetry — real Tweakpane, monitor-only except the spend control -->
-  <div class="hud hud--signal" id="pane-signal" data-visible="true"></div>
-  <div class="hud hud--attribution" id="pane-attribution" data-visible="true"></div>
-
   <!-- Two beats sharing the works_intro runway, in this order: the claim,
        then the stakes. Both are opacity-scrubbed in the frame loop off the
        existing works_intro progress channel — no extra ScrollTrigger. -->
@@ -172,6 +168,7 @@
     <section class="runway runway--works-outro" data-top-section="works_outro"></section>
     <section class="runway runway--mission-in" data-top-section="mission_in"></section>
     <section class="runway runway--mission" data-top-section="mission"></section>
+    <section class="runway runway--calc" data-top-section="calc"></section>
     <section class="runway runway--vision" data-top-section="vision"></section>
     <section class="runway runway--vision-out" data-top-section="vision_out"></section>
     <section class="runway runway--service-in" data-top-section="service_in"></section>
@@ -247,6 +244,24 @@
       <p class="mv__en">Position zero is the answer above the answers. That is where we put service businesses.</p>
     </div>
   </div>
+  <!-- Lead calculator. It lands after POSITION ZERO has made the argument and
+       before METHOD explains the work, so the visitor can put their own budget
+       against the claim first. Spend is the only live control; everything else
+       is derived (see telemetry.js) and carries the illustrative-model note. -->
+  <div class="calc" data-visible="false">
+    <div class="calc__inner">
+      <div class="calc__copy">
+        <p class="calc__kicker">LEAD CALCULATOR</p>
+        <h2 class="calc__title">Put your own numbers against it.</h2>
+        <p class="calc__text">Move the monthly ad spend and the rest follows — leads, cost per lead, return on ad spend. The attribution readout is what changes when you hold position zero instead of page one.</p>
+      </div>
+      <div class="calc__panels">
+        <div class="hud hud--signal" id="pane-signal" data-visible="true"></div>
+        <div class="hud hud--attribution" id="pane-attribution" data-visible="true"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="mv mv--vision" data-visible="false">
     <div class="mv__inner">
       <svg class="mv__ttl" viewBox="0 0 1180 98" aria-hidden="true">

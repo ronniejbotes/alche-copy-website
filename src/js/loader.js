@@ -3,8 +3,9 @@ import * as THREE from 'three';
 /**
  * Loading sequence — an original canvas re-creation of the blueprint
  * loader: a construction grid (guide lines, dashed circles, dashed
- * cross-hairs) draws in as progress advances, the triangle "A" outline
- * traces on once loading completes, and the tagline scramble-types in
+ * cross-hairs) draws in as progress advances, two long X-blade diagonals
+ * strike through it, the X-mark outline traces on once loading completes,
+ * and the tagline scramble-types in
  * XERO letters. The finished sheet is also handed to the GL composite
  * as a texture for the reveal crossfade.
  *
@@ -132,7 +133,9 @@ export class Loader {
     const g = this._guides;                     // 0..1 guide draw progress
     const stage = (a, b) => Math.max(0, Math.min(1, (g - a) / (b - a)));
 
-    const a = px(APEX), bl = px(BL), br = px(BR);
+    // box corners of the X mark: APEX.y is the top edge, BL/BR the bottom
+    const tl = px({ x: BL.x, y: APEX.y }), tr = px({ x: BR.x, y: APEX.y });
+    const bl = px(BL), br = px(BR);
     const cx = ox + 0.5 * S;
     const cy = oy + (APEX.y + BL.y) / 2 * S + S * 0.02;
 
@@ -152,13 +155,18 @@ export class Loader {
       ctx.restore();
     };
 
-    // 1. centre verticals (f0-10)
+    // 1. verticals (f0-10) — centre line plus the mark's left/right box edges
     const tV = stage(0, 0.11);
     line(cx, oy + S * 0.26, cx, oy + S * 0.74, tV, grey, [4, 4]);
+    for (const vx of [BL.x, BR.x]) {
+      line(ox + vx * S, oy + S * 0.2, ox + vx * S, oy + S * 0.78, tV, grey, [4, 4]);
+    }
 
     // 2. horizontals (f4-30) — through apex, base, mid guides
     const tH = stage(0.045, 0.33);
-    const hy = [APEX.y, 0.395, 0.556, 0.598, 0.6065, 0.6194, 0.629];
+    // cap, upper notch shoulder, centre, lower notch shoulder, baseline — the
+    // five lines the X is actually set on (the old set was the A's base stack)
+    const hy = [APEX.y, 0.3837, 0.441, 0.4983, BL.y, 0.629];
     hy.forEach((y, i) => {
       const yy = oy + y * S;
       const dir = i % 2 ? 1 : -1;
@@ -179,23 +187,29 @@ export class Loader {
       ctx.restore();
     }
 
-    // 4. diagonals along the triangle edges (f9-40), three parallels each side
+    // 4. X-blade diagonals (f9-40) — the two long strokes the mark is built
+    // from, corner to corner, three parallels each. They run well past the
+    // sheet so the pair reads as an X being struck out, not as the mark.
     const tD1 = stage(0.1, 0.27);
     const tD2 = stage(0.24, 0.44);
-    const dirL = { x: APEX.x - BL.x, y: APEX.y - BL.y };
-    const dirR = { x: APEX.x - BR.x, y: APEX.y - BR.y };
-    for (let i = -1; i <= 1; i++) {
-      const off = i * S * 0.008;
-      line(
-        bl.x - dirL.x * S * 0.9 + off, bl.y - dirL.y * S * 0.9,
-        a.x + dirL.x * S * 0.9 + off, a.y + dirL.y * S * 0.9,
-        tD2, light
-      );
-      line(
-        br.x - dirR.x * S * 0.9 + off, br.y - dirR.y * S * 0.9,
-        a.x + dirR.x * S * 0.9 + off, a.y + dirR.y * S * 0.9,
-        tD1, light
-      );
+    const EXT = 1.9;               // overshoot past each corner, in blade lengths
+    const blades = [
+      { a: tl, b: br, t: tD2 },    // top-left -> bottom-right
+      { a: tr, b: bl, t: tD1 }     // top-right -> bottom-left
+    ];
+    for (const bd of blades) {
+      const dx = bd.b.x - bd.a.x;
+      const dy = bd.b.y - bd.a.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len, ny = dx / len;      // unit perpendicular
+      for (let i = -1; i <= 1; i++) {
+        const off = i * S * 0.008;
+        line(
+          bd.a.x - dx * EXT + nx * off, bd.a.y - dy * EXT + ny * off,
+          bd.b.x + dx * EXT + nx * off, bd.b.y + dy * EXT + ny * off,
+          bd.t, light
+        );
+      }
     }
 
     // 5. inner dashed circle (f15-40)

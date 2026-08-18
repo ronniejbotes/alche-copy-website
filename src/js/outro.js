@@ -59,13 +59,28 @@ export class Outro {
       c.width = Math.max(2, c.clientWidth * dpr);
       c.height = Math.max(2, c.clientHeight * dpr);
     }
+
+    // The lockup spans 36%..95% of the screen and reads X + gap + E R O, which
+    // comes to 4.4785 cap heights. Sizing the mark from that here — rather than
+    // from a fixed CSS percentage — is what keeps the X at the same cap height
+    // as the letters; the two used to be set from different axes (width % vs
+    // height %) and drifted apart at every viewport.
+    const cw = this.canvas.clientWidth || window.innerWidth;
+    const ch = this.canvas.clientHeight || window.innerHeight;
+    if (cw > 768) {
+      // X + 0.06 gap + 3 letters at 0.95 + 2 gaps at 0.22 = 4.4785 cap heights
+      const capH = Math.min((cw * 0.59) / 4.4785, ch * 0.3);
+      this.mark.style.width = `${(capH * 237) / 206}px`;
+    } else {
+      this.mark.style.width = '';      // narrow layout keeps its CSS sizing
+    }
   }
 
   _play() {
     this._played = true;
     this._playing = true;
     this._glowTarget = 1;
-    gsap.to(this.mark, { left: '17.1%', duration: 1, ease: 'power2.inOut' });
+    gsap.to(this.mark, { left: '36%', duration: 1, ease: 'power2.inOut' });
     setTimeout(() => { this._t0 = performance.now(); }, 1100);
   }
 
@@ -143,14 +158,22 @@ export class Outro {
     const tFill = stage(0.48, 0.66);      // letters fill white
     const guideDim = 1 - stage(0.6, 0.78); // guides fade out
 
-    // wordmark box: the X-mark centres at left 17.1%, width 20.4%;
-    // E R O follow at the same cap height, spanning most of the frame
-    const markW = W * 0.204;
-    const markCx = W * 0.171;
-    const letterH = H * 0.40;
-    const y0 = H / 2 - letterH / 2;
-    const x0 = markCx + markW * 0.58;
-    const letterW = W * 0.165;
+    // The SVG mark is the single size reference: measure it and hang E R O off
+    // it, so the letters share the X's cap height and baseline exactly and sit
+    // beside it instead of under it. The lockup is held clear of the offer copy
+    // column on the left rather than running through it.
+    const cssW = this.canvas.clientWidth || 1;
+    const k = W / cssW;                       // canvas px per CSS px
+    const mr = this.mark.getBoundingClientRect();
+    const markW = mr.width * k;
+    const letterH = mr.height * k;
+    const markCx = mr.left * k;
+    const y0 = mr.top * k;
+    const x0 = markCx + markW + letterH * 0.06;
+    // Letters are proportioned off the cap height, never off "space that is
+    // left" — the mark slides in on a tween, and deriving widths from the gap
+    // to the right edge made the letters resize for the whole animation.
+    const letterW = letterH * 0.95;
     const gap = letterW * 0.22;
 
     ctx.save();

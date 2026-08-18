@@ -136,6 +136,34 @@ export class VisionController extends MissionVisionBase {
   }
 }
 
+/* ---------------- lead calculator ---------------- */
+
+/**
+ * The calculator rides its own runway between mission and vision. It shares
+ * the mission/vision fade grammar (blur out, hold, blur in) but has no
+ * draw-on text, so the maths stays live and readable the whole time it is up.
+ */
+export class CalcController {
+  constructor() {
+    this.root = document.querySelector('.calc');
+    this._g = 0;
+  }
+
+  /** inP: entrance progress 0..1; outP: exit progress 0..1 */
+  update(inP, outP, dt) {
+    if (!this.root) return;
+    const target = Math.max(0, Math.min(1, inP * 1.6));
+    this._g += (target - this._g) * Math.min(1, dt * 8);
+    const out = Math.max(0, 1 - outP * 2);
+    const g = Math.min(this._g, out);
+    const active = inP > 0.02 && outP < 0.98;
+    this.root.style.opacity = active ? String(g) : '0';
+    this.root.style.filter = `blur(${(1 - g) * 8}px)`;
+    this.root.setAttribute('data-visible', String(active));
+    this.root.toggleAttribute('inert', !active);
+  }
+}
+
 /* ---------------- service ---------------- */
 
 export class ServiceItems {
@@ -201,7 +229,7 @@ export class CognexaController {
 const RAIL_GROUPS = {
   kv: ['works_intro'],
   works: ['works', 'works_outro', 'mission_in'],
-  mission: ['mission'],
+  mission: ['mission', 'calc'],
   vision: ['vision', 'vision_out'],
   service: ['service_in', 'service', 'cognexa']
 };
@@ -257,8 +285,6 @@ export class HudVisibility {
   constructor() {
     this.news = document.querySelector('.news-hud');
     this.hint = document.querySelector('.scroll-hint');
-    this.paneSignal = document.getElementById('pane-signal');
-    this.paneAttribution = document.getElementById('pane-attribution');
   }
 
   update(section) {
@@ -269,14 +295,11 @@ export class HudVisibility {
     // the hero claim and the stakes copy both live on the works_intro runway
     // now, scrubbed per-frame in main.js — not gated by section
 
-    // instruments only ride the dark beats — their translucent-black chrome is
-    // unreadable once the light scene wipes in
-    const onWorks = section === 'works_intro' || section === 'works' || section === 'works_outro';
-    const onService = section === 'service_in' || section === 'service';
-    this.paneSignal?.setAttribute('data-visible', String(onKv || onWorks));
-    this.paneAttribution?.setAttribute('data-visible', String(onKv || onService));
+    // the instrument panes now live inside the calc layer, which owns its own
+    // visibility — nothing to gate here
 
-    const light = section === 'mission_in' || section === 'mission' || section === 'vision' || section === 'vision_out';
+    const light = section === 'mission_in' || section === 'mission' || section === 'calc'
+      || section === 'vision' || section === 'vision_out';
     document.body.setAttribute('data-light', String(light));
     const headerHidden = section === 'cognexa' || section === 'footer';
     document.body.setAttribute('data-header-hidden', String(headerHidden));

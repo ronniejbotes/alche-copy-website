@@ -347,6 +347,7 @@ body[data-light="true"] .rail__item[data-active="true"] .rail__label { color: va
 .runway--works-outro { height: 140lvh; min-height: 0; }
 .runway--mission-in { height: 100lvh; }
 .runway--mission { height: 210vh; min-height: 0; }
+.runway--calc { height: 120vh; min-height: 0; }
 .runway--vision { height: 180vh; min-height: 0; }
 .runway--vision-out { height: 150lvh; min-height: 0; }
 .runway--service-in { height: 100lvh; }
@@ -643,6 +644,74 @@ body[data-light="true"] .rail__item[data-active="true"] .rail__label { color: va
   letter-spacing: 0.22em; color: var(--ink-30); width: 22em; white-space: pre-wrap;
 }
 
+/* ---------- lead calculator (light beat, between mission and vision) ---------- */
+.calc {
+  position: fixed; inset: 0; z-index: 8;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  will-change: opacity, filter;
+}
+.calc[data-visible="true"] { pointer-events: auto; }
+.calc__inner {
+  display: grid; grid-template-columns: minmax(0, 1fr) 300px;
+  gap: clamp(32px, 6vw, 96px); align-items: center;
+  width: min(1180px, 88vw);
+}
+.calc__kicker {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em;
+  color: var(--heat); margin-bottom: 18px;
+}
+.calc__title {
+  font-family: var(--display); font-weight: 700;
+  font-size: clamp(30px, 4vw, 60px); line-height: 1.04; letter-spacing: -0.02em;
+  color: #10161C; margin-bottom: 22px;
+}
+.calc__text {
+  font-family: var(--text); font-size: 16px; line-height: 1.7;
+  color: #3A454F; max-width: 46ch;
+}
+.calc__panels { display: flex; flex-direction: column; gap: 26px; }
+
+/* the panes are fixed-position chrome by default — inside the calc layer they
+   are ordinary blocks, and re-voiced for a #EAF2F5 background */
+.calc .hud { position: static; width: 100%; }
+.calc .hud .tp-rotv {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(16, 22, 28, 0.12);
+  --tp-base-background-color: rgba(255, 255, 255, 0.72);
+  --tp-container-background-color: transparent;
+  --tp-container-background-color-active: rgba(16, 22, 28, 0.12);
+  --tp-container-background-color-focus: rgba(16, 22, 28, 0.09);
+  --tp-container-background-color-hover: rgba(16, 22, 28, 0.06);
+  --tp-container-foreground-color: rgba(16, 22, 28, 0.7);
+  --tp-button-background-color: transparent;
+  --tp-button-background-color-active: rgba(16, 22, 28, 0.25);
+  --tp-button-background-color-focus: rgba(16, 22, 28, 0.18);
+  --tp-button-background-color-hover: rgba(16, 22, 28, 0.1);
+  --tp-button-foreground-color: rgba(16, 22, 28, 0.8);
+  --tp-input-background-color: rgba(16, 22, 28, 0.06);
+  --tp-input-background-color-active: rgba(16, 22, 28, 0.16);
+  --tp-input-background-color-focus: rgba(16, 22, 28, 0.12);
+  --tp-input-background-color-hover: rgba(16, 22, 28, 0.09);
+  --tp-input-foreground-color: rgba(16, 22, 28, 0.9);
+  --tp-label-foreground-color: rgba(16, 22, 28, 0.6);
+  --tp-monitor-background-color: rgba(16, 22, 28, 0.04);
+  --tp-monitor-foreground-color: rgba(16, 22, 28, 0.92);
+  --tp-groove-foreground-color: rgba(16, 22, 28, 0.2);
+}
+.calc .hud__note {
+  background: rgba(16, 22, 28, 0.06);
+  color: #4E5A65;
+}
+@media (max-width: 949px) {
+  .calc .hud { display: block; }
+  .calc__inner { grid-template-columns: 1fr; gap: 28px; }
+}
+@media (max-width: 768px) {
+  .calc__inner { width: 88vw; }
+  .calc__panels { gap: 18px; }
+}
+
 /* ---------- outro + close + footer ---------- */
 .outro { position: relative; height: 130vh; z-index: 5; background: var(--bg); }
 .outro__screen { position: sticky; top: 0; height: 100vh; overflow: hidden; pointer-events: none; }
@@ -650,22 +719,22 @@ body[data-light="true"] .rail__item[data-active="true"] .rail__label { color: va
 .outro__mark {
   position: absolute; right: 6vw; top: 50%;
   transform: translateY(-50%);
-  width: 22%;
+  width: 17%;
 }
 
 /* the scroll ends on an ask, not on a logo */
 .outro__offer {
-  position: absolute; left: 5vw; top: 14vh; width: min(42ch, 38vw);
+  position: absolute; left: 5vw; top: 12vh; width: min(34ch, 28vw);
   pointer-events: auto; z-index: 7;
 }
 /* the wordmark construction animates through this area — ground the copy */
 .outro__offer::before {
-  content: ""; position: absolute; inset: -44px -90px -40px -5vw; z-index: -1;
+  content: ""; position: absolute; inset: -44px -130px -40px -5vw; z-index: -1;
   background: radial-gradient(125% 115% at 0% 45%, rgba(5, 7, 10, 0.96) 0%, rgba(5, 7, 10, 0.9) 50%, rgba(5, 7, 10, 0) 86%);
 }
 .outro__offer h2 {
   font-family: var(--display); font-weight: 700;
-  font-size: clamp(30px, 3.6vw, 54px); line-height: 1.05; letter-spacing: -0.02em;
+  font-size: clamp(28px, 2.9vw, 44px); line-height: 1.06; letter-spacing: -0.02em;
   margin-bottom: 22px;
 }
 .outro__offer p {
@@ -680,7 +749,7 @@ body[data-light="true"] .rail__item[data-active="true"] .rail__label { color: va
 .footer {
   /* overlays the very bottom of the outro screen, like the reference */
   position: absolute; bottom: 0; left: 0; right: 0; z-index: 6;
-  padding: 50px 0 2px;
+  padding: 50px 0 26px;
   color: #fff;
   pointer-events: auto;
 }

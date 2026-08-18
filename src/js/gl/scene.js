@@ -199,7 +199,7 @@ uniform float uProgress;
 varying vec2 vUv;
 varying float vAlpha;
 void main() {
-  vec4 t = texture2D(uTex, vUv * vec2(4.0, 1.0) + vec2(uTime * 0.1 - uProgress * 13.0, 0.0));
+  vec4 t = texture2D(uTex, vUv * vec2(22.0, 1.0) + vec2(uTime * 0.1 - uProgress * 13.0, 0.0));
   float p3 = uProgress * 3.0;
   float edges = smoothstep(1.0, 0.0, p3) + smoothstep(2.0, 3.0, p3);
   float a = t.a;
@@ -309,7 +309,15 @@ export class PositionXeroGL {
         side: THREE.DoubleSide
       })
     );
-    this.worksTitle.scale.set(14, 1.6, 1);
+    // The vert shader wraps this plane onto a cylinder of radius 3, so one
+    // texture repeat spans 2*PI*3*scaleX / repeats on screen. At scaleX 14
+    // with 4 repeats that was ~66 world units against a ~12-unit viewport —
+    // under a fifth of one letter filled the frame, which is why it read as
+    // white slabs. 22 repeats puts one WORKS at ~12 units and height 2.6
+    // matches the texture's 1136:256 aspect, so the letters keep their shape.
+    // scaleX stays wide: dropping it pulls the ring onto the logo and the
+    // word disappears behind the glass instead of sweeping past it.
+    this.worksTitle.scale.set(14, 2.6, 1);
     this.worksTitle.renderOrder = 999;
     this.worksTitle.frustumCulled = false;
     this.scene.add(this.worksTitle);
@@ -435,7 +443,7 @@ export class PositionXeroGL {
       name === 'kv' ? 'kv'
       : name === 'works_intro' ? 'works_intro'
       : name === 'works' || name === 'works_outro' ? 'works'
-      : name === 'mission_in' || name === 'mission' ? 'mission'
+      : name === 'mission_in' || name === 'mission' || name === 'calc' ? 'mission'
       // stay locked (no hover wobble) through the dive into the side wall
       : name === 'vision' || name === 'vision_out' || name === 'service_in' ? 'vision'
       : name === 'service' || name === 'cognexa' ? 'service'

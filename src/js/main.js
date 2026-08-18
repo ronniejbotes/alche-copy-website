@@ -13,7 +13,7 @@ import { PositionXeroGL } from './gl/scene.js';
 import { Loader } from './loader.js';
 import { ScrollManager } from './scroll-manager.js';
 import {
-  WorksItems, MissionController, VisionController,
+  WorksItems, MissionController, VisionController, CalcController,
   ServiceItems, CognexaController, RailController, HudVisibility
 } from './dom-sections.js';
 import { buildPanels } from './panels.js';
@@ -59,6 +59,7 @@ async function boot() {
   const works = new WorksItems();
   const mission = new MissionController();
   const vision = new VisionController();
+  const calc = new CalcController();
   const service = new ServiceItems();
   const cognexa = new CognexaController();
 
@@ -115,6 +116,7 @@ async function boot() {
       worksProgress: p.worksProgress,
       worksOutro: p.worksOutro,
       missionIn: p.missionIn,
+      calcIn: p.calcIn,
       vision: p.vision,
       serviceIn: p.serviceIn,
       serviceProgress: p.serviceProgress,
@@ -123,7 +125,8 @@ async function boot() {
       pageScroll: sm.scroll / window.innerHeight
     });
 
-    mission.update(p.missionIn, p.vision, dt);
+    mission.update(p.missionIn, p.calcIn, dt);
+    calc.update(p.calcIn, p.vision, dt);
     vision.update(p.vision, p.visionOut, dt);
     lastVision = p.vision;
     service.setProgress(p.serviceIn);

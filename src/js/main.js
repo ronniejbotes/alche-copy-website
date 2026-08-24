@@ -16,8 +16,7 @@ import {
   WorksItems, MissionController, VisionController, CalcController,
   ServiceItems, CognexaController, RailController, HudVisibility
 } from './dom-sections.js';
-import { buildPanels } from './panels.js';
-import { Telemetry } from './telemetry.js';
+import { LeadCalculator } from './calculator.js';
 import { BinaryTrail } from './binary-trail.js';
 import { Outro } from './outro.js';
 import { initHeader } from './ui.js';
@@ -77,8 +76,7 @@ async function boot() {
 
   const rail = new RailController(sm);
   new Outro();
-  const telemetry = new Telemetry();
-  buildPanels(telemetry);
+  new LeadCalculator();
   const hero = document.querySelector('.hero-layer');
   const stakes = document.querySelector('.stakes-layer');
   const trail = new BinaryTrail(document.querySelector('.content-wrap') ?? document.body);
@@ -94,10 +92,6 @@ async function boot() {
     frame._t = timeMs;
 
     const p = sm.progress;
-    const pageP = Math.min(1, sm.scroll / Math.max(1, document.body.scrollHeight - window.innerHeight));
-    telemetry.update({
-      works: p.worksProgress, mission: p.missionIn, service: p.serviceProgress, page: pageP
-    });
     // The hero claim and the stakes copy are two beats sharing the works_intro
     // runway: claim first, a breath, then stakes. Both read the existing
     // worksTitle channel, so no new ScrollTrigger and scrolling back rewinds.

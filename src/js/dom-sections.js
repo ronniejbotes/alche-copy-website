@@ -229,7 +229,8 @@ export class CognexaController {
 const RAIL_GROUPS = {
   kv: ['works_intro'],
   works: ['works', 'works_outro', 'mission_in'],
-  mission: ['mission', 'calc'],
+  mission: ['mission'],
+  calc: ['calc'],
   vision: ['vision', 'vision_out'],
   service: ['service_in', 'service', 'cognexa']
 };

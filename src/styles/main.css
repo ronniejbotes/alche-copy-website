@@ -90,7 +90,7 @@ body.no-3d::before {
     repeating-linear-gradient(115deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 26px),
     radial-gradient(120% 90% at 50% 40%, #101820 0%, var(--bg) 78%);
 }
-body.no-3d .news-hud, body.no-3d .rail, body.no-3d .hud { display: none; }
+body.no-3d .news-hud, body.no-3d .rail { display: none; }
 
 .fallback-mark {
   display: none;
@@ -108,7 +108,6 @@ body.no-3d .fallback-mark { display: block; }
   transition: opacity 0.8s ease, visibility 0.8s;
 }
 /* keep every fixed HUD layer dark until the GL handoff completes */
-body[data-gl-ready="false"] .hud,
 body[data-gl-ready="false"] .news-hud,
 body[data-gl-ready="false"] .rail,
 body[data-gl-ready="false"] .works-more { opacity: 0 !important; }
@@ -254,48 +253,6 @@ body[data-light="true"] .rail__item[data-active="true"] .rail__line { background
 body[data-light="true"] .rail__label { color: var(--ink-50); }
 body[data-light="true"] .rail__item[data-active="true"] .rail__label { color: var(--bg); }
 
-/* ---------- Tweakpane HUD ---------- */
-.hud { position: fixed; z-index: 10; font-family: var(--mono); transition: opacity 0.4s; }
-.hud[data-visible="false"] { opacity: 0; pointer-events: none; }
-/* single right-edge column — the two-opposite-corners silhouette was the reference's */
-.hud--signal { right: 24px; top: 104px; width: 232px; }
-.hud--attribution { right: 24px; top: 336px; width: 232px; }
-@media (max-width: 949px) { .hud { display: none; } }
-
-.hud .tp-dfwv { min-width: 100%; }
-.hud .tp-rotv {
-  background: rgba(0, 0, 0, 0.1); box-shadow: none; border-radius: 0;
-  font-family: var(--mono); font-size: 11px;
-  --tp-base-background-color: rgba(0, 0, 0, 0.1);
-  --tp-base-shadow-color: transparent;
-  --tp-container-background-color: transparent;
-  --tp-container-background-color-active: rgba(255, 255, 255, 0.1);
-  --tp-container-background-color-focus: rgba(255, 255, 255, 0.08);
-  --tp-container-background-color-hover: rgba(255, 255, 255, 0.05);
-  --tp-container-foreground-color: rgba(255, 255, 255, 0.6);
-  --tp-button-background-color: transparent;
-  --tp-button-background-color-active: rgba(255, 255, 255, 0.25);
-  --tp-button-background-color-focus: rgba(255, 255, 255, 0.2);
-  --tp-button-background-color-hover: rgba(255, 255, 255, 0.12);
-  --tp-button-foreground-color: rgba(255, 255, 255, 0.75);
-  --tp-input-background-color: transparent;
-  --tp-input-background-color-active: rgba(255, 255, 255, 0.15);
-  --tp-input-background-color-focus: rgba(255, 255, 255, 0.12);
-  --tp-input-background-color-hover: rgba(255, 255, 255, 0.08);
-  --tp-input-foreground-color: rgba(255, 255, 255, 0.85);
-  --tp-label-foreground-color: rgba(255, 255, 255, 0.6);
-  --tp-monitor-background-color: transparent;
-  --tp-monitor-foreground-color: rgba(255, 255, 255, 0.9);
-  --tp-groove-foreground-color: rgba(255, 255, 255, 0.25);
-}
-.hud .tp-rotv_t { letter-spacing: 0.22em; opacity: 0.9; font-size: 10px; }
-.hud__note {
-  margin-top: 6px; padding: 6px 8px;
-  background: rgba(5, 7, 10, 0.55);
-  font-family: var(--mono); font-size: 8px;
-  letter-spacing: 0.14em; line-height: 1.5; color: var(--ink-30);
-}
-
 /* ---------- News HUD ---------- */
 .news-hud {
   position: fixed; right: 4vw; bottom: 30px; z-index: 100;
@@ -347,7 +304,7 @@ body[data-light="true"] .rail__item[data-active="true"] .rail__label { color: va
 .runway--works-outro { height: 140lvh; min-height: 0; }
 .runway--mission-in { height: 100lvh; }
 .runway--mission { height: 210vh; min-height: 0; }
-.runway--calc { height: 120vh; min-height: 0; }
+.runway--calc { height: 260vh; min-height: 0; }
 .runway--vision { height: 180vh; min-height: 0; }
 .runway--vision-out { height: 150lvh; min-height: 0; }
 .runway--service-in { height: 100lvh; }
@@ -644,72 +601,160 @@ body[data-light="true"] .rail__item[data-active="true"] .rail__label { color: va
   letter-spacing: 0.22em; color: var(--ink-30); width: 22em; white-space: pre-wrap;
 }
 
-/* ---------- lead calculator (light beat, between mission and vision) ---------- */
+/* ---------- lead calculator (its own light beat, between POSITION ZERO and METHOD) ---------- */
 .calc {
   position: fixed; inset: 0; z-index: 8;
   display: flex; align-items: center; justify-content: center;
+  padding-bottom: clamp(32px, 5vh, 56px);   /* clears the section rail */
   opacity: 0; pointer-events: none;
   will-change: opacity, filter;
 }
 .calc[data-visible="true"] { pointer-events: auto; }
+
+/* one centred column: the three questions and the answer read as a single
+   vertical argument, which is what makes this a section rather than an aside */
 .calc__inner {
-  display: grid; grid-template-columns: minmax(0, 1fr) 300px;
-  gap: clamp(32px, 6vw, 96px); align-items: center;
-  width: min(1180px, 88vw);
+  width: min(560px, 88vw);
+  text-align: center;
 }
+
 .calc__kicker {
-  font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em;
-  color: var(--heat); margin-bottom: 18px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.28em;
+  color: var(--heat); margin-bottom: 16px;
 }
 .calc__title {
   font-family: var(--display); font-weight: 700;
-  font-size: clamp(30px, 4vw, 60px); line-height: 1.04; letter-spacing: -0.02em;
-  color: #10161C; margin-bottom: 22px;
+  font-size: clamp(24px, 2.8vw, 36px); line-height: 1.1; letter-spacing: -0.02em;
+  color: #10161C; margin: 0 auto 14px; max-width: 22ch;
 }
 .calc__text {
-  font-family: var(--text); font-size: 16px; line-height: 1.7;
-  color: #3A454F; max-width: 46ch;
+  font-family: var(--text); font-size: 14px; line-height: 1.65;
+  color: #46525C; margin: 0 auto; max-width: 44ch;
 }
-.calc__panels { display: flex; flex-direction: column; gap: 26px; }
 
-/* the panes are fixed-position chrome by default — inside the calc layer they
-   are ordinary blocks, and re-voiced for a #EAF2F5 background */
-.calc .hud { position: static; width: 100%; }
-.calc .hud .tp-rotv {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(16, 22, 28, 0.12);
-  --tp-base-background-color: rgba(255, 255, 255, 0.72);
-  --tp-container-background-color: transparent;
-  --tp-container-background-color-active: rgba(16, 22, 28, 0.12);
-  --tp-container-background-color-focus: rgba(16, 22, 28, 0.09);
-  --tp-container-background-color-hover: rgba(16, 22, 28, 0.06);
-  --tp-container-foreground-color: rgba(16, 22, 28, 0.7);
-  --tp-button-background-color: transparent;
-  --tp-button-background-color-active: rgba(16, 22, 28, 0.25);
-  --tp-button-background-color-focus: rgba(16, 22, 28, 0.18);
-  --tp-button-background-color-hover: rgba(16, 22, 28, 0.1);
-  --tp-button-foreground-color: rgba(16, 22, 28, 0.8);
-  --tp-input-background-color: rgba(16, 22, 28, 0.06);
-  --tp-input-background-color-active: rgba(16, 22, 28, 0.16);
-  --tp-input-background-color-focus: rgba(16, 22, 28, 0.12);
-  --tp-input-background-color-hover: rgba(16, 22, 28, 0.09);
-  --tp-input-foreground-color: rgba(16, 22, 28, 0.9);
-  --tp-label-foreground-color: rgba(16, 22, 28, 0.6);
-  --tp-monitor-background-color: rgba(16, 22, 28, 0.04);
-  --tp-monitor-foreground-color: rgba(16, 22, 28, 0.92);
-  --tp-groove-foreground-color: rgba(16, 22, 28, 0.2);
+.calc__fields { margin-top: clamp(18px, 2.6vh, 30px); }
+.calc-field + .calc-field { margin-top: clamp(14px, 2.2vh, 24px); }
+
+.calc-field__label {
+  display: block;
+  font-family: var(--text); font-size: 13px; color: #46525C;
 }
-.calc .hud__note {
-  background: rgba(16, 22, 28, 0.06);
-  color: #4E5A65;
+.calc-field__value {
+  display: block; margin: 5px 0 10px;
+  font-family: var(--display); font-weight: 700;
+  font-size: clamp(20px, 2.2vw, 28px); letter-spacing: -0.02em;
+  color: #10161C; font-variant-numeric: tabular-nums;
 }
-@media (max-width: 949px) {
-  .calc .hud { display: block; }
-  .calc__inner { grid-template-columns: 1fr; gap: 28px; }
+
+/* the track is painted from --fill, set per input in calculator.js */
+.calc-field__range {
+  -webkit-appearance: none; appearance: none;
+  display: block; width: 100%; height: 22px;
+  background: transparent; cursor: pointer; margin: 0;
+  --fill: 0%;
 }
+.calc-field__range::-webkit-slider-runnable-track {
+  height: 2px; border-radius: 2px;
+  background: linear-gradient(to right, var(--heat) var(--fill), rgba(16, 22, 28, 0.16) var(--fill));
+}
+.calc-field__range::-moz-range-track {
+  height: 2px; border-radius: 2px; background: rgba(16, 22, 28, 0.16);
+}
+.calc-field__range::-moz-range-progress {
+  height: 2px; border-radius: 2px; background: var(--heat);
+}
+.calc-field__range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 15px; height: 15px; margin-top: -6.5px;
+  border-radius: 50%; background: var(--heat);
+  border: 2px solid #EAF2F5;
+  box-shadow: 0 1px 5px rgba(16, 22, 28, 0.32);
+  transition: transform 0.18s ease;
+}
+.calc-field__range::-moz-range-thumb {
+  width: 15px; height: 15px; box-sizing: border-box;
+  border-radius: 50%; background: var(--heat);
+  border: 2px solid #EAF2F5;
+  box-shadow: 0 1px 5px rgba(16, 22, 28, 0.32);
+  transition: transform 0.18s ease;
+}
+.calc-field__range:hover::-webkit-slider-thumb,
+.calc-field__range:active::-webkit-slider-thumb { transform: scale(1.18); }
+.calc-field__range:hover::-moz-range-thumb,
+.calc-field__range:active::-moz-range-thumb { transform: scale(1.18); }
+.calc-field__range:focus-visible { outline: none; }
+.calc-field__range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px rgba(255, 106, 31, 0.3), 0 1px 5px rgba(16, 22, 28, 0.32);
+}
+.calc-field__range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px rgba(255, 106, 31, 0.3), 0 1px 5px rgba(16, 22, 28, 0.32);
+}
+
+.calc-field__ends {
+  display: flex; justify-content: space-between; margin-top: 2px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em;
+  color: rgba(16, 22, 28, 0.42);
+}
+
+/* the answer, ruled off from the questions */
+.calc__result {
+  margin-top: clamp(18px, 2.8vh, 32px);
+  padding-top: clamp(16px, 2.4vh, 26px);
+  border-top: 1px solid rgba(16, 22, 28, 0.14);
+}
+.calc__total {
+  display: flex; align-items: baseline; justify-content: center; gap: 6px;
+  color: #10161C;
+}
+.calc__total-num {
+  font-family: var(--display); font-weight: 700;
+  font-size: clamp(38px, 5.4vw, 64px); line-height: 1; letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.calc__total-unit {
+  font-family: var(--text); font-size: clamp(14px, 1.5vw, 19px);
+  color: #46525C;
+}
+.calc__result-label {
+  margin-top: 10px;
+  font-family: var(--text); font-size: 13px; color: #46525C;
+}
+.calc__result-sub {
+  margin-top: 8px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+  color: rgba(16, 22, 28, 0.55); font-variant-numeric: tabular-nums;
+}
+.calc__result-sub b { color: var(--heat); font-weight: 400; }
+
+.calc__note {
+  margin: clamp(14px, 2vh, 20px) auto 0;
+  font-family: var(--mono); font-size: 9px; line-height: 1.85;
+  letter-spacing: 0.1em; color: rgba(16, 22, 28, 0.48);
+}
+
 @media (max-width: 768px) {
   .calc__inner { width: 88vw; }
-  .calc__panels { gap: 18px; }
+  .calc__note { font-size: 8px; }
+}
+
+/* Short viewports (laptops at 720/768/800) — the type above is vw-driven, so
+   on a wide-but-short screen it stays large while the column runs out of
+   height and collides with the section rail. Scale the whole beat down. */
+@media (max-height: 820px) {
+  .calc__kicker { margin-bottom: 10px; }
+  .calc__title { font-size: clamp(20px, 2.2vw, 26px); margin-bottom: 10px; }
+  .calc__text { font-size: 13px; line-height: 1.6; }
+  .calc__fields { margin-top: 16px; }
+  .calc-field + .calc-field { margin-top: 12px; }
+  .calc-field__label { font-size: 12px; }
+  .calc-field__value { font-size: clamp(18px, 1.8vw, 20px); margin: 4px 0 8px; }
+  .calc-field__range { height: 18px; }
+  .calc__result { margin-top: 16px; padding-top: 14px; }
+  .calc__total-num { font-size: clamp(32px, 3.6vw, 42px); }
+  .calc__total-unit { font-size: 14px; }
+  .calc__result-label { margin-top: 7px; font-size: 12px; }
+  .calc__result-sub { margin-top: 6px; font-size: 10px; }
+  .calc__note { margin-top: 12px; font-size: 8px; line-height: 1.8; }
 }
 
 /* ---------- outro + close + footer ---------- */

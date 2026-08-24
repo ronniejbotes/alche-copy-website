@@ -134,10 +134,10 @@ export class ScrollManager {
 
     // snapper across works_outro..vision. The array is positional and must
     // match the runway heights in main.css —
-    // 140lvh / 100lvh / 210vh / 120vh / 180vh.
+    // 140lvh / 100lvh / 210vh / 260vh / 180vh.
     const snapper = [sec('works_outro'), sec('mission_in'), sec('mission'), sec('calc'), sec('vision')];
     if (snapper.every(Boolean)) {
-      const ratios = [1.4, 1, 2.1, 1.2, 1.8];
+      const ratios = [1.4, 1, 2.1, 2.6, 1.8];
       const total = ratios.reduce((a, b) => a + b, 0) - 1;
       const points = [0.5 / total];
       let acc = 0;

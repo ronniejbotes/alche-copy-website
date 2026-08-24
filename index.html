@@ -92,6 +92,10 @@
       <div class="rail__main"><span class="rail__line"></span><span class="rail__label">POSITION ZERO</span></div>
       <div class="rail__subs"><span class="rail__sub"></span><span class="rail__sub"></span></div>
     </div>
+    <div class="rail__item" data-rail="calc" data-active="false">
+      <div class="rail__main"><span class="rail__line"></span><span class="rail__label">CALCULATOR</span></div>
+      <div class="rail__subs"><span class="rail__sub"></span><span class="rail__sub"></span></div>
+    </div>
     <div class="rail__item" data-rail="vision" data-active="false">
       <div class="rail__main"><span class="rail__line"></span><span class="rail__label">METHOD</span></div>
       <div class="rail__subs"><span class="rail__sub"></span><span class="rail__sub"></span></div>
@@ -244,21 +248,57 @@
       <p class="mv__en">Position zero is the answer above the answers. That is where we put service businesses.</p>
     </div>
   </div>
-  <!-- Lead calculator. It lands after POSITION ZERO has made the argument and
-       before METHOD explains the work, so the visitor can put their own budget
-       against the claim first. Spend is the only live control; everything else
-       is derived (see telemetry.js) and carries the illustrative-model note. -->
+  <!-- Lead calculator. Its own beat on the runway, between POSITION ZERO and
+       METHOD: the argument has been made, so the visitor gets to price it
+       against their own numbers before we explain the work. Three inputs, one
+       answer — the arithmetic is stated openly under the result so the figure
+       reads as a calculation, not a promise. Wired in calculator.js. -->
   <div class="calc" data-visible="false">
     <div class="calc__inner">
-      <div class="calc__copy">
-        <p class="calc__kicker">LEAD CALCULATOR</p>
-        <h2 class="calc__title">Put your own numbers against it.</h2>
-        <p class="calc__text">Move the monthly ad spend and the rest follows — leads, cost per lead, return on ad spend. The attribution readout is what changes when you hold position zero instead of page one.</p>
+      <p class="calc__kicker">FREE TOOL</p>
+      <h2 class="calc__title">How much revenue are missed leads costing you?</h2>
+      <p class="calc__text">Set your own three numbers to see what a month of qualified leads would be worth to your business.</p>
+
+      <div class="calc__fields">
+        <div class="calc-field">
+          <label class="calc-field__label" for="calc-worth">What’s a new customer worth to you?</label>
+          <output class="calc-field__value" id="calc-worth-out" for="calc-worth">$2,500</output>
+          <input class="calc-field__range" type="range" id="calc-worth"
+                 min="250" max="20000" step="250" value="2500"
+                 aria-describedby="calc-worth-out">
+          <div class="calc-field__ends"><span>$250</span><span>$20,000+</span></div>
+        </div>
+
+        <div class="calc-field">
+          <label class="calc-field__label" for="calc-leads">How many qualified leads a month?</label>
+          <output class="calc-field__value" id="calc-leads-out" for="calc-leads">30</output>
+          <input class="calc-field__range" type="range" id="calc-leads"
+                 min="5" max="100" step="1" value="30"
+                 aria-describedby="calc-leads-out">
+          <div class="calc-field__ends"><span>5</span><span>100</span></div>
+        </div>
+
+        <div class="calc-field">
+          <label class="calc-field__label" for="calc-close">What share of those do you close?</label>
+          <output class="calc-field__value" id="calc-close-out" for="calc-close">15%</output>
+          <input class="calc-field__range" type="range" id="calc-close"
+                 min="1" max="50" step="1" value="15"
+                 aria-describedby="calc-close-out">
+          <div class="calc-field__ends"><span>1%</span><span>50%</span></div>
+        </div>
       </div>
-      <div class="calc__panels">
-        <div class="hud hud--signal" id="pane-signal" data-visible="true"></div>
-        <div class="hud hud--attribution" id="pane-attribution" data-visible="true"></div>
+
+      <div class="calc__result">
+        <p class="calc__total">
+          <span class="calc__total-num" id="calc-annual">$135,000</span><span class="calc__total-unit">/year</span>
+        </p>
+        <p class="calc__result-label">in revenue at the numbers you entered</p>
+        <p class="calc__result-sub">
+          <b id="calc-monthly">$11,250</b>/mo · <b id="calc-customers">4.5</b> new customers/mo
+        </p>
       </div>
+
+      <p class="calc__note">This is arithmetic on the three numbers you set above — customer value × leads × close rate — not a projection of what we would deliver. If you do not know your close rate yet, that is the first thing worth measuring.</p>
     </div>
   </div>
 

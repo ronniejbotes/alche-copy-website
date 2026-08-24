@@ -58,6 +58,11 @@ const wallVert = /* glsl */ `
 ${GLSL_CONSTANTS}
 ${GLSL_HASH}
 ${GLSL_ROTATE2}
+// atlas cell is 512x176. 6 cells across fills the grid without shrinking the
+// word past reading size (~65 words on a 16:9 screen); at 4 it read as a few
+// big fragments cropped by the frame rather than a field.
+#define WORKS_CELL_ASPECT 2.909
+#define WORKS_COLS_ON_SCREEN 6.0
 attribute vec3 instancePosition;
 attribute vec2 instanceScale;
 attribute vec4 instanceID;
@@ -152,16 +157,19 @@ void main() {
   float boHash = floor(uBlackOutHash * 5.0) / 5.0;
   vBlackOut = step(hash21(instanceID.xy + boHash), uBlackOut);
 
-  // WORKS band burned across the wall (rotated, tall repeat, slides in)
-  float bandScale = max(1.0, 0.8 / uScreenAspectRatio * 2.0);
+  // WORKS field: the 4x4 atlas tiled across the whole wall, so the word reads
+  // everywhere in the background instead of one band sweeping past.
+  //
+  // Aspect has to be unwound before the rotation, or the non-uniform scale
+  // after it shears the letterforms. Work in units of screen height, rotate
+  // there, then divide by the on-screen size of one whole atlas.
   vec2 wt = vScreenUv - 0.5;
-  wt *= bandScale;
   wt.x *= uScreenAspectRatio;
-  wt *= rot2(-0.15);
-  wt.y *= 2.2;   // one dominant WORKS row + a dim neighbour, not letter shards
-  wt.x *= 0.9;
-  wt *= rot2(-0.015);
-  wt.x -= -0.18 + uWorksTitleProgress * 0.3;
+  wt *= rot2(-0.05);
+  float cellW = uScreenAspectRatio / WORKS_COLS_ON_SCREEN;
+  float cellH = cellW / WORKS_CELL_ASPECT;
+  wt /= vec2(cellW * 4.0, cellH * 4.0);   // 4x4 cells per atlas
+  wt.x += uWorksTitleProgress * 0.12;     // gentle drift, not a spin
   vWorksTitleUv = wt + 0.5;
 
   // adjacent works art slide (outgoing left, incoming from the right)
@@ -264,7 +272,8 @@ void main() {
   o.rgb += logoMask * 0.2 * (1.0 - bandVis);
 
   // WORKS band burned in
-  vec3 band = texture2D(uWorksTitleTex, vWorksTitleUv).rgb * bandVis;
+  // alpha carries the per-cell weighting painted into the atlas
+  vec3 band = vec3(texture2D(uWorksTitleTex, vWorksTitleUv).a) * bandVis;
 
   // works art wipe between adjacent works
   vec3 t1 = texture2D(uWorks1Tex, vWorksUv1).rgb * uWorks1Loaded;
@@ -280,7 +289,9 @@ void main() {
 
   // per-tile falloff, band overlay, dot matrix, wall vignette
   o.rgb *= smoothstep(1.9, 0.1, length(vUv - 0.5));
-  o.rgb += band * step(vWorksTitleUv.x, 1.0) * step(0.01, vWorksTitleUv.x);
+  // Background, not foreground: at 0.62 the field competed with the hero copy
+  // and washed the refraction out of the glass mark in front of it.
+  o.rgb += band * 0.45;
   float dotw = smoothstep(0.5, 0.2, length(fract(vGlobalUv * 1800.0 * 0.23) - 0.5));
   dotw = mix(dotw, 1.0, 0.6) * 0.9;
   o.rgb *= dotw;

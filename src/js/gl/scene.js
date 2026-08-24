@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Lerper, Animator, easeOutCubic } from '../core/lerper.js';
 import { createFlowNoise } from './flow-noise.js';
 import { createStudioEnvMap } from './env-map.js';
-import { createBrandWordmarkTexture, createWorksTitleTexture, createServicesTitleTexture } from './wordmark-textures.js';
+import { createBrandWordmarkTexture, createWorksAtlasTexture, createServicesTitleTexture } from './wordmark-textures.js';
 import { WorksMedia } from './works-media.js';
 import { BGWall } from './bg-wall.js';
 import { GridOverlay } from './grid-overlay.js';
@@ -170,45 +170,6 @@ void main() {
 }
 `;
 
-const worksTitleVert = /* glsl */ `
-${GLSL_CONSTANTS}
-${GLSL_ROTATE2}
-uniform float uProgress;
-varying vec2 vUv;
-varying float vAlpha;
-void main() {
-  float rotMul = TPI * 1.3;
-  float theta = rotMul + position.x * TPI - uProgress * 3.0 * rotMul;
-  float clamped = clamp(theta, -TPI - PI, PI);
-  float rad = 3.0;
-  vec3 pos = vec3(sin(clamped + PI) * rad, position.y, cos(clamped + PI) * rad);
-  float viewIn = max(0.0, theta - PI);
-  float viewOut = min(0.0, theta + TPI + PI);
-  pos.x += viewIn * 2.0 + viewOut * 2.0;
-  pos.xy *= rot2(0.2);
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-  vUv = uv;
-  vAlpha = smoothstep(2.5, 0.0, viewIn) * smoothstep(-2.5, 0.0, viewOut);
-}
-`;
-
-const worksTitleFrag = /* glsl */ `
-uniform sampler2D uTex;
-uniform float uTime;
-uniform float uProgress;
-varying vec2 vUv;
-varying float vAlpha;
-void main() {
-  vec4 t = texture2D(uTex, vUv * vec2(22.0, 1.0) + vec2(uTime * 0.1 - uProgress * 13.0, 0.0));
-  float p3 = uProgress * 3.0;
-  float edges = smoothstep(1.0, 0.0, p3) + smoothstep(2.0, 3.0, p3);
-  float a = t.a;
-  a *= smoothstep(0.0, 0.2 * edges, vUv.x);
-  a *= smoothstep(1.0, 1.0 - 0.2 * edges, vUv.x);
-  gl_FragColor = vec4(vec3(1.0), a * vAlpha);
-}
-`;
-
 function makeQuadScene(fragmentShader, uniforms) {
   const scene = new THREE.Scene();
   const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -254,7 +215,8 @@ export class PositionXeroGL {
     this.media = new WorksMedia();
     this.pointerTrail = new PointerTrail(this.renderer);
     this._wordmarkTex = createBrandWordmarkTexture();
-    this._worksTitleTex = createWorksTitleTexture();
+    // the WORKS field tiled across the wall — one typeface per atlas cell
+    this._worksTitleTex = createWorksAtlasTexture();
     this._servicesTex = createServicesTitleTexture();
     this._loaderTex = null; // set by the loader once its canvas is final
 
@@ -291,36 +253,6 @@ export class PositionXeroGL {
     this.wordmark2D.position.set(0, 1, -15);
     this.wordmark2D.renderOrder = -900;
     this.scene.add(this.wordmark2D);
-
-    // WORKS ribbon
-    this.worksTitle = new THREE.Mesh(
-      new THREE.PlaneGeometry(1, 1, 64, 1),
-      new THREE.ShaderMaterial({
-        vertexShader: worksTitleVert,
-        fragmentShader: worksTitleFrag,
-        uniforms: {
-          uTex: { value: this._worksTitleTex },
-          uTime: { value: 0 },
-          uProgress: { value: 0 }
-        },
-        transparent: true,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        side: THREE.DoubleSide
-      })
-    );
-    // The vert shader wraps this plane onto a cylinder of radius 3, so one
-    // texture repeat spans 2*PI*3*scaleX / repeats on screen. At scaleX 14
-    // with 4 repeats that was ~66 world units against a ~12-unit viewport —
-    // under a fifth of one letter filled the frame, which is why it read as
-    // white slabs. 22 repeats puts one WORKS at ~12 units and height 2.6
-    // matches the texture's 1136:256 aspect, so the letters keep their shape.
-    // scaleX stays wide: dropping it pulls the ring onto the logo and the
-    // word disappears behind the glass instead of sweeping past it.
-    this.worksTitle.scale.set(14, 2.6, 1);
-    this.worksTitle.renderOrder = 999;
-    this.worksTitle.frustumCulled = false;
-    this.scene.add(this.worksTitle);
 
     this.logo = new MainLogo({ noiseTexture: this.noise.texture, envMap: this.envMap });
     this.scene.add(this.logo);
@@ -639,8 +571,6 @@ export class PositionXeroGL {
     this.wall.setWorksProgress(worksProg, bgU);
     this.wall.update(t);
     this.grid.setScroll(missionScroll * 0.1);
-    this.worksTitle.material.uniforms.uProgress.value = worksTitle;
-    this.worksTitle.material.uniforms.uTime.value = t;
     this.wordmark2D.material.uniforms.uAlpha.value = this.animator.get('wordmark2D');
     this.missionGrid.setScroll(missionScroll);
     this.thumbs.update(carouselU, carouselVel);

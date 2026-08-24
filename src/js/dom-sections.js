@@ -214,7 +214,12 @@ export class CognexaController {
     // hide entirely once the outro/footer takes over
     const p = section === 'footer' ? 0 : Math.min(1, progress * 1.5);
     this.root.style.opacity = String(p);
-    this.root.setAttribute('data-visible', String(p > 0.01));
+    const visible = p > 0.01;
+    this.root.setAttribute('data-visible', String(visible));
+    // .cognexa__logo sets pointer-events:auto, which survives the layer's
+    // pointer-events:none — without inert the invisible link keeps eating
+    // clicks meant for the beat underneath it
+    this.root.toggleAttribute('inert', !visible);
     const frame = this.root.querySelector('.cognexa__frame');
     if (frame) frame.style.setProperty('--progress', String(p));
   }

@@ -103,7 +103,9 @@ async function boot() {
       hero.toggleAttribute('inert', o < 0.05);
     }
     if (stakes) {
-      stakes.style.opacity = String(band(p.worksTitle, 0.52, 0.08, 0.86, 0.14));
+      const o = band(p.worksTitle, 0.52, 0.08, 0.86, 0.14);
+      stakes.style.opacity = String(o);
+      stakes.toggleAttribute('inert', o < 0.05);
     }
     gl.setScrollState({
       worksTitle: p.worksTitle,

@@ -1,14 +1,23 @@
 import * as THREE from 'three';
 
 /**
- * Each case gets a procedurally drawn key visual in the Position Xero
- * palette — amber for the ads-led work, cyan for the search/AI-led work.
+ * Each case gets a key visual: a real screenshot where we have one (`img`),
+ * otherwise a procedurally drawn stand-in in the Position Xero palette —
+ * amber for the ads-led work, cyan for the search/AI-led work.
+ *
  * Order here MUST match the .works-item order in index.html or the wall art
  * desyncs from the card copy.
+ *
+ * `img` is drawn over the procedural art once it loads, into the same canvas,
+ * so the texture object never changes identity and nothing has to re-bind
+ * uniforms. The generated art is what shows while the file is in flight.
  */
 
+// public/ assets are served from the configured base
+const asset = (p) => `${import.meta.env.BASE_URL}${p}`.replace(/([^:])\/{2,}/g, '$1/');
+
 const WORKS = [
-  { title: 'TINY HOMES SA', sub: 'CONFIGURATOR + PAID SEARCH', pal: ['#FF6A1F', '#7A2E0C', '#05070A'] },
+  { title: 'TINY HOMES SA', sub: 'CONFIGURATOR + PAID SEARCH', pal: ['#FF6A1F', '#7A2E0C', '#05070A'], img: asset('works/kv-01.jpg') },
   { title: 'PEAK LEADS', sub: 'PIPELINE-FIRST FUNNELS', pal: ['#2EE6FF', '#0E5C77', '#05070A'] },
   { title: 'EYE CANDY', sub: 'SHOWROOM + ENQUIRY FUNNEL', pal: ['#FF6A1F', '#7A2E0C', '#05070A'] },
   { title: 'CAJEE BOTES', sub: 'BOOKINGS + LOCAL SEARCH', pal: ['#2EE6FF', '#0E5C77', '#05070A'] }
@@ -117,7 +126,34 @@ export class WorksMedia {
     blurTex.colorSpace = THREE.SRGBColorSpace;
     blurTex.wrapS = blurTex.wrapT = THREE.MirroredRepeatWrapping;
 
-    return { canvas: c, ctx, tex, blurTex, spec, seed, aspect: W / H };
+    const entry = { canvas: c, ctx, tex, blurTex, spec, seed, aspect: W / H, hasImage: false };
+
+    if (spec.img) {
+      const im = new Image();
+      im.crossOrigin = 'anonymous';
+      im.onload = () => {
+        // cover-fit: the screenshot and the panel are both 16:9, but do not
+        // assume it — a mismatched capture should crop, never letterbox
+        const s = Math.max(W / im.width, H / im.height);
+        const dw = im.width * s;
+        const dh = im.height * s;
+        ctx.clearRect(0, 0, W, H);
+        ctx.drawImage(im, (W - dw) / 2, (H - dh) / 2, dw, dh);
+        // the generated art tiles happily; a screenshot flipped at the seam
+        // is instantly readable as wrong, so clamp instead of mirror
+        tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+        tex.needsUpdate = true;
+        small.getContext('2d').drawImage(c, 0, 0, 64, 36);
+        blurTex.needsUpdate = true;
+        entry.hasImage = true;
+      };
+      im.onerror = () => {
+        console.warn('[px] works art failed to load, keeping generated art:', spec.img);
+      };
+      im.src = spec.img;
+    }
+
+    return entry;
   }
 
   workTexture(i) {
@@ -130,6 +166,11 @@ export class WorksMedia {
 
   workAspect(i) {
     return this._works[i]?.aspect ?? 16 / 9;
+  }
+
+  /** true once a real screenshot has replaced the generated stand-in */
+  workHasImage(i) {
+    return this._works[i]?.hasImage === true;
   }
 
   serviceTexture(i) {

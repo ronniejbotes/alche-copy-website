@@ -62,6 +62,8 @@ uniform sampler2D uTex;
 uniform float uAlpha;
 uniform float uLoaded;
 uniform float uScrollVelocity;
+uniform float uPhoto;      // 1 once a real screenshot replaced the generated art
+uniform float uParallax;   // how far behind the front glass the content sits
 varying vec2 vUv;
 varying vec2 vMeshUv;
 varying vec3 vNormal;
@@ -73,10 +75,25 @@ void main() {
   float facing = abs(dot(vNormal, vViewDir));
   vec2 normalOffset = -vNormal.xy * 0.5 * smoothstep(0.8, 1.0, 1.0 - facing);
 
+  // --- depth -------------------------------------------------------------
+  // Tangential view direction: which way we are looking ACROSS the panel face.
+  // Zero head-on, and it grows as the carousel rotates the screen away.
+  vec3 N = normalize(vNormal);
+  vec3 V = normalize(vViewDir);
+  vec2 across = (V - N * dot(V, N)).xy;
+
   vec2 cuv = (vUv - 0.5);
-  cuv *= 1.3;
-  cuv.x *= 0.9;
+  // The abstract art is happy overscanned and mirrored at the seam; a
+  // screenshot is not. Photo panels sample INSIDE the image (0.88) rather than
+  // past its edge, which leaves real content for the parallax to slide into —
+  // sampling past 1.0 would just smear the clamped edge pixels instead.
+  cuv *= mix(1.3, 0.88, uPhoto);
+  cuv.x *= mix(0.9, 1.0, uPhoto);
   cuv.x += uScrollVelocity * 0.15;
+
+  // Content is behind the glass, so it slides against the view the way
+  // anything seen through a window does.
+  cuv -= across * uParallax * uPhoto;
 
   vec3 col = vec3(0.0);
   for (int i = 0; i < 4; i++) {
@@ -89,6 +106,19 @@ void main() {
 
   col *= smoothstep(0.9, 0.49, length(vMeshUv - 0.5));
   col = mix(col, vec3(smoothstep(0.0, 0.2, vViewDir.x)), 0.05);
+
+  // Recess wall. Off-axis you see the near inside edge of the housing, and it
+  // falls on the side you are looking in from — this reads as depth far more
+  // strongly than the parallax shift on its own does.
+  vec2 e = vMeshUv - 0.5;
+  vec2 q = abs(e + across * 0.42);
+  float inner = smoothstep(0.5, 0.28, max(q.x, q.y));
+  col *= mix(1.0, 0.58 + 0.42 * inner, uPhoto);
+
+  // Front-surface sheen: a soft highlight that sweeps across the glass as the
+  // panel turns, so the surface reads as being in front of the content.
+  float sweep = dot(normalize(e + 1e-5), normalize(across + 1e-5));
+  col += pow(1.0 - facing, 2.5) * smoothstep(0.15, 1.0, sweep) * 0.11 * uPhoto;
 
   // the slab was a rounded rect before it needed segmenting for the cylinder
   // bend; the box that replaced it has square corners, so mask the radius back
@@ -120,7 +150,9 @@ export class WorksThumbs {
         uTexAspect: { value: media.workAspect(i) },
         uAlpha: { value: 0 },
         uLoaded: { value: 1 },
-        uScrollVelocity: { value: 0 }
+        uScrollVelocity: { value: 0 },
+        uPhoto: { value: 0 },
+        uParallax: { value: 0.055 }
       };
       const mesh = new THREE.Mesh(geo, new THREE.ShaderMaterial({
         vertexShader: vert,
@@ -153,6 +185,8 @@ export class WorksThumbs {
       mesh.scale.setScalar(0.9 + 0.2 * (1 - Math.min(1, ak)));
       mesh.material.uniforms.uAlpha.value = alpha;
       mesh.material.uniforms.uScrollVelocity.value = vel;
+      // screenshots arrive async, so the depth treatment switches on when they do
+      mesh.material.uniforms.uPhoto.value = this.media.workHasImage(i) ? 1 : 0;
     }
   }
 

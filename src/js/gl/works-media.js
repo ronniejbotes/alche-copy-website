@@ -20,7 +20,7 @@ const WORKS = [
   { title: 'TINY HOMES SA', sub: 'CONFIGURATOR + PAID SEARCH', pal: ['#FF6A1F', '#7A2E0C', '#05070A'], img: asset('works/kv-01.jpg') },
   { title: 'PEAK LEADS', sub: 'PIPELINE-FIRST FUNNELS', pal: ['#2EE6FF', '#0E5C77', '#05070A'] },
   { title: 'EYE CANDY', sub: 'SHOWROOM + ENQUIRY FUNNEL', pal: ['#FF6A1F', '#7A2E0C', '#05070A'] },
-  { title: 'CAJEE BOTES', sub: 'BOOKINGS + LOCAL SEARCH', pal: ['#2EE6FF', '#0E5C77', '#05070A'] }
+  { title: 'CAJEE BOTES', sub: 'BOOKINGS + LOCAL SEARCH', pal: ['#2EE6FF', '#0E5C77', '#05070A'], img: asset('works/cajee-botes.jpg') }
 ];
 
 const SERVICE = [

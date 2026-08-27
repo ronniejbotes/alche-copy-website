@@ -1,0 +1,36 @@
+{
+  "captured": "2026-08-27, before the immersive restyle of public/css/style.css",
+  "why": "The restyle rewrites one stylesheet that all 52 pages depend on. These behaviours are CSS-coupled and can break silently.",
+  "checks": {
+    "faq_accordion": {
+      "page": "/faq.html",
+      "mechanism": "public/js/main.js toggles .open on .faq-item and syncs aria-expanded. The collapse itself is CSS: .faq-answer height 0 when closed.",
+      "expect": { "open_class_after_click": true, "aria_expanded_after_click": "true", "answer_height_when_closed": "0px" },
+      "risk": "215 accordion instances. If .faq-answer loses its height rule or .faq-item.open loses its expanded rule, every FAQ on the site is either permanently open or permanently shut."
+    },
+    "scroll_reveal": {
+      "page": "/index.html",
+      "mechanism": "main.js IntersectionObserver adds .visible to .fade-in. Non-IO browsers get everything revealed immediately.",
+      "expect": { "fade_in_total": 47, "revealed_above_fold": 5 },
+      "risk": "581 .fade-in elements sitewide. If .fade-in defaults to opacity 0 and the observer does not fire, or a new script double-binds it, every page ships invisible content."
+    },
+    "warp_grid": {
+      "page": "/index.html",
+      "mechanism": "main.js injects canvas.warp-grid and sets .has-warp-grid on the host, which hides the static CSS grid.",
+      "expect": { "canvas_present": true },
+      "risk": "If .has-warp-grid loses its rule, the static grid and the canvas both render."
+    },
+    "calculators": {
+      "page": "/index.html",
+      "mechanism": "main.js binds #calcValue, #calcLeads, #calcMonth and the lead-value set (#lvMargin, #lvProfit, #lvMaxCpl).",
+      "expect": { "calc_inputs_present": 3 },
+      "risk": "Range inputs are heavily styled per browser. A restyle that misses ::-webkit-slider-thumb leaves an invisible handle."
+    },
+    "free_audit_tool": {
+      "page": "/free-audit.html",
+      "mechanism": "2140 lines, 8-screen funnel, 18-check analyser, report renderer, Web3Forms delivery.",
+      "expect": "screens navigate, report renders",
+      "risk": "Largest and most stateful page on the site. Screen switching is likely class-driven and therefore CSS-coupled."
+    }
+  }
+}

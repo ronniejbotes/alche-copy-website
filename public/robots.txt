@@ -1,0 +1,42 @@
+# Position Xero — robots.txt
+# Position Xero sells AI SEO / LLM SEO, so we deliberately ALLOW the major AI
+# crawlers below: being readable by them is how a brand gets cited in AI answers.
+
+User-agent: *
+Allow: /
+
+# --- AI answer engines (allowed for citation in AI-generated answers) ---
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# --- AI training crawler (Common Crawl) ---
+# Explicitly allowed: feeds many LLM training sets and aids long-term brand recall.
+# Change "Allow: /" to "Disallow: /" if you do NOT want content used for model training.
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://www.positionxero.com/sitemap.xml

@@ -1,0 +1,99 @@
+# Position Xero — Apache config (Hostinger)
+
+# Serve the branded 404 page with a real 404 status (avoids soft-404s).
+ErrorDocument 404 /404.html
+
+# ---------------------------------------------------------------------------
+# NEVER serve internal/source files. pricing.md is the ONE public .md
+# (machine-readable pricing, linked from llms.txt). Everything else that is
+# markdown, and the whole /docs/ tree, returns 404.
+# ---------------------------------------------------------------------------
+RedirectMatch 404 ^/docs(/|$)
+RedirectMatch 404 ^/seo-tool(/|$)
+RedirectMatch 404 ^/(?!pricing\.md$)[^/]*\.md$
+<FilesMatch "\.md$">
+  Require all denied
+</FilesMatch>
+<Files "pricing.md">
+  Require all granted
+</Files>
+
+# Redirect direct /index.html (and /blog/index.html) hits to the clean canonical URL.
+# THE_REQUEST condition prevents loops when Apache serves "/" via DirectoryIndex internally.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]
+  RewriteRule ^(.*/)?index\.html$ https://www.positionxero.com/$1 [R=301,L]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Clean, extensionless URLs (2026-07-12). Canonical URLs no longer carry .html:
+# /services.html 301s to /services, and /services is served from services.html.
+# index.html/404.html are excluded (handled above / error page).
+# ---------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # /seo-audit was replaced by /free-audit before ever shipping (2026-07-13) — catch strays in one hop.
+  RewriteRule ^seo-audit(\.html)?$ https://www.positionxero.com/free-audit [R=301,L]
+  # Legacy .html URL requested directly -> 301 to the clean canonical URL.
+  # Absolute target: even a URL wrong on host AND scheme AND extension resolves in ONE hop.
+  RewriteCond %{REQUEST_URI} !(^|/)(index|404)\.html$ [NC]
+  RewriteCond %{THE_REQUEST} \s/+([^\s?]+)\.html[\s?] [NC]
+  RewriteRule ^ https://www.positionxero.com/%1 [R=301,L]
+  # Clean URL requested -> serve the matching .html file internally
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.+?)/?$ $1.html [L]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Canonical host + HTTPS in a SINGLE hop (matches <link rel="canonical"> and the
+# sitemap). Enabled 2026-07-12 to fix the multi-redirect chain PageSpeed flagged
+# (0.63s). Loop-proofed: the X-Forwarded-Proto guard covers proxy TLS termination.
+# ---------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Any non-canonical host (bare domain, casing variants) -> canonical, one hop
+  RewriteCond %{HTTP_HOST} !^www\.positionxero\.com$ [NC]
+  RewriteRule ^ https://www.positionxero.com%{REQUEST_URI} [L,R=301]
+  # Canonical host over plain HTTP -> HTTPS, one hop
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+  RewriteRule ^ https://www.positionxero.com%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Long-cache static assets for performance (safe for hashed/owned assets).
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg            "access plus 1 year"
+  ExpiresByType image/png             "access plus 1 year"
+  ExpiresByType image/webp            "access plus 1 year"
+  ExpiresByType image/svg+xml         "access plus 1 year"
+  ExpiresByType text/css              "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType image/x-icon          "access plus 1 year"
+  ExpiresByType font/woff2            "access plus 1 year"
+  ExpiresByType font/woff             "access plus 1 year"
+  ExpiresByType application/manifest+json "access plus 1 week"
+</IfModule>
+
+# Long-cache web fonts and icon images as immutable (no revalidation).
+<IfModule mod_headers.c>
+  <FilesMatch "\.(woff2|png|jpg|webp|svg|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+# Compress text assets.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml text/plain font/woff2 font/woff application/font-woff2 text/markdown application/manifest+json
+</IfModule>
+
+# Security / response headers (safe, code-only — no rendering changes).
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>

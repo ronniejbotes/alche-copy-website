@@ -9,9 +9,13 @@ import { resolve } from 'path';
 const root = import.meta.dirname;
 
 export default defineConfig({
-  // Relative base so the built site works on any static host (Vercel, Netlify,
-  // GitHub Pages subpaths) without configuration.
-  base: './',
+  // Absolute base, and this is load-bearing rather than cosmetic. The legacy
+  // pages ship as flat files served extensionless via .htaccess, and Apache
+  // also answers the trailing-slash variant (/services/) from the same file.
+  // Under base: './' that variant would resolve assets against /services/ and
+  // 404 every one of them. Absolute paths make the slash variant irrelevant.
+  // Deployment target is Hostinger/Apache, not a GitHub Pages subpath.
+  base: '/',
   server: {
     watch: {
       // Everything here lives inside the project root but is not source. The
@@ -39,13 +43,20 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      // Only the pages built from src/ are listed here. The 52 legacy pages
+      // live in public/ and are copied verbatim, which keeps Vite away from
+      // free-audit.html's 2,140 lines of inline JS.
+      //
+      // No 'index.html' entry: dist/index.html comes from public/index.html
+      // (the legacy home page). experience.html carries the immersive build
+      // until Phase 5 merges it onto / — see .migration/MIGRATION-PLAN.md.
       input: {
+        // The merged immersive home page. It absorbed the legacy home page's
+        // content and both schema nodes, so this entry now produces dist/index.html
+        // and supersedes the copy that used to come from public/index.html.
         main: resolve(root, 'index.html'),
-        works: resolve(root, 'works/index.html'),
-        about: resolve(root, 'about/index.html'),
-        news: resolve(root, 'news/index.html'),
-        cognexa: resolve(root, 'cognexa/index.html'),
-        contact: resolve(root, 'contact/index.html')
+        works: resolve(root, 'works.html'),
+        cognexa: resolve(root, 'cognexa.html')
       }
     }
   }

@@ -1,0 +1,2340 @@
+/* ===================================================================
+   Position Xero - global stylesheet
+   Immersive design language, legacy class vocabulary.
+
+   Every class name from the previous sheet is preserved. Only the
+   appearance changes, so no page markup needs to move.
+
+   Ground is near-black with a blue bias. Structure comes from
+   hairlines, never from shadow. Mono uppercase microcopy at wide
+   tracking carries the labels, Archivo carries the display type,
+   Inter carries the reading. Cyan is the single signal colour and is
+   spent sparingly. Amber is the heat accent for conversion and order.
+
+   File order: tokens, reset, typography, layout, chrome, sections,
+   components, forms, tables, blog, utilities, responsive,
+   reduced motion, print.
+   =================================================================== */
+
+/* Fonts are loaded by each page's <head>, not from here. Every page
+   carries the non-blocking pattern already in place: a preconnect, a
+   rel=preload as=style, a media="print" stylesheet that flips to all
+   on load, and a <noscript> copy. It requests exactly the three
+   families this sheet uses:
+
+     Archivo 600 and 700, Inter 400 and 500, IBM Plex Mono 400
+
+   A CSS @import here would undo that: it is fetched only after this
+   stylesheet parses and it blocks rendering, so it would cost a round
+   trip and hurt LCP for no gain. Do not add one.
+
+   Note the loaded Inter weights stop at 500. Anything asking for 600
+   or 700 in Inter resolves to 500, so weight alone is never the only
+   thing carrying emphasis in this sheet: emphasised runs also step up
+   the ink ramp. */
+
+/* ===================================================================
+   1. TOKENS
+   Mirrors the block in src/styles/main.css so the two sheets cannot
+   drift, then aliases every legacy token name onto it. The legacy
+   names are load-bearing: 1,154 inline style attributes across the
+   site reference them directly, so none of them may disappear.
+   =================================================================== */
+:root {
+  /* --- Ground and surfaces --- */
+  --bg:        #05070A;   /* the ground, near-black with a blue bias */
+  --bg-2:      #090D12;   /* barely lifted surface: cards, alternating bands */
+  --bg-card:   #090D12;
+  --bg-dark:   #020408;   /* the well: page headers, footer, CTA, stats */
+
+  /* --- Ink ramp --- */
+  --fg:        #F2F5F7;   /* 18.42:1 on the ground */
+  --ink:       #F2F5F7;   /* legacy alias, now the brightest ink */
+  --ink-2:     #D6DDE3;   /* 14.70:1 */
+  --ink-05:    #D6DDE3;
+  --ink-15:    #A3AEB8;   /*  8.94:1 */
+  --ink-30:    #8A949D;   /*  6.53:1, lifted from the source value which
+                              measured 4.46:1 and failed body contrast */
+  --ink-40:    #4E5A65;   /*  2.86:1, decorative only, never text */
+  --ink-50:    #3A454F;   /*  2.06:1, decorative only, never text */
+  --ink-70:    #1A2129;   /*  faintest structural hairline */
+  --muted:     #A3AEB8;   /* legacy alias, workhorse body colour */
+  --muted-2:   #8A949D;   /* legacy alias, tertiary copy */
+  --white:     #F2F5F7;   /* legacy alias, brightest ink on a dark island */
+
+  /* --- Accents --- */
+  --signal:     #2EE6FF;  /* 13.33:1, focus, links, current state, hover edges */
+  --heat:       #FF6A1F;  /*  7.04:1, conversion, ordinals, emphasis rules */
+  --hover-fill: rgba(242, 245, 247, 0.06);
+
+  /* --- Rule ramp. Three strengths plus one for control boundaries. --- */
+  --rule:        rgba(242, 245, 247, 0.14);  /* structural divider */
+  --rule-soft:   rgba(242, 245, 247, 0.08);  /* hairline inside a component */
+  --rule-faint:  rgba(242, 245, 247, 0.05);  /* edge tint, panel seam */
+  --rule-strong: rgba(242, 245, 247, 0.38);  /* 3.04:1, interactive boundary */
+  --border:      rgba(242, 245, 247, 0.12);  /* legacy alias, cell and card edges */
+  --border-h:    rgba(46, 230, 255, 0.55);   /* legacy alias, hover edge */
+
+  /* --- Gradient. Light end to mid-ink, so the dark end still clears
+         8.94:1 wherever gradient text sits on the ground. --- */
+  --gradient: linear-gradient(135deg, #F2F5F7 0%, #A3AEB8 100%);
+
+  /* --- Type families --- */
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --text:    "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:    "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-head: var(--display);  /* legacy alias */
+  --font-body: var(--text);     /* legacy alias */
+
+  /* --- Metrics --- */
+  --max-w:  1200px;
+  --radius: 2px;    /* structural surfaces are square in this language */
+  --pill:   999px;  /* roundness is reserved for things you click */
+  --tr:      0.3s ease;  /* the default interaction duration */
+  --tr-slow: 0.5s ease;  /* chrome that changes because page state changed */
+}
+
+/* ===================================================================
+   2. RESET
+   =================================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  background-color: var(--bg);
+  /* The ground. A faint diagonal technical weave over a soft horizon
+     glow at the top of the document. Both are pure CSS gradients with
+     no JavaScript dependency, so the page looks finished with scripts
+     off. public/js/immersive.js paints its animated version of the
+     same idea into a fixed .px-bg element at z-index -1, which covers
+     this one once scripting is available. */
+  background-image:
+    radial-gradient(125% 100% at 50% 0%, rgba(46, 230, 255, 0.055) 0%, transparent 58%),
+    repeating-linear-gradient(115deg, rgba(242, 245, 247, 0.04) 0 1px, transparent 1px 26px);
+  background-repeat: no-repeat, repeat;
+  background-size: 100% 92vh, auto auto;
+  background-position: 50% 0, 0 0;
+}
+
+body {
+  background-color: transparent;  /* let the html ground show through */
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.72;
+  overflow-x: hidden;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Why the ground lives on html and body is transparent: the animated
+   backdrop sits at z-index -1, and a background on body would paint
+   over anything at a negative z-index. Moving the ground up one level
+   is what gives that layer somewhere to show. Do not put a background
+   colour back on body. */
+
+::selection { background: var(--signal); color: var(--bg); }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--ink-50); border-radius: 2px; }
+
+/* ===================================================================
+   3. TYPOGRAPHY
+   The rule of the scale: the larger the type, the tighter the tracking
+   and the tighter the line-height.
+   =================================================================== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-head);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+h1 {
+  font-size: clamp(2.3rem, 5vw, 3.9rem);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+}
+h2 {
+  font-size: clamp(1.7rem, 3.2vw, 2.55rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-size: clamp(1.05rem, 1.6vw, 1.28rem);
+  line-height: 1.28;
+  letter-spacing: -0.01em;
+}
+h4, h5, h6 { font-size: 1rem; line-height: 1.35; }
+
+p { color: var(--muted); }
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; height: auto; display: block; }
+
+/* Focus. One ring, everywhere, at 13.33:1 against the ground. Two
+   pixels at three pixels of offset clears every 1px hairline in the
+   system so the ring never merges with a border. */
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible,
+summary:focus-visible,
+.btn-primary:focus-visible,
+.btn-outline:focus-visible,
+.btn-white:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+/* Every band is dark now, so the old light-ring override set simply
+   resolves to the same signal ring. The selectors stay because they
+   are referenced by the accessibility audit trail. */
+.footer a:focus-visible,
+.cta-section a:focus-visible,
+.stats-section a:focus-visible,
+.page-header a:focus-visible,
+.article-header a:focus-visible,
+.breadcrumb a:focus-visible,
+body.dark-nav .nav:not(.scrolled) a:focus-visible {
+  outline-color: var(--signal);
+}
+
+/* ===================================================================
+   4. LAYOUT
+   =================================================================== */
+.container {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 clamp(22px, 4vw, 40px);
+}
+.section { padding: clamp(72px, 11vh, 116px) 0; }
+
+/* Gradient text. Light to mid-ink so the dark end still reads. */
+.gradient-text,
+body.dark-nav .nav:not(.scrolled) .gradient-text,
+.page-header .gradient-text,
+.article-header .gradient-text,
+.cta-banner .gradient-text,
+.stats-section .gradient-text,
+.calc-section .gradient-text {
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Section kicker. The signature gesture of this language: mono,
+   uppercase, 0.22em tracking, small. */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+/* The decorative dash stays retired: it read as punctuation. */
+.section-label::before { display: none; }
+
+.section-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto clamp(44px, 6vh, 68px);
+}
+.section-header h2 { margin-bottom: 16px; }
+.section-header p { font-size: 1.02rem; line-height: 1.8; color: var(--muted); }
+
+/* -------------------------------------------------------------------
+   SCROLL REVEAL. Read this before changing anything below.
+
+   The resting state is VISIBLE. That is deliberate and it is the
+   single most important rule in this file: 581 .fade-in elements carry
+   the body content of 19 pages, and if their resting state were hidden
+   then any failure of the reveal script would ship a blank page.
+
+   The animation is opt-in. The interaction layer adds `js-reveal` to
+   the <html> element as early as it can, which arms the hidden state,
+   then adds `.visible` per element as it scrolls into view, exactly as
+   the existing main.js already does. If that class is never added, if
+   scripting is off, or if the reader prefers reduced motion, every
+   .fade-in simply stays where it is: fully visible, in place.
+   ------------------------------------------------------------------- */
+.fade-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-in.visible { opacity: 1; transform: none; }
+.fade-in.delay-1 { transition-delay: 0.1s; }
+.fade-in.delay-2 { transition-delay: 0.2s; }
+.fade-in.delay-3 { transition-delay: 0.3s; }
+.fade-in.delay-4 { transition-delay: 0.4s; }
+
+/* Armed only once the interaction layer says it is running. Amplitude
+   is 12px, matching the 8px to 10px rise the immersive build uses. */
+html.js-reveal .fade-in:not(.visible) {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+/* Belt and braces: if the browser reports no scripting at all, the
+   armed state can never apply, but say so explicitly anyway. */
+@media (scripting: none) {
+  .fade-in,
+  html.js-reveal .fade-in:not(.visible) {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ===================================================================
+   5. CHROME: navigation, mobile menu, breadcrumb, skip link, footer
+   =================================================================== */
+
+/* ---- Skip link ---- */
+.skip-link {
+  position: fixed;
+  top: -64px;
+  left: 16px;
+  z-index: 3000;
+  background: var(--signal);
+  color: var(--bg);
+  padding: 11px 18px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: var(--radius);
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 12px;
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+/* ---- Navigation ----
+   Floats over the page at rest, gains a ground and a hairline once the
+   reader has scrolled. It never changes height dramatically. */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 22px 0;
+  border-bottom: 1px solid transparent;
+  transition: padding var(--tr-slow), background var(--tr-slow),
+              border-color var(--tr-slow), transform var(--tr-slow);
+}
+.nav.scrolled {
+  padding: 14px 0;
+  background: rgba(5, 7, 10, 0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom-color: var(--rule-faint);
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+
+.nav-logo {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--fg);
+  transition: color var(--tr-slow);
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 26px;
+  align-items: center;
+}
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+  transition: color var(--tr);
+}
+.nav-links a:hover { color: var(--fg); }
+.nav-cta { margin-left: 6px; }
+
+/* Header click to call */
+.nav-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: 18px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--ink-30);
+  white-space: nowrap;
+  transition: color var(--tr);
+}
+.nav-phone:hover { color: var(--heat); }
+.nav-phone-num { letter-spacing: 0.06em; }
+
+/* Every band is dark now, so the dark-nav compensation set resolves to
+   the default state. The selectors are kept because the class sits in
+   the <body> tag of 50 pages and must not become a dangling reference. */
+body.dark-nav .nav:not(.scrolled) .nav-logo { color: var(--fg); }
+body.dark-nav .nav:not(.scrolled) .nav-links a { color: var(--ink-30); }
+body.dark-nav .nav:not(.scrolled) .nav-links a:hover { color: var(--fg); }
+body.dark-nav .nav:not(.scrolled) .hamburger span { background: var(--fg); }
+body.dark-nav .nav:not(.scrolled) .nav-phone { color: var(--ink-30); }
+body.dark-nav .nav:not(.scrolled) .btn-primary { background: var(--heat); color: var(--bg); border-color: var(--heat); }
+body.dark-nav .nav:not(.scrolled) .btn-primary:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+/* ---- Hamburger ----
+   Three bars of unequal length that fold into a cross. The tap target
+   stays at least 44px square. */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: var(--fg);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease, background var(--tr-slow);
+}
+.hamburger span:nth-child(2) { width: 14px; align-self: flex-end; }
+.hamburger.active span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.hamburger.active span:nth-child(2) { opacity: 0; width: 22px; }
+.hamburger.active span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* ---- Mobile menu ---- */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(2, 4, 8, 0.96);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  padding: 32px;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  font-family: var(--font-head);
+  font-size: clamp(1.4rem, 6vw, 1.9rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--fg);
+  transition: color var(--tr);
+}
+.mobile-menu a:hover { color: var(--signal); }
+
+/* ---- Breadcrumb ---- */
+.breadcrumb { margin-bottom: 22px; }
+.breadcrumb ol {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 0;
+  margin: 0;
+}
+.breadcrumb li { display: flex; align-items: center; gap: 9px; color: var(--muted-2); }
+.breadcrumb li + li::before { content: "\203A"; color: var(--ink-40); }
+.breadcrumb a { color: var(--muted-2); text-decoration: none; transition: color var(--tr); }
+.breadcrumb a:hover { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
+.breadcrumb [aria-current="page"] { color: var(--fg); font-weight: 400; }
+
+/* ---- Footer ----
+   The whole footer is mono. Headings are 10px at 0.22em, links are
+   13px at 0.02em, and hover is a step up the ink ramp, never an
+   underline. */
+.footer {
+  background: var(--bg-dark);
+  border-top: 1px solid var(--rule);
+  padding: clamp(56px, 8vh, 80px) 0 32px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1.15fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 52px;
+}
+.footer-brand { display: block; }
+.footer-brand-logo {
+  display: inline-block;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+.footer-brand p {
+  font-size: 0.86rem;
+  margin-top: 14px;
+  max-width: 250px;
+  line-height: 1.75;
+  color: var(--muted-2);
+}
+.footer-col h4,
+.footer-heading {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+  margin-bottom: 18px;
+}
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.footer-col a {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  transition: color var(--tr);
+}
+.footer-col a:hover { color: var(--fg); }
+
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: 28px;
+  border-top: 1px solid var(--rule-soft);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted-2);
+}
+.footer-bottom a { color: var(--muted-2); transition: color var(--tr); }
+.footer-bottom a:hover { color: var(--fg); }
+.footer-legal { white-space: nowrap; }
+
+/* Header retract. immersive.js sets both hooks on scroll down and clears them
+   on scroll up, at the top of the page, and whenever the mobile menu opens or
+   focus moves into the header. Without these rules the script ran and nothing
+   moved. */
+body[data-header-hidden="true"] .nav,
+.nav.nav-hidden {
+  transform: translateY(-100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-header-hidden="true"] .nav,
+  .nav.nav-hidden { transform: none; }
+}
+
+/* ===================================================================
+   6. SECTIONS
+   Every band used to be a dark island on a light page. Now that the
+   whole page is dark they are re-differentiated by a hairline edge,
+   a marginally deeper ground, and generous air.
+   =================================================================== */
+
+/* The static grid that stands behind the five sections main.js targets.
+   It must survive: with reduced motion the warp canvas is never
+   injected and this pseudo-element is the only backdrop those bands
+   get. main.js hides it with .has-warp-grid once the canvas is live. */
+.page-header::before,
+.article-header::before,
+.stats-section::before,
+.cta-banner::before,
+.calc-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(242, 245, 247, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(242, 245, 247, 0.035) 1px, transparent 1px);
+}
+.page-header::before,
+.article-header::before { background-size: 72px 72px; }
+.stats-section::before,
+.calc-section::before { background-size: 64px 64px; }
+.cta-banner::before { background-size: 48px 48px; }
+
+/* ---- Page header ----
+   position: relative is required here and on the four bands below.
+   main.js sets it inline if CSS does not, and an inline value would
+   then win over anything this sheet tries to do later. */
+.page-header {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-dark);
+  border-bottom: 1px solid var(--rule);
+  padding: clamp(140px, 19vh, 190px) 0 clamp(60px, 9vh, 92px);
+}
+.page-header .container { position: relative; z-index: 1; }
+.page-header h1 { color: var(--fg); margin-bottom: 18px; }
+.page-header .section-label { color: var(--ink-30); }
+.page-header .section-label::before { display: none; }
+.page-header > .container > p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  max-width: 62ch;
+  color: var(--ink-15);
+}
+.page-header > .container > p.page-header-tagline {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--ink-05);
+  margin-bottom: 12px;
+}
+
+/* ---- Article header ---- */
+.article-header {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-dark);
+  border-bottom: 1px solid var(--rule);
+  padding: clamp(140px, 19vh, 190px) 0 clamp(48px, 7vh, 72px);
+}
+.article-header .container { position: relative; z-index: 1; max-width: 860px; }
+.article-header h1 {
+  color: var(--fg);
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  margin-bottom: 18px;
+}
+.article-header > .container > p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--ink-15);
+}
+.article-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--muted-2);
+}
+.article-tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-15);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: var(--pill);
+  padding: 4px 11px;
+}
+
+/* ---- Stats band ---- */
+.stats-section {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-dark);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.stat-number {
+  font-family: var(--font-head);
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  display: block;
+  margin-bottom: 12px;
+  font-variant-numeric: tabular-nums;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.stat-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1.7;
+  color: var(--ink-15);
+}
+.stats-section .section-label { color: var(--ink-30); }
+.stats-section .section-label::before { display: none; }
+.stats-section .section-header h2 { color: var(--fg); }
+.stats-section .section-header p { color: var(--ink-15); }
+
+/* ---- CTA band ---- */
+.cta-section { padding: clamp(64px, 9vh, 96px) 0; }
+.cta-banner {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-dark);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: clamp(52px, 8vw, 88px) clamp(26px, 6vw, 64px);
+  text-align: center;
+}
+.cta-banner > * { position: relative; z-index: 1; }
+.cta-banner .section-label { color: var(--ink-30); }
+.cta-banner .section-label::before { display: none; }
+.cta-banner h2 {
+  font-size: clamp(1.7rem, 3.6vw, 2.6rem);
+  color: var(--fg);
+  margin-bottom: 16px;
+}
+.cta-banner p {
+  font-size: 1.02rem;
+  line-height: 1.8;
+  max-width: 56ch;
+  margin: 0 auto 34px;
+  color: var(--ink-15);
+}
+/* The old white inversion is gone. On an all-dark site it would make
+   the CTA the only white block anywhere. */
+.cta-banner .btn-primary { background: var(--heat); color: var(--bg); border-color: var(--heat); }
+.cta-banner .btn-primary:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+/* ---- Alternating bands ---- */
+.problem-section,
+.team-section {
+  background: var(--bg-2);
+  border-top: 1px solid var(--rule-faint);
+  border-bottom: 1px solid var(--rule-faint);
+}
+
+/* ---- Rating strip ---- */
+.rating-strip {
+  background: var(--bg-dark);
+  padding: 18px 0;
+  border-top: 1px solid var(--rule-soft);
+  border-bottom: 1px solid var(--rule-soft);
+}
+.rating-strip-inner { display: flex; align-items: center; gap: 32px; flex-wrap: wrap; }
+.rs-badges { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.rs-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--muted-2);
+  white-space: nowrap;
+}
+
+/* ---- Home hero ----
+   The only page that opens on a full-viewport hero. The canvas grid
+   and the orbs are texture, not content. */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  padding-top: 120px;
+  background: transparent;
+}
+.hero-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+#heroGrid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 55% 45%, rgba(46, 230, 255, 0.05) 0%, transparent 68%);
+}
+
+/* Orbs. Barely-there colour texture, never a light source. */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  animation: orbFloat linear infinite;
+  pointer-events: none;
+}
+.orb-1 {
+  width: 620px; height: 620px;
+  background: radial-gradient(circle, rgba(46, 230, 255, 0.09) 0%, transparent 70%);
+  top: -140px; right: -90px;
+  animation-duration: 28s;
+}
+.orb-2 {
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(255, 106, 31, 0.07) 0%, transparent 70%);
+  bottom: -110px; left: -70px;
+  animation-duration: 34s; animation-direction: reverse;
+}
+.orb-3 {
+  width: 340px; height: 340px;
+  background: radial-gradient(circle, rgba(46, 230, 255, 0.05) 0%, transparent 70%);
+  top: 40%; left: 20%;
+  animation-duration: 42s;
+}
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(36px, -44px) scale(1.04); }
+  66%      { transform: translate(-28px, 32px) scale(0.96); }
+}
+
+.hero-content { position: relative; z-index: 1; max-width: 880px; }
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: var(--pill);
+  padding: 7px 16px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-15);
+  margin-bottom: 28px;
+}
+.hero-eyebrow::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--heat);
+  animation: dotPulse 2.5s ease-in-out infinite;
+}
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); }
+  50%      { opacity: 1; transform: scale(1); }
+}
+
+.hero h1 {
+  font-size: clamp(2.6rem, 6.6vw, 4.9rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  margin-bottom: 26px;
+  color: var(--fg);
+}
+.hero-sub {
+  font-size: clamp(1rem, 1.7vw, 1.12rem);
+  color: var(--ink-05);
+  max-width: 58ch;
+  margin-bottom: 40px;
+  line-height: 1.8;
+}
+.hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 60px; }
+.hero-rating { color: var(--heat); letter-spacing: 0.12em; }
+
+.trust-bar { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--muted-2);
+}
+.trust-icon { font-size: 1rem; line-height: 1; }
+.trust-divider { width: 1px; height: 18px; background: var(--rule); }
+
+/* ---- Hero metrics panel ---- */
+.hero-metrics {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  margin-top: 48px;
+  background: var(--bg-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 22px 28px;
+  max-width: 640px;
+}
+.hero-metric { flex: 1; min-width: 110px; text-align: center; }
+.hm-num {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--fg);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.hm-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  color: var(--ink-15);
+}
+.hero-metric-div { width: 1px; height: 36px; background: var(--rule); flex-shrink: 0; }
+
+/* ---- Intake steps ---- */
+.intake-steps {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 36px;
+  flex-wrap: wrap;
+}
+.intake-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  flex: 1 1 220px;
+  max-width: 240px;
+  text-align: left;
+}
+.is-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--heat);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--heat);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.is-text { display: flex; flex-direction: column; gap: 5px; }
+.is-text strong {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+.is-text span { font-size: 0.78rem; color: var(--muted-2); line-height: 1.6; }
+.intake-arrow { font-size: 1.2rem; color: var(--ink-40); flex-shrink: 0; align-self: center; }
+
+/* ===================================================================
+   7. COMPONENTS
+   =================================================================== */
+
+/* ---- Buttons ----
+   Two pills, both mono. Filled amber is the offer. Outline is the
+   secondary action. Roundness is reserved for things you click. */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--heat);
+  color: var(--bg);
+  border: 1px solid var(--heat);
+  border-radius: var(--pill);
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 15px 28px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--tr), border-color var(--tr), color var(--tr);
+}
+.btn-primary:hover {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
+}
+
+/* The old light-ground variant becomes the signal-filled pill: the one
+   place cyan is allowed to be a background. */
+.btn-white { background: var(--signal); border-color: var(--signal); color: var(--bg); }
+.btn-white:hover { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--fg);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--pill);
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 15px 28px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color var(--tr), color var(--tr), background var(--tr);
+}
+.btn-outline:hover {
+  border-color: var(--signal);
+  color: var(--signal);
+  background: var(--hover-fill);
+}
+
+/* ---- Button colour guard ----
+   Scoped anchor-colour rules such as .article-content a outrank the
+   button's own colour and would repaint these as underlined cyan text.
+   Restate the button's colours inside every link-styled container. */
+.article-content a.btn-primary,
+.contact-card a.btn-primary,
+.legal-content a.btn-primary,
+.audit-card a.btn-primary,
+.footer-col a.btn-primary,
+.mobile-menu a.btn-primary {
+  background: var(--heat);
+  border-color: var(--heat);
+  color: var(--bg);
+  text-decoration: none;
+}
+.footer-col a.btn-primary:hover,
+.mobile-menu a.btn-primary:hover {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
+  text-decoration: none;
+}
+.mobile-menu a.btn-primary {
+  font-size: 12px;
+  padding: 17px 34px;
+  margin-top: 10px;
+}
+.article-content a.btn-outline,
+.legal-content a.btn-outline,
+.audit-card a.btn-outline {
+  color: var(--fg);
+  text-decoration: none;
+}
+
+/* ---- The card ----
+   One recipe for every card on the site: a hairline box on a barely
+   lifted ground, square corners, no shadow. The only hover is the edge
+   moving to signal, plus a restrained three pixel lift. */
+.card,
+.problem-card,
+.service-card,
+.process-card,
+.niche-card,
+.value-card,
+.benefit-card,
+.result-card,
+.blog-card {
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  min-width: 0;
+  transition: border-color var(--tr), background var(--tr), transform var(--tr);
+}
+.card:hover,
+.problem-card:hover,
+.service-card:hover,
+.process-card:hover,
+.niche-card:hover,
+.value-card:hover,
+.benefit-card:hover,
+.result-card:hover,
+.blog-card:hover {
+  border-color: var(--border-h);
+  background: #0C1219;
+  transform: translateY(-3px);
+}
+
+.card { padding: 32px; }
+
+/* Problem cards */
+.problem-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.problem-card { padding: 40px 32px; }
+.problem-num {
+  display: block;
+  font-family: var(--font-head);
+  font-size: clamp(2.4rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 22px;
+  color: var(--heat);
+  font-variant-numeric: tabular-nums;
+}
+.problem-card h3 { font-size: 1.05rem; margin-bottom: 12px; color: var(--fg); }
+.problem-card p { font-size: 0.9rem; line-height: 1.78; color: var(--muted); }
+
+/* Service cards */
+.services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.service-card { padding: 32px 26px; text-decoration: none; display: block; }
+.service-icon { font-size: 1.6rem; line-height: 1; margin-bottom: 18px; display: block; }
+.service-card h3 { font-size: 1.05rem; margin-bottom: 10px; color: var(--fg); }
+.service-card p { font-size: 0.875rem; line-height: 1.75; color: var(--muted); }
+.service-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--signal);
+  transition: gap var(--tr);
+}
+.service-card:hover .service-link { gap: 10px; }
+
+/* Process cards. The top rule is the hover affordance. */
+.process-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.process-card { padding: 40px 30px; position: relative; overflow: hidden; }
+.process-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--signal);
+  opacity: 0;
+  transition: opacity var(--tr);
+}
+.process-card:hover::before { opacity: 1; }
+.process-step {
+  display: block;
+  font-family: var(--font-head);
+  font-size: clamp(2.4rem, 4.2vw, 3.1rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 26px;
+  color: var(--heat);
+  font-variant-numeric: tabular-nums;
+}
+.process-card h3 { font-size: 1.1rem; margin-bottom: 12px; color: var(--fg); }
+.process-card p { font-size: 0.9rem; line-height: 1.78; color: var(--muted); }
+
+/* Niche cards */
+.niches-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.niche-card { padding: 30px 20px; text-align: center; }
+.niche-icon { font-size: 1.9rem; line-height: 1; margin-bottom: 14px; display: block; }
+.niche-card h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--fg);
+  font-family: var(--font-head);
+  letter-spacing: -0.005em;
+}
+
+/* Value cards */
+.values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.value-card { padding: 32px 26px; }
+.value-icon { font-size: 1.6rem; line-height: 1; margin-bottom: 14px; display: block; }
+.value-card h3 { font-size: 1rem; margin-bottom: 10px; color: var(--fg); }
+.value-card p { font-size: 0.88rem; line-height: 1.78; color: var(--muted); }
+
+/* Benefit cards */
+.benefits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.benefit-card { padding: 36px 30px; position: relative; overflow: hidden; }
+.benefit-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--signal);
+  opacity: 0;
+  transition: opacity var(--tr);
+}
+.benefit-card:hover::before { opacity: 1; }
+.benefit-icon { font-size: 1.8rem; line-height: 1; margin-bottom: 16px; display: block; }
+.benefit-card h3 { font-size: 1.1rem; margin-bottom: 12px; color: var(--fg); }
+.benefit-card p { font-size: 0.88rem; line-height: 1.78; color: var(--muted); }
+.benefit-tag {
+  display: inline-block;
+  margin-top: 20px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--heat);
+  color: var(--heat);
+  padding: 4px 11px;
+  border-radius: var(--pill);
+}
+
+/* Client result cards */
+.results-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.result-card { padding: 28px 24px; display: flex; flex-direction: column; gap: 10px; }
+.rc-industry {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+.rc-metric {
+  font-family: var(--font-head);
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--fg);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.rc-label { font-size: 0.8rem; font-weight: 500; color: var(--ink-05); }
+.rc-detail { font-size: 0.83rem; color: var(--muted); line-height: 1.7; margin-top: 4px; flex: 1; }
+.rc-footer { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.rc-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink-15);
+  padding: 3px 9px;
+  border-radius: var(--pill);
+}
+
+/* ---- FAQ accordion ----
+   main.js only ever toggles `.open` on `.faq-item` and syncs
+   aria-expanded. Every piece of visual state lives here, so `.open`
+   must remain the switch.
+
+   Two fixes over the legacy behaviour, both CSS only:
+   1. The marker is drawn by .faq-question::after so all 215 items get
+      an affordance. The 28 blog posts ship no .faq-icon element, so
+      the old plus sign gave them nothing. .faq-icon is hidden rather
+      than styled, which guarantees the indicator never doubles up.
+   2. The closed panel is visibility: hidden, so links inside a closed
+      answer leave the tab order instead of staying focusable behind
+      an overflow clip. Visibility is switched with a delay on close so
+      the height animation still plays out. */
+.faq-list { max-width: 760px; margin: 0 auto; border-top: 1px solid var(--rule-soft); }
+.faq-item { border-bottom: 1px solid var(--rule-soft); }
+.faq-question {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 22px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--fg);
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  transition: color var(--tr);
+}
+.faq-question:hover { color: var(--signal); }
+.faq-question::after {
+  content: "+";
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--rule-strong);
+  border-radius: 50%;
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 1;
+  color: var(--ink-15);
+  transition: transform 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+.faq-item.open .faq-question::after {
+  transform: rotate(45deg);
+  color: var(--signal);
+  border-color: var(--signal);
+}
+/* Hidden, not restyled: the ::after marker above covers every page. */
+.faq-icon { display: none; }
+.faq-item.open .faq-icon { display: none; }
+
+/* max-height is deliberate rather than a grid 0fr to 1fr swap: the
+   answer paragraph carries its own bottom padding, and padding is
+   outside the box that min-height can zero, so a grid track would
+   never actually collapse to nothing. Every answer is a single short
+   paragraph, so the 1200px ceiling has plenty of headroom. */
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  transition: max-height 0.4s ease, visibility 0s linear 0.4s;
+}
+.faq-item.open .faq-answer {
+  max-height: 1200px;
+  visibility: visible;
+  transition: max-height 0.4s ease, visibility 0s linear 0s;
+}
+.faq-answer p {
+  padding-bottom: 24px;
+  font-size: 0.95rem;
+  line-height: 1.85;
+  color: var(--muted);
+}
+
+/* ---- Definition block ----
+   The most content-bearing rule on the site: it marks the canonical
+   definition of a term for answer engines, sixty times across
+   38 pages. Cyan says "this is the claim". */
+.definition-block {
+  background: var(--bg-2);
+  border: 1px solid var(--rule-soft);
+  border-left: 2px solid var(--signal);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 22px 26px;
+  margin: 28px 0;
+}
+.definition-block p {
+  color: var(--ink-05);
+  font-size: 1rem;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* ---- Audit card. Amber says "this is the offer". ---- */
+.audit-card {
+  background: var(--bg-2);
+  border: 1px solid var(--rule-soft);
+  border-left: 2px solid var(--heat);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 20px 22px;
+  margin: 22px 0;
+}
+.audit-card p { margin: 0; font-size: 0.95rem; line-height: 1.75; color: var(--muted); }
+.audit-card a {
+  color: var(--signal);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---- Bullet list inside a card ---- */
+.report-list {
+  list-style: disc;
+  padding-left: 20px;
+  margin-top: 12px;
+  display: grid;
+  gap: 7px;
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: var(--muted);
+}
+
+/* ---- Warp grid canvas ----
+   Injected by main.js. Both rules below are load-bearing: without the
+   second one the canvas paints over section content on five component
+   types across fifty pages. */
+.warp-grid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  z-index: 0;
+}
+.has-warp-grid::before { display: none !important; }
+.has-warp-grid > *:not(.warp-grid) { position: relative; z-index: 1; }
+
+/* ---- Team and founders ---- */
+.team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+.team-photo {
+  aspect-ratio: 1537 / 900;
+  position: relative;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
+  overflow: hidden;
+}
+.team-photo-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+.team-photo-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--bg-2);
+}
+.team-photo-placeholder span {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+}
+.team-story h2 { margin-bottom: 22px; }
+.team-story p { font-size: 0.98rem; line-height: 1.85; color: var(--ink-05); margin-bottom: 18px; }
+.team-story p:last-of-type { margin-bottom: 0; }
+.team-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+
+.founders-grid {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) 1fr;
+  gap: 56px;
+  align-items: start;
+  max-width: 1020px;
+  margin: 0 auto;
+}
+.founders-photo { margin: 0; }
+.founders-photo img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
+}
+.founders-photo figcaption {
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  text-align: center;
+  line-height: 1.7;
+}
+.founder-avatar {
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 18px;
+  border: 1px solid var(--rule);
+}
+.author-monogram {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-2);
+  color: var(--fg);
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--rule);
+  text-transform: uppercase;
+}
+
+/* ---- Calculators ----
+   The homepage cost calculator and the in-article lead value
+   calculator converge on one dark treatment, so .lv-calc no longer
+   has to fight the base. */
+.calc-section {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-dark);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.calc-section .section-label { color: var(--ink-30); }
+.calc-section .section-header h2 { color: var(--fg); }
+.calc-section .section-header p { color: var(--ink-15); }
+
+.calc { max-width: 620px; margin: 10px auto 0; text-align: center; position: relative; z-index: 1; }
+.calc-input { margin-bottom: 34px; }
+.calc-input-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1.7;
+  color: var(--ink-15);
+  margin-bottom: 12px;
+}
+.calc-value-readout {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 2.4vw, 2rem);
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  margin-bottom: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.calc-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 22px;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+}
+.calc-slider::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(242, 245, 247, 0.18);
+}
+.calc-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px; height: 18px;
+  margin-top: -8px;
+  border-radius: 50%;
+  background: var(--heat);
+  border: 2px solid var(--bg);
+  cursor: pointer;
+  transition: transform 0.18s ease;
+}
+.calc-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.calc-slider::-moz-range-track { height: 2px; border-radius: 2px; background: rgba(242, 245, 247, 0.18); }
+.calc-slider::-moz-range-thumb {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--heat);
+  border: 2px solid var(--bg);
+  cursor: pointer;
+}
+.calc-slider:focus-visible { outline: 2px solid var(--signal); outline-offset: 4px; }
+.calc-scale {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--muted-2);
+  margin-top: 10px;
+}
+
+.calc-result { padding-top: 32px; border-top: 1px solid var(--rule); }
+.calc-headline {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(2.4rem, 6.4vw, 3.9rem);
+  color: var(--fg);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.calc-headline .calc-per {
+  font-family: var(--text);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 8px;
+  letter-spacing: 0;
+}
+.calc-result-label { font-size: 1rem; color: var(--ink-05); margin-top: 12px; }
+.calc-result-sub { font-size: 0.85rem; color: var(--muted-2); margin-top: 14px; }
+.calc-result-sub span { color: var(--heat); font-weight: 500; }
+.calc-note {
+  max-width: 600px;
+  margin: 30px auto 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--muted-2);
+  line-height: 1.7;
+}
+.calc-note strong { color: var(--ink-05); }
+.calc-cta { text-align: center; margin-top: 32px; }
+
+.lv-calc {
+  background: var(--bg-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  margin: 32px auto 12px;
+  max-width: 100%;
+}
+.lv-calc .calc-input-label { color: var(--ink-15); }
+.lv-calc .calc-value-readout { color: var(--fg); }
+.lv-calc .calc-scale { color: var(--muted-2); }
+.lv-calc .calc-slider { background: transparent; }
+.lv-calc .calc-slider::-moz-range-track { background: rgba(242, 245, 247, 0.18); }
+.lv-calc .calc-result { border-top: 1px solid var(--rule); }
+.lv-calc .calc-headline { color: var(--fg); }
+.lv-calc .calc-headline .calc-per { color: var(--muted); }
+.lv-calc .calc-result-label { color: var(--ink-05); }
+.lv-calc .calc-result-sub { color: var(--muted-2); }
+.article-content .calc-note {
+  color: var(--muted-2);
+  max-width: 100%;
+  margin: 0 0 20px;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+/* ===================================================================
+   8. FORMS
+   Fields are transparent with a hairline boundary at 3.04:1, which
+   clears the non-text contrast bar for a control edge. Focus never
+   removes a ring without replacing it.
+   =================================================================== */
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; min-width: 0; }
+/* min-width: 0 on the group and on the controls is what stops a two-up
+   field row from pushing the page sideways on a narrow screen. A text
+   input carries an intrinsic min-content width of roughly 180px, and
+   an auto-minimum grid track will honour it unless told otherwise. */
+.form-group { margin-bottom: 22px; min-width: 0; }
+.form-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-15);
+  margin-bottom: 9px;
+}
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  min-width: 0;
+  background: rgba(242, 245, 247, 0.03);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  padding: 13px 14px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  transition: border-color var(--tr), box-shadow var(--tr), background var(--tr);
+  appearance: none;
+  -webkit-appearance: none;
+}
+.form-select {
+  /* appearance: none removes the native arrow, so re-supply one. */
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%23A3AEB8' stroke-width='1.5' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 38px;
+}
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--signal);
+  background: rgba(242, 245, 247, 0.05);
+  box-shadow: 0 0 0 3px rgba(46, 230, 255, 0.22);
+}
+.form-input:focus-visible,
+.form-textarea:focus-visible,
+.form-select:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+.form-textarea { min-height: 150px; resize: vertical; }
+/* Native dropdown lists render in the OS layer, so state both the
+   ground and the ink explicitly rather than relying on inheritance. */
+.form-select option { background: #0A0E13; color: #F2F5F7; }
+.form-input::placeholder,
+.form-textarea::placeholder { color: var(--ink-30); opacity: 1; }
+
+.contact-info { display: flex; flex-direction: column; gap: 14px; }
+.contact-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: border-color var(--tr), background var(--tr);
+}
+.contact-card:hover { border-color: var(--border-h); background: #0C1219; }
+.contact-card-icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.contact-card h4 {
+  font-family: var(--font-head);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+.contact-card p { font-size: 0.84rem; margin: 0; color: var(--muted); }
+.contact-card a {
+  color: var(--signal);
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ===================================================================
+   9. TABLES
+   The zebra tint is gone: a two percent white fill does not read on a
+   near-black ground. Rows are separated by hairlines and the header
+   row is mono uppercase.
+   =================================================================== */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  -webkit-overflow-scrolling: touch;
+}
+.comparison-table { width: 100%; border-collapse: collapse; }
+.comparison-table th {
+  background: rgba(242, 245, 247, 0.05);
+  padding: 14px 20px;
+  text-align: left;
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-15);
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+.comparison-table td {
+  padding: 14px 20px;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  border-bottom: 1px solid var(--rule-soft);
+  color: var(--muted);
+  vertical-align: top;
+}
+.comparison-table tr:last-child td { border-bottom: none; }
+.comparison-table tr:nth-child(even) td { background: rgba(242, 245, 247, 0.022); }
+
+/* ===================================================================
+   10. BLOG
+   Hero above, then a clean reading column. .article-content is the
+   place the immersive language deliberately steps back.
+   =================================================================== */
+.blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.blog-card { overflow: hidden; text-decoration: none; display: block; }
+.blog-thumb {
+  height: 200px;
+  background: linear-gradient(135deg, #0A0E13 0%, #141C24 100%);
+  border-bottom: 1px solid var(--rule-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.6rem;
+  position: relative;
+  overflow: hidden;
+}
+.blog-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0.88;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+.blog-card:hover .blog-thumb img { transform: scale(1.04); opacity: 1; }
+
+/* .blog-card-body and .blog-card-tag are aliases. One page ships those
+   spellings; the alias styles them correctly without a markup edit. */
+.blog-body,
+.blog-card-body { padding: 24px; }
+.blog-tag,
+.blog-card-tag {
+  display: inline-block;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: var(--pill);
+  color: var(--ink-15);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 4px 11px;
+  margin-bottom: 14px;
+}
+.blog-card h2,
+.blog-card h3 {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 1.02rem;
+  color: var(--fg);
+  margin-bottom: 10px;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+.blog-card p { font-size: 0.85rem; line-height: 1.75; margin-bottom: 14px; color: var(--muted); }
+.blog-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  color: var(--muted-2);
+}
+
+.article-featured-img {
+  margin: 0 0 clamp(32px, 5vh, 48px);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+}
+.article-featured-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ---- The reading column ----
+   Roughly 68 characters of measure, real vertical rhythm, and nothing
+   that moves. Body ink is the 14.70:1 step rather than the muted one,
+   because this is where people read at length. */
+.article-content {
+  max-width: 68ch;
+  margin: 0 auto;
+  padding: clamp(48px, 7vh, 72px) 0 clamp(72px, 11vh, 110px);
+  font-size: 1.02rem;
+}
+.article-content h2 {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 2.6vw, 1.95rem);
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  margin: 2.4em 0 0.6em;
+}
+.article-content h3 {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: clamp(1.1rem, 1.7vw, 1.28rem);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  margin: 1.9em 0 0.5em;
+}
+.article-content h2:first-child,
+.article-content h3:first-child { margin-top: 0; }
+.article-content p {
+  font-size: 1.02rem;
+  line-height: 1.87;
+  margin-bottom: 1.15em;
+  color: var(--ink-05);
+}
+.article-content ul,
+.article-content ol { margin: 0 0 1.4em; padding-left: 1.4em; }
+.article-content ul { list-style: disc; }
+.article-content ol { list-style: decimal; }
+.article-content li {
+  color: var(--ink-05);
+  margin-bottom: 0.5em;
+  font-size: 1.02rem;
+  line-height: 1.8;
+}
+.article-content li::marker { color: var(--ink-30); }
+.article-content strong { color: var(--fg); font-weight: 600; }
+.article-content em { color: var(--ink-05); }
+/* Cyan at 13.33:1, and the underline stays so colour is never the only
+   cue that a run of text is a link. */
+.article-content a {
+  color: var(--signal);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(46, 230, 255, 0.45);
+  transition: text-decoration-color var(--tr);
+}
+.article-content a:hover { text-decoration-color: var(--signal); }
+.article-content blockquote {
+  margin: 1.8em 0;
+  padding: 4px 0 4px 24px;
+  border-left: 2px solid var(--signal);
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 1.1rem;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: var(--ink-05);
+}
+.article-content blockquote p { font: inherit; color: inherit; margin-bottom: 0.6em; }
+.article-content blockquote p:last-child { margin-bottom: 0; }
+.article-content code {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  background: rgba(242, 245, 247, 0.06);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius);
+  padding: 1px 5px;
+  color: var(--ink-05);
+}
+.article-content pre {
+  margin: 1.6em 0;
+  padding: 20px;
+  background: var(--bg-2);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+.article-content pre code { background: none; border: none; padding: 0; font-size: inherit; }
+.article-content img,
+.article-content figure img {
+  margin: 1.8em 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+.article-content figure { margin: 1.8em 0; }
+.article-content figcaption {
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  text-align: center;
+}
+.article-content hr { border: none; border-top: 1px solid var(--rule); margin: 2.4em 0; }
+
+/* Raw tables inside posts carry no wrapper and no class, so they are
+   styled by element and given their own scroll container on narrow
+   screens rather than pushing the page sideways. */
+.article-content .table-wrap { margin: 1.6em 0; }
+.article-content table:not(.comparison-table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.6em 0;
+  font-size: 0.9rem;
+}
+.article-content table:not(.comparison-table) th {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--ink-15);
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+}
+.article-content table:not(.comparison-table) td {
+  padding: 12px 14px;
+  line-height: 1.7;
+  color: var(--ink-05);
+  vertical-align: top;
+  border: 1px solid var(--border);
+}
+
+/* Related-article cards reuse .blog-card without a thumb or a body
+   wrapper, so they need their own padding and no inherited underline. */
+.article-content .blog-grid {
+  gap: 18px;
+  margin-top: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+.article-content .blog-card { text-decoration: none; padding: 22px 24px; }
+.article-content .blog-card h2,
+.article-content .blog-card h3 { margin-bottom: 10px; color: var(--fg); text-decoration: none; }
+.article-content .blog-card p { color: var(--muted); margin-bottom: 0; text-decoration: none; }
+.article-content .blog-card:hover h3 { color: var(--signal); }
+
+/* ---- Legal pages. Same reading recipe, its own class family. ---- */
+.legal-content {
+  max-width: 68ch;
+  margin: 0 auto;
+  font-size: 1rem;
+}
+.legal-updated {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  margin-bottom: 30px;
+}
+.legal-content h2 {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  margin: 2.2em 0 0.55em;
+}
+.legal-content h2:first-of-type { margin-top: 0; }
+.legal-content h3 {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  color: var(--fg);
+  margin: 1.6em 0 0.4em;
+}
+.legal-content p {
+  font-size: 0.98rem;
+  line-height: 1.87;
+  color: var(--ink-05);
+  margin-bottom: 1em;
+}
+.legal-content ul { list-style: disc; margin: 0 0 1.2em 1.4em; }
+.legal-content li {
+  font-size: 0.98rem;
+  line-height: 1.8;
+  color: var(--ink-05);
+  margin-bottom: 0.45em;
+}
+.legal-content a {
+  color: var(--signal);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.legal-content strong { color: var(--fg); font-weight: 600; }
+
+/* ===================================================================
+   11. UTILITIES
+   =================================================================== */
+.u-bg-soft  { background: var(--bg); }
+.u-bg-white { background: var(--bg-2); }
+.u-mt-40    { margin-top: 40px; }
+.u-cta-note { margin-top: 16px; font-size: 0.82rem; color: var(--muted-2); }
+
+/* ===================================================================
+   12. RESPONSIVE
+   The 768px breakpoint is the one that switches the navigation to the
+   hamburger on all 51 pages. Do not lose it.
+   =================================================================== */
+@media (max-width: 1024px) {
+  .stats-grid   { grid-template-columns: repeat(2, 1fr); gap: 40px; }
+  .footer-grid  { grid-template-columns: 1fr 1fr; }
+  .niches-grid  { grid-template-columns: repeat(2, 1fr); }
+  .results-grid { grid-template-columns: repeat(2, 1fr); }
+  .nav-links    { gap: 20px; }
+}
+
+@media (max-width: 900px) {
+  .team-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+
+@media (max-width: 820px) {
+  .founders-grid { grid-template-columns: 1fr; gap: 32px; }
+  .founders-photo { max-width: 320px; margin: 0 auto; }
+}
+
+@media (max-width: 768px) {
+  .nav-links,
+  .nav-cta      { display: none; }
+  .hamburger    { display: inline-flex; }
+  .nav-phone    { margin-left: auto; margin-right: 6px; }
+  .nav-phone-num{ display: none; }
+
+  .problem-cards,
+  .services-grid,
+  .process-grid,
+  .blog-grid,
+  .values-grid,
+  .benefits-grid,
+  .results-grid { grid-template-columns: 1fr; }
+
+  .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+  .footer-grid  { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .trust-divider{ display: none; }
+  .trust-bar    { gap: 16px; }
+  .section      { padding: 72px 0; }
+  .cta-banner   { padding: 48px 26px; }
+  .hero h1      { font-size: 2.5rem; }
+
+  .hero-metrics { gap: 0; padding: 18px 20px; }
+  .hm-num       { font-size: 1.25rem; }
+
+  .rating-strip-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
+
+  .intake-steps { flex-direction: column; align-items: stretch; }
+  .intake-step  { flex: 1 1 auto; max-width: 100%; }
+  .intake-arrow { display: none; }
+
+  /* Raw tables in blog posts have no wrapper, so give the element
+     itself a scroll container rather than letting it break the page.
+     A .comparison-table gets the same safety net for the pages that
+     forgot the .table-wrap, then hands it straight back wherever the
+     wrapper is present and already doing the job. */
+  .article-content table:not(.comparison-table),
+  .comparison-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table-wrap > .comparison-table {
+    display: table;
+    overflow: visible;
+  }
+}
+
+@media (min-width: 769px) {
+  .hamburger { display: none; }
+}
+
+@media (max-width: 640px) {
+  .article-content,
+  .legal-content { font-size: 1rem; }
+  .article-content p,
+  .article-content li { font-size: 1rem; }
+}
+
+@media (max-width: 600px) {
+  .lv-calc { padding: 24px 18px; }
+}
+
+@media (max-width: 540px) {
+  .footer-grid   { grid-template-columns: 1fr; }
+  .hero-ctas     { flex-direction: column; }
+  .hero-ctas > * { width: 100%; justify-content: center; }
+  .stats-grid    { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .niches-grid   { grid-template-columns: 1fr 1fr; }
+  .footer-bottom { flex-direction: column; gap: 10px; text-align: center; }
+  .hero-metrics  { flex-direction: column; gap: 16px; align-items: flex-start; padding: 20px; }
+  .hero-metric-div { width: 100%; height: 1px; }
+  .hero-metric   { text-align: left; }
+
+  /* A full-width submit button carries a nowrap mono label that is wider
+     than a 360px screen. Let it wrap rather than push the page sideways. */
+  .btn-primary,
+  .btn-outline,
+  .btn-white { white-space: normal; text-align: center; padding: 15px 22px; }
+
+  /* Several pages pin a card grid to two columns with an inline style, so
+     pull the card padding in rather than leave a 90px measure. */
+  .card,
+  .problem-card,
+  .service-card,
+  .process-card,
+  .niche-card,
+  .value-card,
+  .benefit-card,
+  .result-card { padding: 22px 18px; }
+}
+
+/* ===================================================================
+   13. REDUCED MOTION
+   Targeted, not blunt. Colour changes are kept because a colour change
+   is not motion and removing it makes interactive states feel broken.
+   Everything that translates, scales or animates is stopped, and every
+   .fade-in is forced visible so no content can be stranded.
+   =================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    scroll-behavior: auto !important;
+    /* Keep colour and opacity transitions, drop everything that moves
+       or resizes: transform, grid-template-rows, width, gap. */
+    transition-property: color, background-color, border-color, outline-color, box-shadow, opacity, fill, stroke !important;
+  }
+
+  /* The single most important line in this file under reduced motion. */
+  .fade-in,
+  .fade-in.delay-1,
+  .fade-in.delay-2,
+  .fade-in.delay-3,
+  .fade-in.delay-4,
+  html.js-reveal .fade-in:not(.visible) {
+    opacity: 1 !important;
+    transform: none !important;
+    transition-delay: 0s !important;
+  }
+
+  /* No hover lifts, no zooms, no rotations. */
+  .card:hover,
+  .problem-card:hover,
+  .service-card:hover,
+  .process-card:hover,
+  .niche-card:hover,
+  .value-card:hover,
+  .benefit-card:hover,
+  .result-card:hover,
+  .blog-card:hover,
+  .btn-primary:hover,
+  .blog-card:hover .blog-thumb img,
+  .calc-slider::-webkit-slider-thumb:hover,
+  .faq-item.open .faq-question::after {
+    transform: none !important;
+  }
+
+  /* The accordion opens and closes instantly, which is correct here. */
+  .faq-answer,
+  .faq-item.open .faq-answer { transition: none !important; }
+
+  .orb { animation: none !important; }
+  .hero-eyebrow::before { animation: none !important; opacity: 1 !important; }
+  #heroGrid { display: none !important; }
+}
+
+/* ===================================================================
+   14. PRINT
+   The site is near-black on screen. On paper that is a solid block of
+   toner, so invert back to ink on white and drop the chrome.
+   =================================================================== */
+@media print {
+  html {
+    background: #FFFFFF !important;
+    background-image: none !important;
+  }
+  body {
+    background: #FFFFFF !important;
+    color: #111111 !important;
+  }
+
+  .nav,
+  .mobile-menu,
+  .hamburger,
+  .skip-link,
+  .warp-grid,
+  .hero-bg,
+  #heroGrid,
+  .orb,
+  .px-bg,
+  .footer,
+  .cta-section,
+  .rating-strip { display: none !important; }
+
+  .page-header,
+  .article-header,
+  .stats-section,
+  .cta-banner,
+  .calc-section,
+  .problem-section,
+  .team-section,
+  .card,
+  .problem-card,
+  .service-card,
+  .process-card,
+  .niche-card,
+  .value-card,
+  .benefit-card,
+  .result-card,
+  .contact-card,
+  .blog-card,
+  .definition-block,
+  .audit-card,
+  .lv-calc,
+  .hero-metrics,
+  .intake-step {
+    background: #FFFFFF !important;
+    border-color: rgba(0, 0, 0, 0.22) !important;
+  }
+
+  .page-header::before,
+  .article-header::before,
+  .stats-section::before,
+  .cta-banner::before,
+  .calc-section::before,
+  .process-card::before,
+  .benefit-card::before { display: none !important; }
+
+  h1, h2, h3, h4, h5, h6,
+  .page-header h1,
+  .article-header h1,
+  .cta-banner h2,
+  .stats-section .section-header h2,
+  .article-content strong,
+  .legal-content strong { color: #000000 !important; }
+
+  p,
+  li,
+  .article-content p,
+  .article-content li,
+  .legal-content p,
+  .legal-content li,
+  .comparison-table td { color: #222222 !important; }
+
+  .gradient-text,
+  .stat-number,
+  .problem-num,
+  .process-step {
+    background: none !important;
+    -webkit-text-fill-color: #000000 !important;
+    color: #000000 !important;
+  }
+
+  .article-content a,
+  .legal-content a,
+  .audit-card a,
+  .contact-card a { color: #10161C !important; }
+
+  .article-content a[href^="http"]::after,
+  .legal-content a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #555555;
+  }
+
+  /* Nothing may print collapsed or invisible. */
+  .fade-in,
+  html.js-reveal .fade-in:not(.visible) { opacity: 1 !important; transform: none !important; }
+  .faq-answer {
+    max-height: none !important;
+    visibility: visible !important;
+    overflow: visible !important;
+  }
+  .faq-question::after { display: none !important; }
+  .table-wrap { overflow: visible !important; }
+}

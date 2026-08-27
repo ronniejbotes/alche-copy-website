@@ -1,0 +1,2140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<title>Free SEO Audit Tool: Instant Website Report Card | Position Xero</title>
+<meta name="description" content="Get a free SEO audit of your website: an instant graded report card scoring your on-page SEO, with plain-English fixes ranked by impact. No credit card.">
+<link rel="canonical" href="https://www.positionxero.com/free-audit">
+<meta name="theme-color" content="#0D0D0D">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free SEO Audit Tool: Instant Website Report Card">
+<meta property="og:description" content="Get a free SEO audit of your website: an instant graded report card with plain-English fixes ranked by impact.">
+<meta property="og:url" content="https://www.positionxero.com/free-audit">
+<meta property="og:site_name" content="Position Xero">
+<meta property="og:image" content="https://www.positionxero.com/img/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Position Xero: we turn ad spend into revenue. Google Ads, Meta Ads, SEO &amp; lead generation.">
+<meta name="twitter:image" content="https://www.positionxero.com/img/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Free SEO Audit Tool: Instant Website Report Card">
+<meta name="twitter:description" content="Get a free SEO audit of your website: an instant graded report card with plain-English fixes ranked by impact.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230D0D0D'/%3E%3Cpath d='M20 20 L44 44 M44 20 L20 44' stroke='%23F5F4F1' stroke-width='9' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Free SEO Audit Tool: Instant Website Report Card",
+  "url": "https://www.positionxero.com/free-audit",
+  "description": "Get a free SEO audit of your website: an instant graded report card scoring your on-page SEO, with plain-English fixes ranked by impact.",
+  "publisher": { "@id": "https://www.positionxero.com/#organization" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type":"ListItem","position":1,"name":"Home","item":"https://www.positionxero.com/"},
+    {"@type":"ListItem","position":2,"name":"Free SEO Audit","item":"https://www.positionxero.com/free-audit"}
+  ]
+}
+</script>
+<style>
+:root{
+  --bg:#05070A;
+  --bg-dark:#020408;
+  --bg-card:#090D12;
+  --border:rgba(242,245,247,0.12);
+  --border-h:rgba(46,230,255,0.55);
+  --ink:#F2F5F7;
+  --muted:#A3AEB8;
+  --white-on-dark:#F2F5F7;
+  --gold:#E8C666;
+  --blue:#6E8CFF;
+  --red:#FF6B5B;
+  --radius:2px;
+  --tr:0.3s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none !important}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Inter','DM Sans',system-ui,-apple-system,sans-serif;
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:'Archivo','Outfit',sans-serif;line-height:1.1}
+button,input{font:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+
+/* ---------- Progress bar ---------- */
+.progress-track{
+  position:fixed;top:0;left:0;right:0;height:4px;z-index:20;
+  background:rgba(245,244,241,0.12);
+}
+.progress-track i{
+  display:block;height:100%;width:0%;background:var(--gold);
+  transition:width 0.35s ease;
+}
+
+/* ---------- Full-screen shell ---------- */
+.shell{
+  background:var(--bg-dark);color:var(--white-on-dark);
+  min-height:100vh;min-height:100svh;
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+}
+.shell.done{min-height:0;padding-bottom:18px}
+.shell > .wrap{width:100%}
+
+/* ---------- Interactive warp grid ----------
+   Canvas injected below so the grid reacts to the cursor (same cloth-warp as
+   the site hero). The static ::before grid is the no-JS / reduced-motion
+   fallback and is hidden once the canvas is live. */
+.shell::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size:68px 68px;
+}
+.shell.has-warp-grid::before{display:none}
+.warp-grid{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  display:block;pointer-events:none;z-index:0;
+}
+.shell > *:not(.warp-grid){position:relative;z-index:1}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:24px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo-mark{
+  width:40px;height:40px;flex:0 0 auto;border-radius:10px;
+  background:#141414;border:1px solid rgba(255,255,255,0.16);
+  display:grid;place-items:center;
+  font-family:'Archivo','Outfit',sans-serif;font-weight:800;font-size:22px;color:var(--white-on-dark);
+}
+.wordmark{font-family:'Archivo','Outfit',sans-serif;font-size:19px;letter-spacing:-0.01em}
+.wordmark b{font-weight:700}
+.wordmark span{font-weight:400}
+.top-link{font-size:14px;color:rgba(245,244,241,0.65);text-decoration:none;transition:color var(--tr)}
+.top-link:hover{color:var(--white-on-dark)}
+.pill{
+  display:inline-block;padding:7px 16px;border-radius:999px;
+  border:1px solid rgba(245,244,241,0.28);
+  font-family:'Archivo','Outfit',sans-serif;font-size:12px;font-weight:600;
+  letter-spacing:0.14em;text-transform:uppercase;color:rgba(245,244,241,0.85);
+}
+.breadcrumb{font-size:13px;margin-bottom:18px}
+.breadcrumb ol{list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.breadcrumb a{color:rgba(245,244,241,0.7);text-decoration:none}
+.breadcrumb a:hover{color:var(--white-on-dark)}
+.breadcrumb li{color:rgba(245,244,241,0.55)}
+.breadcrumb li+li::before{content:"/";margin-right:6px;color:rgba(245,244,241,0.35)}
+
+.shell-body{
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+  width:100%;max-width:760px;margin:0 auto;padding:24px 20px 72px;
+}
+.q-meta{display:flex;align-items:center;gap:16px;min-height:34px;margin-bottom:26px}
+.back-btn{
+  background:transparent;border:none;cursor:pointer;padding:4px 8px;
+  font-family:'Archivo','Outfit',sans-serif;font-size:14px;font-weight:600;
+  color:rgba(245,244,241,0.55);transition:color var(--tr);
+}
+.back-btn:hover{color:var(--white-on-dark)}
+.progress-text{font-family:'Archivo','Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;color:rgba(245,244,241,0.5)}
+
+/* ---------- Question screens ---------- */
+.screen{max-width:640px}
+.screen.in{animation:screenIn 0.3s ease both}
+@keyframes screenIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+fieldset.screen{border:none}
+.q-num{display:block;font-family:'Archivo','Outfit',sans-serif;font-size:14px;font-weight:700;color:var(--gold);margin-bottom:10px;letter-spacing:0.04em}
+.q-label,legend.q-label{
+  display:block;font-family:'Archivo','Outfit',sans-serif;font-weight:800;letter-spacing:-0.02em;
+  font-size:clamp(1.45rem,3.8vw,2.1rem);margin-bottom:10px;line-height:1.15;
+}
+.q-sub{color:rgba(245,244,241,0.62);font-size:15px;margin-bottom:22px;max-width:38em}
+.q-input{
+  width:100%;max-width:560px;padding:16px 18px;font-size:1.12rem;
+  border-radius:var(--radius);border:1px solid rgba(245,244,241,0.22);
+  background:#161616;color:var(--white-on-dark);transition:border-color var(--tr);
+}
+.q-input::placeholder{color:rgba(245,244,241,0.35)}
+.q-input:hover{border-color:rgba(245,244,241,0.4)}
+.q-input:focus{outline:none;border-color:var(--gold)}
+.q-input.invalid{border-color:#E8A79B}
+.field{margin-bottom:14px}
+.field-label{
+  display:block;font-family:'Archivo','Outfit',sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:0.04em;text-transform:uppercase;color:rgba(245,244,241,0.6);margin-bottom:6px;
+}
+.field-error{color:#E8A79B;font-size:14px;margin-top:8px;display:none}
+.field-error.on{display:block}
+.q-actions{display:flex;align-items:center;gap:16px;margin-top:24px;flex-wrap:wrap}
+.key-hint{font-size:13px;color:rgba(245,244,241,0.55)}
+.btn{
+  font-family:'Archivo','Outfit',sans-serif;font-weight:700;font-size:16px;
+  padding:15px 28px;border-radius:var(--radius);border:none;cursor:pointer;
+  transition:transform var(--tr),opacity var(--tr),background var(--tr);
+  white-space:nowrap;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn[disabled]{opacity:0.55;cursor:wait;transform:none}
+.btn-gold{background:var(--gold);color:#0D0D0D}
+.btn-dark{background:var(--bg-dark);color:var(--white-on-dark)}
+.btn-ghost{background:transparent;border:1px solid var(--border-h);color:var(--ink)}
+.btn-line{background:transparent;border:1px solid rgba(245,244,241,0.35);color:var(--white-on-dark)}
+.text-btn{
+  background:transparent;border:none;cursor:pointer;padding:4px 2px;
+  color:rgba(245,244,241,0.6);font-size:14.5px;text-decoration:underline;
+  text-underline-offset:3px;transition:color var(--tr);
+}
+.text-btn:hover{color:var(--white-on-dark)}
+.lead-micro{margin-top:26px;font-size:13px;color:rgba(245,244,241,0.58);max-width:44em}
+.lead-micro a{color:rgba(245,244,241,0.8)}
+.lead-micro a:hover{color:var(--white-on-dark)}
+
+/* ---------- Option cards (radio + checkbox) ---------- */
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:640px}
+.opt-input{position:absolute;opacity:0;pointer-events:none}
+.opt-card{
+  display:flex;align-items:center;gap:14px;padding:18px 20px;cursor:pointer;
+  border:1px solid rgba(245,244,241,0.22);border-radius:var(--radius);background:#161616;
+  font-family:'Archivo','Outfit',sans-serif;font-weight:600;font-size:16.5px;color:rgba(245,244,241,0.85);
+  transition:border-color var(--tr),background var(--tr),color var(--tr);
+}
+.opt-card:hover{border-color:rgba(245,244,241,0.5)}
+.opt-dot{
+  width:18px;height:18px;flex:0 0 auto;border-radius:50%;
+  border:2px solid rgba(245,244,241,0.4);transition:background var(--tr),border-color var(--tr);
+}
+.opt-input:checked + .opt-card{border-color:var(--gold);background:rgba(200,168,75,0.12);color:var(--white-on-dark)}
+.opt-input:checked + .opt-card .opt-dot{background:var(--gold);border-color:var(--gold)}
+.opt-input:focus-visible + .opt-card{outline:2px solid var(--blue);outline-offset:2px}
+/* q-service allows multiple picks, so its dots render as ticked checkboxes */
+#q-service .opt-dot{border-radius:5px;display:flex;align-items:center;justify-content:center}
+#q-service .opt-dot::after{content:'\2713';font-size:12px;font-weight:700;line-height:1;color:transparent;transition:color var(--tr)}
+#q-service .opt-input:checked + .opt-card .opt-dot::after{color:#161616}
+
+/* ---------- Intro + final screens ---------- */
+.intro-screen h1{font-size:clamp(2.3rem,6.5vw,4rem);font-weight:800;letter-spacing:-0.03em;margin:22px 0 16px}
+.intro-screen .sub{font-size:clamp(1.02rem,2.2vw,1.2rem);color:rgba(245,244,241,0.72);max-width:34em;margin-bottom:32px}
+.final-screen h2{font-size:clamp(1.6rem,4.5vw,2.4rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px}
+.final-screen h2:focus{outline:none}
+.final-screen p{color:rgba(245,244,241,0.7);max-width:44em;margin-bottom:10px}
+.final-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.final-actions a{text-decoration:none;display:inline-block}
+.hp-field{position:absolute;left:-9999px;top:-9999px;height:1px;width:1px;overflow:hidden}
+.noscript-note{padding:0 0 48px;color:rgba(245,244,241,0.75);max-width:640px}
+.noscript-note a{color:var(--white-on-dark)}
+
+/* ---------- Loading / scan / error ---------- */
+.stage{padding:56px 0}
+.card{
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:28px;transition:border-color var(--tr);
+}
+.loading-card{text-align:center;padding:44px 28px 40px}
+.scanbar{
+  height:6px;max-width:420px;margin:0 auto 28px;border-radius:99px;
+  background:rgba(0,0,0,0.08);overflow:hidden;
+}
+.scanbar i{
+  display:block;height:100%;width:30%;border-radius:99px;background:var(--gold);
+  animation:scan 1.3s linear infinite;
+}
+@keyframes scan{from{transform:translateX(-110%)}to{transform:translateX(345%)}}
+.scan-list{
+  list-style:none;max-width:340px;margin:0 auto 26px;text-align:left;
+  display:flex;flex-direction:column;gap:12px;
+}
+.scan-item{display:flex;align-items:center;gap:12px;font-family:'Archivo','Outfit',sans-serif;font-weight:600;font-size:15.5px;color:var(--muted)}
+.scan-ind{
+  width:20px;height:20px;flex:0 0 auto;border-radius:50%;
+  border:2px solid var(--border);display:grid;place-items:center;
+}
+.scan-item.running .scan-ind{border-top-color:var(--gold);animation:spin 0.8s linear infinite}
+.scan-item.done{color:var(--ink)}
+.scan-item.done .scan-ind{border-color:var(--gold);background:var(--gold);animation:none}
+.scan-item.done .scan-ind::before{content:"✓";font-size:12px;font-weight:800;color:#0D0D0D;line-height:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+.live-msg{font-family:'Archivo','Outfit',sans-serif;font-weight:600;font-size:18px}
+.live-sub{color:var(--muted);font-size:14px;margin-top:6px}
+.error-card{border-left:4px solid var(--red)}
+.error-card h2{margin-bottom:8px;font-size:20px}
+.error-card p{color:var(--muted);margin-bottom:18px;max-width:46em}
+.error-actions{display:flex;gap:12px;flex-wrap:wrap}
+
+/* ---------- Report ---------- */
+.report{padding:56px 0 40px}
+.report-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px;margin-bottom:24px}
+.report-head h2{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800;letter-spacing:-0.02em}
+.report-meta{color:var(--muted);font-size:14px;margin-top:6px;word-break:break-all}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.actions .btn{font-size:14px;padding:11px 18px}
+
+.grade-card{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;margin-bottom:16px}
+.grade-badge{
+  width:118px;height:118px;border-radius:26px;display:grid;place-items:center;
+  font-family:'Archivo','Outfit',sans-serif;font-weight:800;font-size:52px;color:var(--white-on-dark);
+  background:var(--bg-dark);
+  animation:pop 0.45s ease both;
+}
+@keyframes pop{from{transform:scale(0.6);opacity:0}to{transform:scale(1);opacity:1}}
+.grade-badge.g-good{background:#2E5E3A}
+.grade-badge.g-gold{background:var(--gold);color:#0D0D0D}
+.grade-badge.g-mid{background:#8a6d1f;color:var(--white-on-dark)}
+.grade-badge.g-bad{background:var(--red)}
+.grade-score{font-family:'Archivo','Outfit',sans-serif;font-weight:800;font-size:clamp(1.5rem,3.5vw,2rem);letter-spacing:-0.02em}
+.grade-score small{font-weight:500;font-size:0.6em;color:var(--muted)}
+.grade-verdict{color:var(--muted);margin-top:6px;max-width:38em}
+.critical-alert{
+  margin-top:14px;padding:12px 16px;border-radius:10px;background:rgba(192,57,43,0.08);
+  border:1px solid rgba(192,57,43,0.35);color:var(--red);font-weight:600;font-size:14.5px;
+}
+
+.section-label{
+  font-family:'Archivo','Outfit',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--muted);margin:34px 0 14px;
+}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cat-card .cat-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.cat-card .cat-name{font-family:'Archivo','Outfit',sans-serif;font-weight:700;font-size:15.5px}
+.cat-card .cat-pct{font-family:'Archivo','Outfit',sans-serif;font-weight:700;font-size:15.5px;color:var(--muted)}
+.bar{height:8px;border-radius:99px;background:rgba(0,0,0,0.08);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--gold);transition:width 0.8s ease}
+.bar i.b-good{background:#3f7a4f}
+.bar i.b-bad{background:var(--red)}
+
+.issue{border-left:4px solid var(--muted);margin-bottom:12px}
+.issue.sev-high{border-left-color:var(--red)}
+.issue.sev-medium{border-left-color:var(--gold)}
+.issue.sev-low{border-left-color:rgba(0,0,0,0.25)}
+.issue-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.issue h3{font-size:17px;font-weight:700}
+.sev-pill{
+  font-family:'Archivo','Outfit',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;
+  text-transform:uppercase;padding:4px 10px;border-radius:999px;
+}
+.sev-pill.p-high{background:rgba(192,57,43,0.1);color:var(--red)}
+.sev-pill.p-medium{background:rgba(200,168,75,0.16);color:#8a6d1f}
+.sev-pill.p-low{background:rgba(0,0,0,0.06);color:var(--muted)}
+.issue p{color:var(--muted);font-size:15px;max-width:60em}
+.issue h3,.issue p,.pass-list li,.fix span{overflow-wrap:anywhere}
+.fix{
+  margin-top:12px;padding:12px 16px;border-radius:10px;background:var(--bg);
+  border:1px solid var(--border);font-size:14.5px;
+}
+.fix b{font-family:'Archivo','Outfit',sans-serif;font-weight:700;display:block;margin-bottom:3px;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink)}
+.fix span{color:var(--muted)}
+
+.pass-list{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;list-style:none}
+.pass-list li{display:flex;gap:10px;align-items:baseline;font-size:15px;color:var(--ink)}
+.pass-list .tick{color:#3f7a4f;font-weight:700;flex:0 0 auto}
+.pass-list .why{color:var(--muted);font-size:13.5px}
+
+/* ---------- CTA + footer ---------- */
+.cta-card{
+  background:var(--bg-dark);color:var(--white-on-dark);border:none;
+  padding:44px 36px;margin-top:36px;text-align:center;
+}
+.cta-card h3{font-size:clamp(1.5rem,4vw,2.1rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:10px}
+.cta-card p{color:rgba(245,244,241,0.65);max-width:36em;margin:0 auto 24px}
+.cta-card .btn-gold{display:inline-block;text-decoration:none}
+.cta-foot{margin-top:22px;font-size:13.5px;color:rgba(245,244,241,0.58)}
+.cta-foot a{color:rgba(245,244,241,0.7);text-decoration:none}
+.cta-foot a:hover{color:var(--white-on-dark)}
+#fixRequestCard a.btn{display:inline-block;text-decoration:none}
+#fixRequestCard h3:focus{outline:none}
+.fix-blog-list{list-style:none;margin-top:12px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.fix-blog-link{color:rgba(245,244,241,0.85);text-decoration:underline;text-underline-offset:3px}
+.fix-blog-link:hover{color:var(--white-on-dark)}
+.site-foot{padding:34px 0 44px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--border);margin-top:40px}
+.site-foot .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.site-foot a{text-decoration:none}
+.site-foot a:hover{text-decoration:underline}
+.foot-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:18px}
+.foot-links a{color:var(--ink);font-weight:500}
+.print-note{display:none}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ---------- Responsive ---------- */
+@media (max-width:760px){
+  .opt-grid{grid-template-columns:1fr}
+  .cat-grid,.pass-list{grid-template-columns:1fr}
+  .grade-card{grid-template-columns:1fr;text-align:center;gap:16px}
+  .grade-badge{margin:0 auto}
+  .grade-verdict{margin-left:auto;margin-right:auto}
+}
+@media (max-width:400px){
+  .wrap{padding:0 14px}
+  .shell-body{padding:24px 14px 64px}
+  .card{padding:20px}
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .screen.in{animation:none}
+  .scan-item.running .scan-ind{animation:none;border-top-color:var(--border)}
+  .scanbar i{animation:none;width:100%;transform:none}
+  .grade-badge{animation:none}
+  .bar i{transition:none}
+  .progress-track i{transition:none}
+  .btn:hover,.btn:active{transform:none}
+  *{transition-duration:0.01ms !important}
+}
+
+/* ---------- Print ---------- */
+@media print{
+  body{background:#fff}
+  .progress-track,.shell,.stage,.site-foot,.actions,.cta-card,#fixRequestCard{display:none !important}
+  .report{padding:0}
+  .card{box-shadow:none;border:1px solid #ddd;break-inside:avoid}
+  .print-note{display:block;margin-top:20px;font-size:12px;color:#666}
+  .bar i{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .grade-badge,.sev-pill{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-track" aria-hidden="true"><i id="progressFill"></i></div>
+
+<section class="shell" id="shell">
+  <div class="wrap">
+    <div class="topbar">
+      <a class="brand" href="/" aria-label="Position Xero home">
+        <span class="logo-mark" aria-hidden="true">X</span>
+        <span class="wordmark"><b>Position</b> <span>Xero</span></span>
+      </a>
+      <a class="top-link" href="/">positionxero.com</a>
+    </div>
+  </div>
+  <div class="shell-body" id="shellBody">
+    <div class="q-meta">
+      <button type="button" id="backBtn" class="back-btn" hidden>&larr; Back</button>
+      <span id="progressText" class="progress-text" aria-live="polite"></span>
+    </div>
+    <div id="funnel">
+
+      <div class="screen intro-screen" id="s-intro">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <ol>
+            <li><a href="/">Home</a></li>
+            <li aria-current="page">Free SEO Audit</li>
+          </ol>
+        </nav>
+        <span class="pill">Free Audit</span>
+        <h1>Get Your Free SEO Audit &amp; Website Report Card.</h1>
+        <p class="sub">Seven quick questions about your business. If SEO is your focus, we&rsquo;ll grade your website live, right after you submit. A full report card, free. Either way, we review your answers and reply by email.</p>
+        <div class="q-actions">
+          <button type="button" id="startBtn" class="btn btn-gold q-next">Start</button>
+          <span class="key-hint">press Enter &#8629;</span>
+        </div>
+        <p class="lead-micro">The audit (and a quote if you want one) is free. We&rsquo;ll use the details you share to follow up about your answers. See our <a href="/privacy">privacy policy</a>.</p>
+      </div>
+
+      <div class="screen" id="q-name" hidden>
+        <p class="q-num" aria-hidden="true">1 &rarr;</p>
+        <label class="q-label" for="nameInput">What&rsquo;s your full name?</label>
+        <input class="q-input" id="nameInput" name="name" type="text" placeholder="Jane Doe" autocomplete="name" maxlength="100" aria-describedby="nameError">
+        <p class="field-error" id="nameError" aria-live="polite"></p>
+        <div class="q-actions">
+          <button type="button" class="btn btn-gold q-next">Next</button>
+          <span class="key-hint">press Enter &#8629;</span>
+        </div>
+      </div>
+
+      <div class="screen" id="q-email" hidden>
+        <p class="q-num" aria-hidden="true">2 &rarr;</p>
+        <label class="q-label" for="emailInput">What&rsquo;s your business email?</label>
+        <p class="q-sub">This is where we&rsquo;ll reply once we&rsquo;ve reviewed your answers.</p>
+        <input class="q-input" id="emailInput" name="email" type="email" autocomplete="email" maxlength="254" aria-describedby="emailError">
+        <p class="field-error" id="emailError" aria-live="polite"></p>
+        <div class="q-actions">
+          <button type="button" class="btn btn-gold q-next">Next</button>
+          <span class="key-hint">press Enter &#8629;</span>
+        </div>
+      </div>
+
+      <div class="screen" id="q-phone" hidden>
+        <p class="q-num" aria-hidden="true">3 &rarr;</p>
+        <label class="q-label" for="phoneInput">What&rsquo;s the best contact number?</label>
+        <input class="q-input" id="phoneInput" name="phone" type="tel" autocomplete="tel" maxlength="40" aria-describedby="phoneError">
+        <p class="field-error" id="phoneError" aria-live="polite"></p>
+        <div class="q-actions">
+          <button type="button" class="btn btn-gold q-next">Next</button>
+          <span class="key-hint">press Enter &#8629;</span>
+        </div>
+      </div>
+
+      <div class="screen" id="q-biz" hidden>
+        <p class="q-num" aria-hidden="true">4 &rarr;</p>
+        <label class="q-label" for="bizInput">What&rsquo;s your business called?</label>
+        <input class="q-input" id="bizInput" name="business" type="text" placeholder="Acme Plumbing" autocomplete="organization" maxlength="120" aria-describedby="bizError">
+        <p class="field-error" id="bizError" aria-live="polite"></p>
+        <div class="q-actions">
+          <button type="button" class="btn btn-gold q-next">Next</button>
+          <span class="key-hint">press Enter &#8629;</span>
+        </div>
+      </div>
+
+      <div class="screen" id="q-industry" hidden>
+        <p class="q-num" aria-hidden="true">5 &rarr;</p>
+        <label class="q-label" for="industryInput">What industry are you in?</label>
+        <p class="q-sub">Pick one from the list or type your own.</p>
+        <input class="q-input" id="industryInput" name="industry" type="text" list="industryList" placeholder="e.g. Roofing" autocomplete="off" maxlength="120" aria-describedby="industryError">
+        <datalist id="industryList">
+          <option value="Plumbing &amp; HVAC"></option>
+          <option value="Roofing"></option>
+          <option value="Solar"></option>
+          <option value="Legal"></option>
+          <option value="Real Estate"></option>
+          <option value="Insurance"></option>
+          <option value="Automotive"></option>
+          <option value="Healthcare"></option>
+          <option value="E-commerce"></option>
+          <option value="Hospitality"></option>
+          <option value="Construction"></option>
+          <option value="Other"></option>
+        </datalist>
+        <p class="field-error" id="industryError" aria-live="polite"></p>
+        <div class="q-actions">
+          <button type="button" class="btn btn-gold q-next">Next</button>
+          <span class="key-hint">press Enter &#8629;</span>
+        </div>
+      </div>
+
+      <fieldset class="screen" id="q-service" hidden>
+        <legend class="q-label"><span class="q-num" aria-hidden="true">6 &rarr;</span>Which services are you interested in?</legend>
+        <p class="q-sub">Select all that apply.</p>
+        <div class="opt-grid">
+          <input class="opt-input" type="checkbox" id="service-seo" name="service" value="seo" aria-describedby="serviceError">
+          <label class="opt-card" for="service-seo"><span class="opt-dot" aria-hidden="true"></span>SEO &amp; AI SEO</label>
+          <input class="opt-input" type="checkbox" id="service-ads" name="service" value="ads" aria-describedby="serviceError">
+          <label class="opt-card" for="service-ads"><span class="opt-dot" aria-hidden="true"></span>Google Ads &amp; Meta Ads</label>
+          <input class="opt-input" type="checkbox" id="service-web" name="service" value="web" aria-describedby="serviceError">
+          <label class="opt-card" for="service-web"><span class="opt-dot" aria-hidden="true"></span>Web Design</label>
+          <input class="opt-input" type="checkbox" id="service-leads" name="service" value="leads" aria-describedby="serviceError">
+          <label class="opt-card" for="service-leads"><span class="opt-dot" aria-hidden="true"></span>Lead Generation</label>
+        </div>
+        <p class="field-error" id="serviceError" aria-live="polite"></p>
+        <div class="q-actions">
+          <button type="button" class="btn btn-gold q-next">Next</button>
+          <span class="key-hint">press Enter &#8629;</span>
+        </div>
+      </fieldset>
+
+      <fieldset class="screen" id="q-adspend" hidden>
+        <legend class="q-label"><span class="q-num" aria-hidden="true">7 &rarr;</span>What&rsquo;s your current monthly ad spend?</legend>
+        <div class="opt-grid">
+          <input class="opt-input" type="radio" id="adspend-none" name="adspend" value="none" aria-describedby="adspendError">
+          <label class="opt-card" for="adspend-none"><span class="opt-dot" aria-hidden="true"></span>Not spending yet</label>
+          <input class="opt-input" type="radio" id="adspend-under-500" name="adspend" value="under-500" aria-describedby="adspendError">
+          <label class="opt-card" for="adspend-under-500"><span class="opt-dot" aria-hidden="true"></span>Under $500</label>
+          <input class="opt-input" type="radio" id="adspend-500-2k" name="adspend" value="500-2k" aria-describedby="adspendError">
+          <label class="opt-card" for="adspend-500-2k"><span class="opt-dot" aria-hidden="true"></span>$500 &ndash; $2,000</label>
+          <input class="opt-input" type="radio" id="adspend-2k-10k" name="adspend" value="2k-10k" aria-describedby="adspendError">
+          <label class="opt-card" for="adspend-2k-10k"><span class="opt-dot" aria-hidden="true"></span>$2,000 &ndash; $10,000</label>
+          <input class="opt-input" type="radio" id="adspend-over-10k" name="adspend" value="over-10k" aria-describedby="adspendError">
+          <label class="opt-card" for="adspend-over-10k"><span class="opt-dot" aria-hidden="true"></span>Over $10,000</label>
+        </div>
+        <p class="field-error" id="adspendError" aria-live="polite"></p>
+        <div class="q-actions">
+          <button type="button" class="btn btn-gold q-next">Next</button>
+          <span class="key-hint">press Enter &#8629;</span>
+        </div>
+      </fieldset>
+
+      <div class="screen" id="q-site" hidden>
+        <p class="q-num" aria-hidden="true">8 &rarr;</p>
+        <label class="q-label" for="urlInput">What&rsquo;s your website address?</label>
+        <p class="q-sub">We&rsquo;ll grade its on-page SEO right now, free.</p>
+        <div class="field">
+          <input class="q-input" id="urlInput" name="url" type="text" inputmode="url" placeholder="yourwebsite.com" autocomplete="url" maxlength="2000" aria-describedby="urlError">
+          <p class="field-error" id="urlError" aria-live="polite"></p>
+        </div>
+        <div class="field">
+          <label class="field-label" for="kwInput">Target keyword (optional)</label>
+          <input class="q-input" id="kwInput" name="keyword" type="text" placeholder="e.g. plumber sydney" autocomplete="off" maxlength="120">
+        </div>
+        <div class="q-actions">
+          <button type="button" class="btn btn-gold q-next">Run My Free Audit</button>
+          <span class="key-hint">press Enter &#8629;</span>
+        </div>
+        <div class="q-actions">
+          <button type="button" id="noSiteBtn" class="text-btn">I don&rsquo;t have a website yet</button>
+        </div>
+      </div>
+
+      <div class="screen final-screen" id="thanksCard" hidden>
+        <h2 tabindex="-1">Thanks. We&rsquo;ve got your details.</h2>
+        <p>Your answers are in. We&rsquo;ll review them and reply to you by email with honest next steps: what we&rsquo;d do, roughly what it costs, and whether we&rsquo;re actually the right fit.</p>
+        <div class="final-actions">
+          <a id="thanksServiceLink" class="btn btn-gold" href="/services">See our marketing services</a>
+          <a class="btn btn-line" href="/contact">Contact us</a>
+        </div>
+      </div>
+
+      <div class="screen final-screen" id="noSiteCard" hidden>
+        <h2 tabindex="-1">Thanks. We&rsquo;ve got your details.</h2>
+        <p>No website yet means there&rsquo;s nothing to grade, and that&rsquo;s fine. It just means the first step is different.</p>
+        <p>Position Xero also designs and builds websites, so starting from zero is something we handle.</p>
+        <div class="final-actions">
+          <a class="btn btn-gold" href="/web-design">See our web design services</a>
+          <a class="btn btn-line" href="/contact">Talk to us</a>
+        </div>
+      </div>
+
+      <div class="hp-field" aria-hidden="true">
+        <label for="hpInput">Leave this field empty</label>
+        <input id="hpInput" name="px_extra" type="text" tabindex="-1" autocomplete="off">
+      </div>
+
+    </div>
+    <noscript>
+      <div class="noscript-note">This page needs JavaScript to run the question flow and your free report. Prefer to skip it? <a href="/contact">Contact us directly</a> and we&rsquo;ll take it from there.</div>
+    </noscript>
+  </div>
+</section>
+
+<main>
+  <div id="srStatus" class="sr-only" aria-live="polite"></div>
+  <section id="stage" class="stage wrap" hidden>
+    <div id="loadingCard" class="card loading-card" hidden>
+      <div class="scanbar" aria-hidden="true"><i></i></div>
+      <ul class="scan-list">
+        <li class="scan-item" id="scan-content"><span class="scan-ind" aria-hidden="true"></span><span>Content</span></li>
+        <li class="scan-item" id="scan-tech"><span class="scan-ind" aria-hidden="true"></span><span>Technical</span></li>
+        <li class="scan-item" id="scan-meta"><span class="scan-ind" aria-hidden="true"></span><span>Meta &amp; Social</span></li>
+        <li class="scan-item" id="scan-structure"><span class="scan-ind" aria-hidden="true"></span><span>Structure</span></li>
+      </ul>
+      <p id="liveMsg" class="live-msg" aria-live="polite">Fetching your page&hellip;</p>
+      <p class="live-sub">Reading the server HTML of the page you entered.</p>
+    </div>
+    <div id="errorCard" class="card error-card" role="alert" hidden>
+      <h2 id="errorTitle">We couldn&rsquo;t reach that site</h2>
+      <p id="errorMsg"></p>
+      <div class="error-actions">
+        <button type="button" id="retryBtn" class="btn btn-dark">Retry</button>
+        <button type="button" id="editUrlBtn" class="btn btn-ghost">Try a different URL</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="report" class="report wrap" hidden aria-label="SEO report card"></section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap" style="display:block">
+    <nav class="foot-links" aria-label="Explore our services">
+      <a href="/lead-gen">Lead generation services</a>
+      <a href="/seo">SEO &amp; AI SEO services</a>
+      <a href="/ads">Google Ads &amp; Meta Ads management</a>
+      <a href="/web-design">Website &amp; landing page design</a>
+      <a href="/services">All services</a>
+      <a href="/how-we-work">How we work</a>
+      <a href="/blog/">Blog</a>
+      <a href="/contact">Contact</a>
+    </nav>
+  </div>
+  <div class="wrap">
+    <span>&copy; <a href="/"><b>Position</b> Xero</a>. We Turn Ad Spend Into Revenue.</span>
+    <span>Google Ads &middot; Meta Ads &middot; SEO &middot; Lead Generation</span>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   ============  EDIT THESE 3 THINGS  =========================
+   1. LEAD_WEBHOOK: a JSON POST endpoint that receives lead
+      payloads (e.g. your Cloudflare Worker /lead route).
+   2. WEB3FORMS_KEY: web3forms.com access key; used only when
+      LEAD_WEBHOOK is empty. Leads are emailed to the inbox
+      registered with that key. Leave both '' and leads are
+      logged to the console only.
+   3. PROXY_URL: your own Cloudflare Worker CORS proxy.
+      Leave '' to fall back to free public proxies.
+   ============================================================ */
+const CONFIG = {
+  BRAND_NAME: 'Position Xero',
+  BRAND_URL: 'https://www.positionxero.com',
+  BRAND_TAGLINE: 'We Turn Ad Spend Into Revenue.',
+  CONTACT_CTA_URL: 'https://www.positionxero.com/contact',
+  LEAD_WEBHOOK: '',   // JSON POST endpoint for lead payloads. Empty = try WEB3FORMS_KEY next.
+  WEB3FORMS_KEY: '83837384-b86e-4045-9b25-9cb9ae8276a9',  // web3forms.com access key (public by design). Delivers leads to the founder inbox. Empty = leads logged to console only.
+  PROXY_URL: '',      // Your own Cloudflare Worker proxy, e.g. 'https://seo-proxy.YOURNAME.workers.dev/?url='. Empty = fall back to free public proxies.
+};
+/* ============================================================ */
+
+const LEAD_KEY = 'pxseo_lead';
+const OUTBOX_KEY = 'pxseo_lead_outbox';
+const PAGE_URL = 'https://www.positionxero.com/free-audit';
+const REDUCED = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const SCROLL_BEHAVIOR = REDUCED ? 'auto' : 'smooth';
+const $ = (id) => document.getElementById(id);
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+/* DOM builder: all report content goes through textContent (fetched HTML is hostile input). */
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined && text !== null) n.textContent = text;
+  return n;
+}
+
+/* ---------------- URL handling ---------------- */
+function normalizeUrl(raw) {
+  let s = (raw || '').trim();
+  if (!s) return null;
+  if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
+  let u;
+  try { u = new URL(s); } catch (e) { return null; }
+  if (!/^https?:$/.test(u.protocol)) return null;
+  if (u.username || u.password) return null; // never forward embedded credentials to a proxy
+  if (!u.hostname || (!u.hostname.includes('.') && u.hostname !== 'localhost')) return null;
+  return u.href;
+}
+
+/* ---------------- Proxy chain fetcher ---------------- */
+/* opts.lite (default off): first 2 proxies only, one try each, 8s timeout,
+   used by the email finder so enrichment stays cheap. The main audit fetch
+   passes no options and behaves exactly as before. */
+async function fetchViaProxies(targetUrl, opts) {
+  const lite = !!(opts && opts.lite);
+  const timeoutMs = lite ? 8000 : 15000;
+  let chain = [];
+  if (CONFIG.PROXY_URL) chain.push({ prefix: CONFIG.PROXY_URL, tries: 1 });
+  chain.push({ prefix: 'https://api.allorigins.win/raw?url=', tries: 2 }); // intermittently 500s, retry once
+  chain.push({ prefix: 'https://corsproxy.io/?url=', tries: 1 });
+  chain.push({ prefix: 'https://api.codetabs.com/v1/proxy?quest=', tries: 1 });
+  chain.push({ prefix: 'https://proxy.cors.sh/', tries: 1, raw: true }); // path-style, needs the raw URL, not encoded
+  if (lite) chain = chain.slice(0, 2);
+
+  let sawNonHtml = false;
+  for (const proxy of chain) {
+    const tries = lite ? 1 : proxy.tries;
+    for (let attempt = 0; attempt < tries; attempt++) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+      try {
+        const res = await fetch(proxy.prefix + (proxy.raw ? targetUrl : encodeURIComponent(targetUrl)), { signal: ctrl.signal });
+        if (!res.ok) { clearTimeout(timer); continue; }
+        const text = await res.text();
+        clearTimeout(timer);
+        if (!text || text.trim().length < 40) continue;
+        if (!/<\s*(!doctype|html|head|body|meta|title|div|h1)/i.test(text)) { sawNonHtml = true; continue; }
+        return text;
+      } catch (e) {
+        clearTimeout(timer);
+        /* timeout / network, fall through to next attempt */
+      }
+    }
+  }
+  throw new Error(sawNonHtml ? 'non-html' : 'all-failed');
+}
+
+/* ---------------- Analysis ---------------- */
+function analyze(html, targetUrl, keyword) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const target = new URL(targetUrl);
+  const kw = (keyword || '').trim().replace(/\s+/g, ' ').toLowerCase();
+
+  // Resolution base (respect absolute <base href>)
+  let base = targetUrl;
+  const baseTag = doc.querySelector('base[href]');
+  if (baseTag) { try { base = new URL(baseTag.getAttribute('href'), targetUrl).href; } catch (e) {} }
+
+  const meta = (name) => {
+    const m = doc.querySelector('meta[name="' + name + '" i]');
+    return m ? (m.getAttribute('content') || '').trim() : null;
+  };
+  const prop = (p) => {
+    const m = doc.querySelector('meta[property="' + p + '" i]');
+    return m ? (m.getAttribute('content') || '').trim() : null;
+  };
+
+  // Main-content text
+  let bodyText = '';
+  if (doc.body) {
+    const clone = doc.body.cloneNode(true);
+    clone.querySelectorAll('script,style,noscript,svg,template,nav,header,footer').forEach(n => n.remove());
+    bodyText = (clone.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+  const words = bodyText ? bodyText.split(' ') : [];
+  const wordCount = words.length;
+  const jsRendered = wordCount < 50;
+
+  const checks = [];
+  const add = (c) => { checks.push(Object.assign({ applicable: true, severity: 'low' }, c)); };
+
+  /* --- Meta & Social --- */
+  const titleEl = doc.querySelector('title');
+  const titleText = titleEl ? titleEl.textContent.trim() : '';
+  if (!titleText) {
+    add({ id:'title', cat:'meta', weight:10, earned:0, status:'fail', severity:'high',
+      title:'Missing title tag',
+      finding:'This page has no <title> tag. The title is the blue headline in Google results and one of the strongest on-page ranking signals.',
+      fix:'Add a unique, descriptive <title> of 30–60 characters that leads with what the page is about, e.g. "Emergency Plumber in Sydney | YourBrand".' });
+  } else if (titleText.length < 30 || titleText.length > 60) {
+    add({ id:'title', cat:'meta', weight:10, earned:6, status:'warn', severity:'medium',
+      title:'Title tag is ' + (titleText.length < 30 ? 'too short' : 'too long') + ' (' + titleText.length + ' characters)',
+      finding:'Your title is "' + titleText.slice(0,80) + (titleText.length > 80 ? '…' : '') + '". Titles outside roughly 30–60 characters get truncated in Google or waste prime ranking real estate.',
+      fix:'Rewrite the title to 30–60 characters. Put the most important phrase first and your brand last.' });
+  } else {
+    add({ id:'title', cat:'meta', weight:10, earned:10, status:'pass',
+      title:'Title tag looks good (' + titleText.length + ' characters)',
+      finding:'Well-sized title: "' + titleText + '"' });
+  }
+
+  const desc = meta('description');
+  if (!desc) {
+    add({ id:'desc', cat:'meta', weight:5, earned:0, status:'fail', severity:'medium',
+      title:'Missing meta description',
+      finding:'No meta description found. It doesn’t affect rankings directly, but it influences click-through rate. Google often shows it as your snippet, and a good one wins more clicks.',
+      fix:'Add <meta name="description" content="…"> of 70–160 characters that sells the click: what the page offers and why it’s worth visiting.' });
+  } else if (desc.length < 70 || desc.length > 160) {
+    add({ id:'desc', cat:'meta', weight:5, earned:3, status:'warn', severity:'low',
+      title:'Meta description is ' + (desc.length < 70 ? 'too short' : 'too long') + ' (' + desc.length + ' characters)',
+      finding:'Meta descriptions influence click-through rate, not rankings. At ' + desc.length + ' characters yours will likely be ' + (desc.length < 70 ? 'padded out by Google with random page text' : 'cut off mid-sentence in results') + '.',
+      fix:'Rewrite it to 70–160 characters with a clear benefit and a reason to click.' });
+  } else {
+    add({ id:'desc', cat:'meta', weight:5, earned:5, status:'pass',
+      title:'Meta description present (' + desc.length + ' characters)',
+      finding:'Good length. Remember: it influences click-through rate, not rankings.' });
+  }
+
+  const ogTitle = prop('og:title'), ogDesc = prop('og:description'), ogImg = prop('og:image');
+  const ogCount = [ogTitle, ogDesc, ogImg].filter(Boolean).length;
+  if (ogCount === 3) {
+    add({ id:'og', cat:'meta', weight:3, earned:3, status:'pass',
+      title:'Open Graph tags complete',
+      finding:'og:title, og:description and og:image are all set. Links to this page will look good when shared.' });
+  } else {
+    const missing = [!ogTitle && 'og:title', !ogDesc && 'og:description', !ogImg && 'og:image'].filter(Boolean).join(', ');
+    add({ id:'og', cat:'meta', weight:3, earned:ogCount, status: ogCount ? 'warn' : 'fail', severity:'low',
+      title:'Incomplete Open Graph tags',
+      finding:'Missing: ' + missing + '. When someone shares this page on Facebook, LinkedIn or WhatsApp, the preview will look broken or generic.',
+      fix:'Add the missing <meta property="og:…"> tags in <head>. og:image should be an absolute URL to a 1200×630 image.' });
+  }
+
+  const twCard = meta('twitter:card');
+  if (twCard) {
+    add({ id:'tw', cat:'meta', weight:2, earned:2, status:'pass',
+      title:'Twitter card tag present', finding:'twitter:card is set to "' + twCard + '".' });
+  } else {
+    add({ id:'tw', cat:'meta', weight:2, earned:0, status:'fail', severity:'low',
+      title:'No Twitter card tag',
+      finding:'Without twitter:card, shares on X/Twitter fall back to a plain link with no preview image.',
+      fix:'Add <meta name="twitter:card" content="summary_large_image"> alongside your Open Graph tags.' });
+  }
+
+  /* --- Structure --- */
+  const h1s = Array.from(doc.querySelectorAll('h1')).filter(h => h.textContent.trim());
+  if (h1s.length === 1) {
+    add({ id:'h1', cat:'structure', weight:8, earned:8, status:'pass',
+      title:'Exactly one H1',
+      finding:'H1: "' + h1s[0].textContent.trim().slice(0,90) + '"' });
+  } else if (h1s.length === 0) {
+    add({ id:'h1', cat:'structure', weight:8, earned:0, status:'fail', severity:'high',
+      title:'No H1 heading',
+      finding:'The H1 tells Google (and visitors) what this page is about. This page has none, so search engines have to guess your main topic.',
+      fix:'Add a single <h1> near the top of the page stating the page’s main topic in plain language.' });
+  } else {
+    add({ id:'h1', cat:'structure', weight:8, earned:4, status:'warn', severity:'medium',
+      title:h1s.length + ' H1 headings found',
+      finding:'Multiple H1s dilute the page’s topical focus and usually mean the template is using H1 for styling instead of structure.',
+      fix:'Keep one <h1> for the main topic; demote the others to <h2>/<h3>.' });
+  }
+
+  const headings = Array.from(doc.querySelectorAll('h1,h2,h3,h4,h5,h6'));
+  let skipped = false, prevLevel = 0;
+  for (const h of headings) {
+    const lvl = parseInt(h.tagName[1], 10);
+    if (prevLevel && lvl > prevLevel + 1) { skipped = true; break; }
+    prevLevel = lvl;
+  }
+  if (headings.length && !skipped) {
+    add({ id:'hier', cat:'structure', weight:5, earned:5, status:'pass',
+      title:'Heading hierarchy is sane', finding:'No skipped heading levels detected across ' + headings.length + ' headings.' });
+  } else if (!headings.length) {
+    add({ id:'hier', cat:'structure', weight:5, earned:0, status:'fail', severity:'medium',
+      title:'No headings at all',
+      finding:'Headings break content into scannable, indexable sections. A page with none reads as one undifferentiated blob to both users and crawlers.',
+      fix:'Structure the page: one <h1>, then <h2> for each major section, <h3> for subsections.' });
+  } else {
+    add({ id:'hier', cat:'structure', weight:5, earned:2, status:'warn', severity:'low',
+      title:'Skipped heading levels',
+      finding:'The heading order jumps levels (e.g. an <h2> followed directly by an <h4>). It won’t tank rankings, but it hurts accessibility and makes the outline messy.',
+      fix:'Adjust headings so each level only steps down by one (h2 → h3 → h4).' });
+  }
+
+  // Links
+  const anchors = Array.from(doc.querySelectorAll('a[href]'));
+  let internal = 0, external = 0, brokenSyntax = 0;
+  for (const a of anchors) {
+    const href = (a.getAttribute('href') || '').trim();
+    if (!href || href === '#') { brokenSyntax++; continue; }
+    if (/^(javascript:|mailto:|tel:)/i.test(href)) continue;
+    try {
+      const u = new URL(href, base);
+      if (u.hostname === target.hostname) internal++; else external++;
+    } catch (e) { brokenSyntax++; }
+  }
+  const brokenNote = brokenSyntax ? ' (' + brokenSyntax + ' link' + (brokenSyntax > 1 ? 's' : '') + ' with empty or malformed href: syntax check only, we don’t crawl them)' : '';
+  if (internal > 0) {
+    add({ id:'ilinks', cat:'structure', weight:4, earned:4, status:'pass',
+      title:internal + ' internal link' + (internal > 1 ? 's' : ''), finding:'Internal links help Google discover and rank your other pages.' + brokenNote });
+  } else {
+    add({ id:'ilinks', cat:'structure', weight:4, earned:0, status:'fail', severity:'medium',
+      title:'No internal links found',
+      finding:'Internal links pass authority between your pages and help Google crawl your site. This page links to none of your other pages.' + brokenNote,
+      fix:'Link naturally to 3–5 related pages on your own site using descriptive anchor text (not "click here").' });
+  }
+  if (external > 0) {
+    add({ id:'elinks', cat:'structure', weight:2, earned:2, status:'pass',
+      title:external + ' external link' + (external > 1 ? 's' : ''), finding:'Citing reputable external sources is a mild trust signal.' });
+  } else {
+    add({ id:'elinks', cat:'structure', weight:2, earned:0, status:'fail', severity:'low',
+      title:'No external links',
+      finding:'Not fatal, but linking out to a couple of authoritative sources can make content look better-researched.',
+      fix:'Where relevant, cite an authoritative source or two with a normal link.' });
+  }
+
+  const lang = doc.documentElement.getAttribute('lang');
+  if (lang) {
+    add({ id:'lang', cat:'structure', weight:3, earned:3, status:'pass',
+      title:'html lang attribute set ("' + lang + '")', finding:'Helps search engines and screen readers know the page language.' });
+  } else {
+    add({ id:'lang', cat:'structure', weight:3, earned:0, status:'fail', severity:'low',
+      title:'Missing html lang attribute',
+      finding:'Without lang, browsers, translators and screen readers guess the language, and sometimes guess wrong.',
+      fix:'Add lang="en" (or your language code) to the <html> tag.' });
+  }
+
+  /* --- Content --- */
+  if (jsRendered) {
+    add({ id:'words', cat:'content', weight:9, earned:0, status:'fail', severity:'medium',
+      title:'Almost no readable text in the HTML (' + wordCount + ' words)',
+      finding:'Note: this site is likely JavaScript-rendered. This tool reads the server HTML, the same first thing Google fetches. If your content only appears after JS runs, Google can index it, but slower and less reliably.',
+      fix:'Use server-side rendering or pre-rendering so your core content is present in the initial HTML. Verify with View Source (not Inspect).' });
+  } else if (wordCount < 300) {
+    add({ id:'words', cat:'content', weight:9, earned:2, status:'fail', severity:'medium',
+      title:'Thin content (' + wordCount + ' words)',
+      finding:'Pages under ~300 words rarely rank for anything competitive. There’s simply not enough for Google to understand or reward.',
+      fix:'Expand the page to 600+ words of genuinely useful content: answer the questions your customers actually ask.' });
+  } else if (wordCount < 600) {
+    add({ id:'words', cat:'content', weight:9, earned:5, status:'warn', severity:'low',
+      title:'Moderate content length (' + wordCount + ' words)',
+      finding:'Decent, but pages that rank well for competitive terms usually run 600+ words of substance.',
+      fix:'Add depth: FAQs, examples, specifics. Length for its own sake doesn’t help; usefulness does.' });
+  } else {
+    add({ id:'words', cat:'content', weight:9, earned:9, status:'pass',
+      title:'Healthy content length (' + wordCount + ' words)',
+      finding:'Enough substance for Google to understand and rank the page.' });
+  }
+
+  if (kw) {
+    const lcTitle = titleText.toLowerCase();
+    const lcH1 = h1s.length ? h1s[0].textContent.trim().toLowerCase() : '';
+    const first100 = words.slice(0, 100).join(' ').toLowerCase();
+    const lcDesc = (desc || '').toLowerCase();
+    // Whole-word match: keyword "art" must not match "apartments".
+    const kwEsc = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const kwHas = (s) => new RegExp('(?<![\\p{L}\\p{N}])' + kwEsc + '(?![\\p{L}\\p{N}])', 'iu').test(s);
+    const inTitle = kwHas(lcTitle), inH1 = kwHas(lcH1), inFirst = kwHas(first100), inDesc = kwHas(lcDesc);
+    const kwWords = kw.split(/\s+/).length;
+    const occ = wordCount ? (bodyText.toLowerCase().match(new RegExp('(?<![\\p{L}\\p{N}])' + kwEsc + '(?![\\p{L}\\p{N}])', 'giu')) || []).length : 0;
+    const density = wordCount ? (occ * kwWords / wordCount) * 100 : 0;
+    const densityOk = density >= 0.5 && density <= 3;
+    let pts = (inTitle ? 2 : 0) + (inH1 ? 2 : 0) + (inFirst ? 2 : 0) + (inDesc ? 1 : 0) + (densityOk ? 1 : 0);
+    const parts = [
+      'Title: ' + (inTitle ? 'yes' : 'no'),
+      'H1: ' + (inH1 ? 'yes' : 'no'),
+      'First 100 words: ' + (inFirst ? 'yes' : 'no'),
+      'Meta description: ' + (inDesc ? 'yes' : 'no'),
+      'Density: ' + density.toFixed(1) + '%'
+    ].join(' · ');
+    if (density > 3) {
+      add({ id:'kw', cat:'content', weight:8, earned:Math.min(pts, 4), status:'warn', severity:'medium',
+        title:'Keyword "' + keyword.trim() + '" looks stuffed (' + density.toFixed(1) + '% density)',
+        finding:parts + '. Over ~3% density reads as keyword stuffing. Google actively demotes it and it puts readers off. More repetition is NOT better.',
+        fix:'Cut repetitions. Use the keyword once in the title, H1 and opening paragraph, then write naturally with synonyms and related phrases.' });
+    } else if (pts >= 7) {
+      add({ id:'kw', cat:'content', weight:8, earned:pts, status:'pass',
+        title:'Keyword "' + keyword.trim() + '" is well placed',
+        finding:parts + '. Placement looks natural, so don’t force it further; stuffing hurts more than it helps.' });
+    } else {
+      const gaps = [!inTitle && 'the title tag', !inH1 && 'the H1', !inFirst && 'the first 100 words', !inDesc && 'the meta description'].filter(Boolean).join(', ');
+      add({ id:'kw', cat:'content', weight:8, earned:pts, status: pts >= 4 ? 'warn' : 'fail', severity: pts >= 4 ? 'medium' : 'high',
+        title:'Keyword "' + keyword.trim() + '" is missing from key spots',
+        finding:parts + '. Google leans heavily on the title, H1 and opening copy to match a page to a search.',
+        fix:'Work the keyword (or a close natural variant) into: ' + (gaps || 'body copy') + '. Once each is plenty. Keep density between 0.5% and 3%; stuffing it in repeatedly will backfire.' });
+    }
+  }
+
+  const imgs = Array.from(doc.querySelectorAll('img'));
+  // Decorative images (explicit alt="" or role="presentation"/"none") are correct practice, so exclude them.
+  const decorative = imgs.filter(i => {
+    const role = (i.getAttribute('role') || '').trim().toLowerCase();
+    if (role === 'presentation' || role === 'none') return true;
+    return i.hasAttribute('alt') && (i.getAttribute('alt') || '').trim() === '';
+  }).length;
+  const contentImgs = imgs.filter(i => {
+    const role = (i.getAttribute('role') || '').trim().toLowerCase();
+    if (role === 'presentation' || role === 'none') return false;
+    return !(i.hasAttribute('alt') && (i.getAttribute('alt') || '').trim() === '');
+  });
+  if (imgs.length === 0) {
+    add({ id:'alt', cat:'content', weight:7, earned:7, status:'pass',
+      title:'No images to check', finding:'No <img> tags found, so alt-text coverage isn’t an issue on this page.' });
+  } else if (contentImgs.length === 0) {
+    add({ id:'alt', cat:'content', weight:7, earned:7, status:'pass',
+      title:'All images marked decorative', finding:'Every image is explicitly decorative (alt="" or role="presentation"), the correct way to tell screen readers to skip them.' });
+  } else {
+    const withAlt = contentImgs.filter(i => { const a = (i.getAttribute('alt') || '').trim(); return a.length >= 3; }).length;
+    const pct = Math.round((withAlt / contentImgs.length) * 100);
+    const label = withAlt + ' of ' + contentImgs.length + ' content images (' + pct + '%) have meaningful alt text' + (decorative ? ' (' + decorative + ' correctly marked decorative and not counted)' : '');
+    if (pct >= 90) {
+      add({ id:'alt', cat:'content', weight:7, earned:7, status:'pass',
+        title:'Good image alt coverage', finding:label + '. Honestly: alt text mostly helps image search and accessibility rather than core rankings, but it’s cheap to get right.' });
+    } else {
+      add({ id:'alt', cat:'content', weight:7, earned: pct >= 60 ? 4 : (pct > 0 ? 2 : 0), status: pct >= 60 ? 'warn' : 'fail', severity:'low',
+        title:'Weak image alt coverage (' + pct + '%)',
+        finding:label + '. To be honest about the stakes: alt text mostly helps image search and accessibility, not core rankings, but screen-reader users hit these gaps daily.',
+        fix:'Give every meaningful image a short, literal description (alt="red brick house with solar panels"). Decorative images can use alt="".' });
+    }
+  }
+
+  /* --- Technical --- */
+  const isHttps = target.protocol === 'https:';
+  if (isHttps) {
+    add({ id:'https', cat:'tech', weight:5, earned:5, status:'pass',
+      title:'Served over HTTPS', finding:'HTTPS is a confirmed (minor) ranking signal and table stakes for trust.' });
+  } else {
+    add({ id:'https', cat:'tech', weight:5, earned:0, status:'fail', severity:'high',
+      title:'Not using HTTPS',
+      finding:'The URL you audited uses plain http://. Browsers flag it "Not secure", visitors bounce, and Google prefers the https version.',
+      fix:'Install an SSL certificate (free via Let’s Encrypt or your host) and 301-redirect all http:// URLs to https://.' });
+  }
+
+  const viewport = meta('viewport');
+  if (viewport) {
+    add({ id:'viewport', cat:'tech', weight:6, earned:6, status:'pass',
+      title:'Viewport meta tag present', finding:'The page can render properly on phones. Google indexes the mobile version of your site first.' });
+  } else {
+    add({ id:'viewport', cat:'tech', weight:6, earned:0, status:'fail', severity:'high',
+      title:'Missing viewport meta tag',
+      finding:'Without it, phones render the page zoomed-out desktop-style. Google indexes mobile-first, so a broken mobile experience drags everything down.',
+      fix:'Add <meta name="viewport" content="width=device-width, initial-scale=1"> to <head>.' });
+  }
+
+  const canonEl = doc.querySelector('link[rel="canonical"]');
+  const canonHref = canonEl ? (canonEl.getAttribute('href') || '').trim() : '';
+  let canonAbs = false;
+  if (canonHref) { try { canonAbs = /^https?:$/.test(new URL(canonHref).protocol); } catch (e) { canonAbs = false; } }
+  if (canonHref && canonAbs) {
+    add({ id:'canonical', cat:'tech', weight:5, earned:5, status:'pass',
+      title:'Canonical tag present', finding:'Points to ' + canonHref.slice(0,90) + '. That tells Google which URL is the "real" one and prevents duplicate-content dilution.' });
+  } else if (canonHref) {
+    add({ id:'canonical', cat:'tech', weight:5, earned:2, status:'warn', severity:'low',
+      title:'Canonical tag is not an absolute URL',
+      finding:'Found rel="canonical" with href "' + canonHref.slice(0,90) + '". Relative or malformed canonicals are ambiguous and sometimes ignored.',
+      fix:'Use the full absolute URL including https:// and the domain.' });
+  } else {
+    add({ id:'canonical', cat:'tech', weight:5, earned:0, status:'fail', severity:'medium',
+      title:'No canonical tag',
+      finding:'Without a canonical, www/non-www, trailing-slash and tracking-parameter variants of this URL can compete against each other in Google’s index.',
+      fix:'Add <link rel="canonical" href="' + targetUrl + '"> (the preferred version of this URL) to <head>.' });
+  }
+
+  const robots = (meta('robots') || '').toLowerCase();
+  const noindexed = robots.includes('noindex');
+  if (noindexed) {
+    add({ id:'robots', cat:'tech', weight:5, earned:0, status:'fail', severity:'high',
+      title:'Page is set to NOINDEX',
+      finding:'A meta robots tag ("' + robots + '") is explicitly telling Google not to index this page. Nothing else on this report matters until this is removed. The page cannot appear in search results at all.',
+      fix:'Remove "noindex" from the meta robots tag (or the CMS setting that adds it; in WordPress check Settings → Reading → "Discourage search engines").' });
+  } else {
+    add({ id:'robots', cat:'tech', weight:5, earned:5, status:'pass',
+      title:'Page is indexable', finding: robots ? 'Meta robots is "' + robots + '", with no noindex directive.' : 'No blocking meta robots tag (absence = indexable by default).' });
+  }
+
+  const ldScripts = Array.from(doc.querySelectorAll('script[type="application/ld+json"]'));
+  if (ldScripts.length) {
+    let validLd = 0;
+    for (const s of ldScripts) { try { JSON.parse(s.textContent); validLd++; } catch (e) {} }
+    if (validLd > 0) {
+      add({ id:'jsonld', cat:'tech', weight:9, earned:9, status:'pass',
+        title:'Structured data (JSON-LD) present',
+        finding:validLd + ' valid JSON-LD block' + (validLd > 1 ? 's' : '') + ' found, so the page is eligible for rich results like review snippets, FAQs and business info.' });
+    } else {
+      add({ id:'jsonld', cat:'tech', weight:9, earned:3, status:'warn', severity:'medium',
+        title:'JSON-LD present but doesn’t parse',
+        finding:'Found ' + ldScripts.length + ' JSON-LD block' + (ldScripts.length > 1 ? 's' : '') + ', but none parse as valid JSON. Google will silently ignore broken structured data.',
+        fix:'Validate the blocks at validator.schema.org and fix the JSON syntax (usually a trailing comma or unescaped quote).' });
+    }
+  } else {
+    add({ id:'jsonld', cat:'tech', weight:9, earned:0, status:'fail', severity:'medium',
+      title:'No structured data (JSON-LD)',
+      finding:'Structured data tells Google exactly what your business/page is, and unlocks richer listings (star-free business panels, FAQs, breadcrumbs).',
+      fix:'Add a JSON-LD block for your type (LocalBusiness, Organization, Product or Article) via schema.org or your SEO plugin.' });
+  }
+
+  const faviconEl = doc.querySelector('link[rel~="icon" i], link[rel="shortcut icon" i], link[rel="apple-touch-icon" i]');
+  if (faviconEl) {
+    add({ id:'favicon', cat:'tech', weight:2, earned:2, status:'pass',
+      title:'Favicon declared', finding:'Google shows favicons next to mobile results, and yours is set.' });
+  } else {
+    add({ id:'favicon', cat:'tech', weight:2, earned:0, status:'fail', severity:'low',
+      title:'No favicon link found',
+      finding:'No <link rel="icon"> in the HTML. Browsers may still find /favicon.ico, but Google shows favicons in mobile results, and a missing one looks unpolished.',
+      fix:'Add <link rel="icon" href="/favicon.ico"> (or an SVG/PNG icon) to <head>.' });
+  }
+
+  const charsetEl = doc.querySelector('meta[charset], meta[http-equiv="Content-Type" i]');
+  if (charsetEl) {
+    add({ id:'charset', cat:'tech', weight:2, earned:2, status:'pass',
+      title:'Character encoding declared', finding:'Charset is declared, so special characters render reliably.' });
+  } else {
+    add({ id:'charset', cat:'tech', weight:2, earned:0, status:'fail', severity:'low',
+      title:'No charset declaration',
+      finding:'Without <meta charset>, browsers guess the encoding and special characters (’ “ é) can render as garbage.',
+      fix:'Add <meta charset="utf-8"> as the first tag inside <head>.' });
+  }
+
+  /* --- Score (weights normalized to 100; keyword weight auto-redistributes when absent) --- */
+  let totalWeight = 0, earnedSum = 0;
+  for (const c of checks) { totalWeight += c.weight; earnedSum += c.earned; }
+  const score = Math.max(0, Math.min(100, Math.round((earnedSum / totalWeight) * 100)));
+
+  let grade;
+  if (score >= 95) grade = 'A+'; else if (score >= 85) grade = 'A';
+  else if (score >= 70) grade = 'B'; else if (score >= 55) grade = 'C';
+  else if (score >= 40) grade = 'D'; else grade = 'F';
+  if (noindexed) grade = 'F';
+
+  const catDefs = { content:'Content', tech:'Technical', meta:'Meta & Social', structure:'Structure' };
+  const categories = Object.keys(catDefs).map(key => {
+    let w = 0, e = 0;
+    for (const c of checks) if (c.cat === key) { w += c.weight; e += c.earned; }
+    return { key, name: catDefs[key], pct: w ? Math.round((e / w) * 100) : 100 };
+  });
+
+  return { checks, score, grade, categories, noindexed, wordCount, jsRendered };
+}
+
+/* ---------------- Rendering (createElement/textContent only) ---------------- */
+const VERDICTS = {
+  'A+': 'Outstanding. Your on-page SEO fundamentals are in excellent shape.',
+  'A': 'Strong foundations, only fine-tuning left.',
+  'B': 'Solid, but a handful of fixes below would move the needle.',
+  'C': 'Average. Several issues are limiting how well Google can rank this page.',
+  'D': 'Weak. Search engines are struggling with this page, and it shows.',
+  'F': 'Critical problems are holding this page back on Google.'
+};
+
+function gradeClass(grade) {
+  if (grade === 'A+' || grade === 'A') return 'g-good';
+  if (grade === 'B') return 'g-gold';
+  if (grade === 'C') return 'g-mid';
+  return 'g-bad';
+}
+
+function countUp(node, targetVal) {
+  if (REDUCED) { node.textContent = String(targetVal); return; }
+  const dur = 1000;
+  let start = null, finished = false;
+  function step(t) {
+    if (start === null) start = t;
+    const p = Math.min(1, (t - start) / dur);
+    node.textContent = String(Math.round(p * targetVal));
+    if (p < 1) requestAnimationFrame(step); else finished = true;
+  }
+  requestAnimationFrame(step);
+  // rAF can be throttled/paused (background tab), so never leave the score stuck short.
+  setTimeout(() => { if (!finished) { finished = true; node.textContent = String(targetVal); } }, dur + 600);
+}
+
+function buildIssueCard(c) {
+  const card = el('div', 'card issue sev-' + c.severity);
+  const top = el('div', 'issue-top');
+  top.appendChild(el('span', 'sev-pill p-' + c.severity, c.severity === 'high' ? 'High priority' : c.severity === 'medium' ? 'Medium' : 'Low'));
+  top.appendChild(el('h3', null, c.title));
+  card.appendChild(top);
+  card.appendChild(el('p', null, c.finding));
+  if (c.fix) {
+    const fix = el('div', 'fix');
+    fix.appendChild(el('b', null, 'How to fix'));
+    fix.appendChild(el('span', null, c.fix));
+    card.appendChild(fix);
+  }
+  return card;
+}
+
+function buildReport(result, auditedUrl, keyword) {
+  const report = $('report');
+  report.textContent = '';
+
+  // Header
+  const head = el('div', 'report-head');
+  const hLeft = el('div');
+  hLeft.appendChild(el('h2', null, 'SEO Report Card'));
+  const metaLine = el('p', 'report-meta');
+  metaLine.textContent = auditedUrl + (keyword ? ' · keyword: "' + keyword + '"' : '') + ' · ' + new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  hLeft.appendChild(metaLine);
+  head.appendChild(hLeft);
+  const actions = el('div', 'actions');
+  const printBtn = el('button', 'btn btn-ghost', 'Print / Save as PDF');
+  printBtn.type = 'button';
+  printBtn.addEventListener('click', () => window.print());
+  const againBtn = el('button', 'btn btn-dark', 'Audit another site');
+  againBtn.type = 'button';
+  againBtn.id = 'againBtn';
+  againBtn.addEventListener('click', () => {
+    report.hidden = true; $('stage').hidden = true;
+    reopenFunnelAtSite();
+  });
+  actions.appendChild(printBtn); actions.appendChild(againBtn);
+  head.appendChild(actions);
+  report.appendChild(head);
+
+  // Grade card
+  const gradeCard = el('div', 'card grade-card');
+  gradeCard.appendChild(el('div', 'grade-badge ' + gradeClass(result.grade), result.grade));
+  const gRight = el('div');
+  const gScore = el('div', 'grade-score');
+  const gNum = el('span', null, REDUCED ? String(result.score) : '0');
+  gScore.appendChild(gNum);
+  gScore.appendChild(document.createTextNode(' '));
+  gScore.appendChild(el('small', null, '/ 100'));
+  gRight.appendChild(gScore);
+  countUp(gNum, result.score);
+  gRight.appendChild(el('p', 'grade-verdict', result.noindexed
+    ? 'This page tells Google not to index it. Fix that before anything else on this report.'
+    : VERDICTS[result.grade]));
+  if (result.noindexed) {
+    gRight.appendChild(el('div', 'critical-alert', 'Critical: a noindex directive was found. This page cannot appear in Google search results, so the grade is capped at F.'));
+  }
+  gradeCard.appendChild(gRight);
+  report.appendChild(gradeCard);
+
+  // Issues sorted by severity
+  const sevRank = { high: 0, medium: 1, low: 2 };
+  const issues = result.checks.filter(c => c.status !== 'pass').sort((a, b) => sevRank[a.severity] - sevRank[b.severity] || b.weight - a.weight);
+  const passed = result.checks.filter(c => c.status === 'pass');
+
+  if (issues.length) {
+    report.appendChild(el('p', 'section-label', 'Issues to fix, highest impact first'));
+    for (const c of issues) report.appendChild(buildIssueCard(c));
+  } else {
+    report.appendChild(el('p', 'section-label', 'Issues to fix'));
+    const none = el('div', 'card');
+    none.appendChild(el('p', null, 'No issues found. This page passed every check we run. Genuinely rare.'));
+    report.appendChild(none);
+  }
+
+  report.appendChild(el('p', 'section-label', 'Category breakdown'));
+  const catGrid = el('div', 'cat-grid');
+  for (const cat of result.categories) {
+    const cc = el('div', 'card cat-card');
+    const top = el('div', 'cat-top');
+    top.appendChild(el('span', 'cat-name', cat.name));
+    top.appendChild(el('span', 'cat-pct', cat.pct + '%'));
+    cc.appendChild(top);
+    const bar = el('div', 'bar');
+    const fill = el('i', cat.pct >= 80 ? 'b-good' : cat.pct < 45 ? 'b-bad' : '');
+    fill.style.width = '0%';
+    requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.width = cat.pct + '%'; }));
+    bar.appendChild(fill);
+    cc.appendChild(bar);
+    catGrid.appendChild(cc);
+  }
+  report.appendChild(catGrid);
+
+  if (passed.length) {
+    report.appendChild(el('p', 'section-label', 'What you’re doing right'));
+    const passCard = el('div', 'card');
+    const ul = el('ul', 'pass-list');
+    for (const c of passed) {
+      const li = el('li');
+      li.appendChild(el('span', 'tick', '✓'));
+      const txt = el('span');
+      txt.appendChild(document.createTextNode(c.title + '. '));
+      if (c.finding) txt.appendChild(el('span', 'why', c.finding));
+      li.appendChild(txt);
+      ul.appendChild(li);
+    }
+    passCard.appendChild(ul);
+    report.appendChild(passCard);
+  }
+
+  // CTA
+  const cta = el('div', 'card cta-card');
+  cta.appendChild(el('h3', null, 'Want us to fix this for you?'));
+  cta.appendChild(el('p', null, CONFIG.BRAND_TAGLINE + ' We handle Google Ads, Meta Ads, SEO and lead generation: qualified leads at scale, not vanity metrics.'));
+  const fixBtn = el('button', 'btn btn-gold', 'Yes, contact me to fix this');
+  fixBtn.type = 'button';
+  fixBtn.id = 'fixBtn';
+  fixBtn.addEventListener('click', handleFixRequest);
+  cta.appendChild(fixBtn);
+  const foot = el('p', 'cta-foot');
+  foot.appendChild(document.createTextNode('Built by ' + CONFIG.BRAND_NAME + ' at '));
+  const footLink = el('a', null, CONFIG.BRAND_URL.replace(/^https?:\/\/(www\.)?/, ''));
+  footLink.href = CONFIG.BRAND_URL;
+  foot.appendChild(footLink);
+  cta.appendChild(foot);
+  report.appendChild(cta);
+
+  // Fix-request end screen, revealed in place (no navigation) once the visitor confirms.
+  const fixCard = el('div', 'card cta-card');
+  fixCard.id = 'fixRequestCard';
+  fixCard.hidden = true;
+  const fixHeading = el('h3', null, 'Request received.');
+  fixHeading.setAttribute('tabindex', '-1');
+  fixCard.appendChild(fixHeading);
+  fixCard.appendChild(el('p', null, 'Your details and this report are with ' + CONFIG.BRAND_NAME + '. Someone will be in touch by email to talk through what we found and map out next steps.'));
+  const fixHomeLink = el('a', 'btn btn-line', 'Back to the homepage');
+  fixHomeLink.id = 'fixHomeLink';
+  fixHomeLink.href = '/';
+  fixCard.appendChild(fixHomeLink);
+  const fixRelated = el('div');
+  fixRelated.id = 'fixRelatedWrap';
+  fixCard.appendChild(fixRelated);
+  report.appendChild(fixCard);
+
+  report.appendChild(el('p', 'print-note', 'SEO Report Card for ' + auditedUrl + ', generated by ' + CONFIG.BRAND_NAME + ' (' + CONFIG.BRAND_URL.replace(/^https?:\/\/(www\.)?/, '') + ')'));
+
+  report.hidden = false;
+  report.scrollIntoView({ behavior: SCROLL_BEHAVIOR, block: 'start' });
+}
+
+/* ---------------- Lead state ---------------- */
+let currentLead = null;
+let suppressLead = false; // honeypot tripped: keep the visitor experience identical, send nothing
+let lastReport = null; // { leadSnapshot, grade, score, topIssues } for the currently displayed report, set in runAudit's success path
+
+function loadStoredLead() {
+  try {
+    const raw = localStorage.getItem(LEAD_KEY);
+    if (!raw) return null;
+    const l = JSON.parse(raw);
+    if (!l || typeof l !== 'object' || !l.name || !l.email) return null;
+    return l;
+  } catch (e) { return null; }
+}
+function storeLead(lead) {
+  try { localStorage.setItem(LEAD_KEY, JSON.stringify(lead)); } catch (e) {}
+}
+
+function buildLeadPayload(stage, extra, lead) {
+  const l = lead || currentLead || {};
+  const p = {
+    source: 'seo-report-card',
+    stage: stage,
+    name: l.name || '',
+    business: l.business || '',
+    email: l.email || '',
+    phone: l.phone || '',
+    industry: l.industry || '',
+    service: l.service || '',
+    adSpend: l.adSpend || '',
+    hasWebsite: !!l.hasWebsite,
+    website: l.hasWebsite ? (l.website || null) : null,
+    keyword: l.keyword || '',
+    page: PAGE_URL,
+    ts: new Date().toISOString()
+  };
+  return Object.assign(p, extra || {});
+}
+
+function topIssueTitles(result) {
+  const sevRank = { high: 0, medium: 1, low: 2 };
+  return result.checks
+    .filter(c => c.status !== 'pass')
+    .sort((a, b) => sevRank[a.severity] - sevRank[b.severity] || b.weight - a.weight)
+    .slice(0, 5)
+    .map(c => c.title);
+}
+
+/* ---------------- Blog matcher (fix-request end screen "worth a read" links) ----------------
+   Titles copied verbatim from blog/index.html. Do not paraphrase. */
+const BLOG_POST_TITLES = {
+  'buy-exclusive-roofing-leads': 'Buy Exclusive Roofing Leads',
+  'how-much-do-solar-leads-cost': 'How Much Do Solar Leads Cost in 2026?',
+  'is-it-worth-buying-real-estate-leads': 'Is It Worth Buying Real Estate Leads?',
+  'real-estate-lead-generation': 'Real Estate Lead Generation: How Top Agents Fill Their Pipeline',
+  'law-firm-lead-generation': 'How to Generate Leads for a Law Firm: The Complete Guide',
+  'is-buying-insurance-leads-worth-it': 'Is Buying Insurance Leads Worth It?',
+  'buy-aged-final-expense-leads': 'Buy Aged Final Expense Leads',
+  'how-to-get-hvac-leads-small-company': 'How to Get HVAC Leads for a Small Company',
+  'buy-mortgage-broker-leads': 'Buy Mortgage Broker Leads',
+  'local-seo-for-service-businesses': 'Local SEO for Service Businesses: How to Rank in Your City',
+  'what-is-ai-seo': 'What Is AI SEO? The Complete Guide for 2026',
+  'google-ads-vs-meta-ads': 'Google Ads vs Meta Ads: Which Platform Should You Use in 2026?',
+  'how-much-do-google-ads-cost': 'How Much Do Google Ads Cost? A Real Breakdown for 2026',
+  'what-is-a-landing-page': 'What Is a Landing Page and Why Does It Matter for Lead Gen?',
+  'lead-generation-for-small-business': 'Lead Generation for Small Businesses: 7 Strategies That Actually Work',
+  'how-much-does-lead-generation-cost': 'How Much Does Lead Generation Cost in 2026?',
+  'is-buying-leads-worth-it': 'Is Buying Leads Worth It? An Honest 2026 Breakdown',
+  'is-lead-generation-worth-the-investment': 'Is Lead Generation Worth the Investment?'
+};
+const BLOG_INDUSTRY_RULES = [
+  { keywords: ['roof'], slugs: ['buy-exclusive-roofing-leads'] },
+  { keywords: ['solar'], slugs: ['how-much-do-solar-leads-cost'] },
+  { keywords: ['real estate', 'realtor', 'property'], slugs: ['is-it-worth-buying-real-estate-leads', 'real-estate-lead-generation'] },
+  { keywords: ['law', 'legal', 'attorney'], slugs: ['law-firm-lead-generation'] },
+  { keywords: ['insurance'], slugs: ['is-buying-insurance-leads-worth-it', 'buy-aged-final-expense-leads'] },
+  { keywords: ['hvac', 'plumb', 'heating'], slugs: ['how-to-get-hvac-leads-small-company'] },
+  { keywords: ['mortgage', 'broker'], slugs: ['buy-mortgage-broker-leads'] }
+];
+const BLOG_SERVICE_RULES = {
+  seo: ['local-seo-for-service-businesses', 'what-is-ai-seo'],
+  ads: ['google-ads-vs-meta-ads', 'how-much-do-google-ads-cost'],
+  web: ['what-is-a-landing-page'],
+  leads: ['lead-generation-for-small-business', 'how-much-does-lead-generation-cost']
+};
+const BLOG_FALLBACK_SLUGS = ['is-buying-leads-worth-it', 'is-lead-generation-worth-the-investment'];
+
+/* Pure: industry (free text) -> services (comma-joined enums, e.g. 'seo, web')
+   -> fallbacks, deduped, capped at 3. topIssues is accepted for signature
+   symmetry with the lead payload but doesn't currently drive matching;
+   industry/services are the reliable signals we have. */
+function pickRelatedPosts(industry, service, topIssues) {
+  const ind = (industry || '').toLowerCase();
+  const slugs = [];
+  const pushSlug = (slug) => { if (slug && slugs.indexOf(slug) === -1) slugs.push(slug); };
+  for (const rule of BLOG_INDUSTRY_RULES) {
+    if (rule.keywords.some((kw) => ind.indexOf(kw) !== -1)) rule.slugs.forEach(pushSlug);
+  }
+  for (const svc of (service || '').split(',')) {
+    if (slugs.length >= 3) break;
+    const rules = BLOG_SERVICE_RULES[svc.trim()];
+    if (rules) rules.forEach(pushSlug);
+  }
+  if (slugs.length < 3) BLOG_FALLBACK_SLUGS.forEach(pushSlug);
+  return slugs.slice(0, 3).map((slug) => ({ href: '/blog/' + slug, title: BLOG_POST_TITLES[slug] }));
+}
+
+/* ---------------- Fix-request flow (report CTA -> in-page confirmation) ----------------
+   Bound to the run that produced the currently displayed report (lastReport), never to
+   live currentLead: "Audit another site" must not let a stale click attach to a new run. */
+function handleFixRequest() {
+  const btn = $('fixBtn');
+  if (!btn || btn.disabled) return;
+  btn.disabled = true;
+  if (!suppressLead && lastReport && lastReport.leadSnapshot) {
+    sendLead(buildLeadPayload('fix-request', {
+      auditOk: true,
+      grade: lastReport.grade,
+      score: lastReport.score,
+      topIssues: lastReport.topIssues
+    }, lastReport.leadSnapshot));
+  }
+  const industry = (lastReport && lastReport.leadSnapshot && lastReport.leadSnapshot.industry) || '';
+  const service = (lastReport && lastReport.leadSnapshot && lastReport.leadSnapshot.service) || '';
+  const topIssues = (lastReport && lastReport.topIssues) || [];
+  const posts = pickRelatedPosts(industry, service, topIssues);
+  const relatedWrap = $('fixRelatedWrap');
+  if (relatedWrap) {
+    relatedWrap.textContent = '';
+    if (posts.length) {
+      relatedWrap.appendChild(el('p', 'cta-foot', 'While you wait, worth a read:'));
+      const ul = el('ul', 'fix-blog-list');
+      for (const post of posts) {
+        const li = el('li');
+        const a = el('a', 'fix-blog-link', post.title);
+        a.href = post.href;
+        li.appendChild(a);
+        ul.appendChild(li);
+      }
+      relatedWrap.appendChild(ul);
+    }
+  }
+  const card = $('fixRequestCard');
+  if (card) {
+    card.hidden = false;
+    card.scrollIntoView({ behavior: SCROLL_BEHAVIOR, block: 'start' });
+    const heading = card.querySelector('h3');
+    if (heading) heading.focus();
+  }
+  $('srStatus').textContent = 'Request received. Position Xero has your details and this report, and will follow up by email.';
+}
+
+/* ---------------- Lead delivery ---------------- */
+/* Delivery failures must never surface to the visitor. */
+function sendLead(payload) {
+  try {
+    if (CONFIG.LEAD_WEBHOOK) {
+      deliverToWebhook(payload);
+    } else if (CONFIG.WEB3FORMS_KEY) {
+      deliverToWeb3Forms(payload);
+    } else {
+      console.warn('[lead] no delivery endpoint configured; stage=' + payload.stage);
+    }
+  } catch (e) { /* never surface */ }
+}
+
+async function deliverToWebhook(payload) {
+  // Queue first, remove on ack: a navigation mid-retry must never lose a lead.
+  // Worst case (page dies between server ack and removal) is a duplicate send
+  // on the next visit's flush; a duplicate is acceptable, a lost lead is not.
+  pushOutbox(payload);
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(CONFIG.LEAD_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true
+      });
+      if (res.ok) { removeFromOutbox(payload); return; }
+    } catch (e) { /* network failure, retry once below */ }
+    if (attempt === 0) await sleep(2000);
+  }
+}
+
+function removeFromOutbox(payload) {
+  try {
+    let box = JSON.parse(localStorage.getItem(OUTBOX_KEY) || '[]');
+    if (!Array.isArray(box)) return;
+    box = box.filter((p) => !(p && p.ts === payload.ts && p.stage === payload.stage));
+    localStorage.setItem(OUTBOX_KEY, JSON.stringify(box));
+  } catch (e) {}
+}
+
+function pushOutbox(payload) {
+  try {
+    let box = [];
+    try { box = JSON.parse(localStorage.getItem(OUTBOX_KEY) || '[]'); } catch (e) {}
+    if (!Array.isArray(box)) box = [];
+    box.push(payload);
+    while (box.length > 20) box.shift();
+    localStorage.setItem(OUTBOX_KEY, JSON.stringify(box));
+  } catch (e) {}
+}
+
+function flushOutbox() {
+  if (!CONFIG.LEAD_WEBHOOK) return;
+  let box;
+  try {
+    box = JSON.parse(localStorage.getItem(OUTBOX_KEY) || '[]');
+    localStorage.removeItem(OUTBOX_KEY);
+  } catch (e) { return; }
+  if (!Array.isArray(box)) return;
+  for (const p of box) {
+    try { deliverToWebhook(p); } catch (e) {}
+  }
+}
+
+async function deliverToWeb3Forms(payload) {
+  try {
+    const body = {
+      access_key: CONFIG.WEB3FORMS_KEY,
+      subject: 'New SEO Report Card lead: ' + (payload.business || 'unknown business'),
+      from_name: 'Position Xero SEO Report Card'
+    };
+    for (const k of Object.keys(payload)) {
+      const v = payload[k];
+      body[k] = Array.isArray(v) ? v.join(', ') : (v === null || v === undefined) ? '' : String(v);
+    }
+    await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(body),
+      keepalive: true
+    });
+  } catch (e) { /* never surface */ }
+}
+
+/* ---------------- Email finder (lead enrichment only, must never break the audit,
+   results go ONLY into the lead payload, never into the DOM) ---------------- */
+const EMAIL_FILE_EXT = /\.(png|jpe?g|gif|webp|svg|css|js|woff2?)$/i;
+const EMAIL_JUNK_DOMAINS = ['example.com','example.org','example.net','sentry.io','wixpress.com','schema.org','w3.org','googleapis.com','gstatic.com','cloudflare.com','sentry-next.wixpress.com','company.com','yourcompany.com','yourdomain.com','domain.com','yoursite.com','yourwebsite.com','yourbusiness.com','email.com','test.com'];
+
+function scanEmailsInto(rawHtml, found) {
+  if (!rawHtml) return;
+  const push = (raw) => {
+    // Strip control chars (decoded %0d%0a etc.) so a hostile page can't smuggle
+    // extra lines through mailto: hrefs into the lead-notification email.
+    const e2 = (raw || '').replace(/[\x00-\x1f\x7f]/g, '').trim().toLowerCase();
+    if (!e2 || e2.length > 254) return;
+    if (EMAIL_FILE_EXT.test(e2)) return;
+    if (e2.includes('@2x') || e2.includes('@3x')) return;
+    const at = e2.lastIndexOf('@');
+    if (at < 1 || at === e2.length - 1) return;
+    const domain = e2.slice(at + 1);
+    for (const junk of EMAIL_JUNK_DOMAINS) {
+      if (domain === junk || domain.endsWith('.' + junk)) return;
+    }
+    found.add(e2);
+  };
+  let m;
+  const mailtoRe = /mailto:([^"'\s<>?]+)/gi;
+  while ((m = mailtoRe.exec(rawHtml))) {
+    let v = m[1];
+    try { v = decodeURIComponent(v); } catch (e) {}
+    push(v);
+  }
+  const emailRe = /[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+/gi;
+  while ((m = emailRe.exec(rawHtml))) push(m[0]);
+}
+
+async function findEmails(rawHtml, auditUrl) {
+  const found = new Set();
+  try {
+    scanEmailsInto(rawHtml, found);
+    const target = new URL(auditUrl);
+    const doc = new DOMParser().parseFromString(rawHtml, 'text/html');
+    const contactUrls = [];
+    for (const a of Array.from(doc.querySelectorAll('a[href]'))) {
+      const href = (a.getAttribute('href') || '').trim();
+      if (!href || !/contact|about|kontak|team|reach/i.test(href)) continue;
+      let u;
+      try { u = new URL(href, auditUrl); } catch (e) { continue; }
+      if (!/^https?:$/.test(u.protocol) || u.hostname !== target.hostname) continue;
+      u.hash = '';
+      if (u.href === auditUrl || contactUrls.indexOf(u.href) !== -1) continue;
+      contactUrls.push(u.href);
+      if (contactUrls.length >= 2) break;
+    }
+    for (const pageUrl of contactUrls) {
+      try {
+        const html = await fetchViaProxies(pageUrl, { lite: true });
+        scanEmailsInto(html, found);
+      } catch (e) { /* enrichment only, ignore */ }
+    }
+    // Prefer emails on the audited site's own domain, cap at 10
+    const host = target.hostname.replace(/^www\./, '');
+    const own = [], other = [];
+    for (const em of found) {
+      const domain = em.slice(em.lastIndexOf('@') + 1);
+      if (domain === host || domain.endsWith('.' + host)) own.push(em); else other.push(em);
+    }
+    own.sort(); other.sort();
+    return own.concat(other).slice(0, 10);
+  } catch (e) {
+    return Array.from(found).slice(0, 10);
+  }
+}
+
+/* ---------------- Field validation helpers ---------------- */
+const FIELD_ERROR_IDS = { nameInput: 'nameError', emailInput: 'emailError', phoneInput: 'phoneError', bizInput: 'bizError', industryInput: 'industryError', urlInput: 'urlError' };
+function setFieldError(inputId, msg) {
+  const input = $(inputId), err = $(FIELD_ERROR_IDS[inputId]);
+  if (msg) {
+    err.textContent = msg; err.classList.add('on');
+    input.classList.add('invalid'); input.setAttribute('aria-invalid', 'true');
+  } else {
+    err.textContent = ''; err.classList.remove('on');
+    input.classList.remove('invalid'); input.removeAttribute('aria-invalid');
+  }
+}
+function setChoiceError(groupName, errId, msg) {
+  const err = $(errId);
+  const radios = document.querySelectorAll('input[name="' + groupName + '"]');
+  if (msg) {
+    err.textContent = msg; err.classList.add('on');
+    radios.forEach(r => r.setAttribute('aria-invalid', 'true'));
+  } else {
+    err.textContent = ''; err.classList.remove('on');
+    radios.forEach(r => r.removeAttribute('aria-invalid'));
+  }
+}
+
+const EMAIL_FORMAT_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+function validPhone(raw) {
+  const s = (raw || '').replace(/[\s\-().]/g, '');
+  return /^\+?\d{7,15}$/.test(s);
+}
+
+/* ---------------- Question funnel engine ---------------- */
+const SCREENS = ['s-intro','q-name','q-email','q-phone','q-biz','q-industry','q-service','q-adspend','q-site'];
+const SITE_SCREEN_INDEX = 8;
+const answers = { name:'', business:'', email:'', phone:'', industry:'', services:[], adSpend:'' };
+let cur = 0;
+let funnelDone = false;
+
+function totalQ() { return answers.services.indexOf('seo') !== -1 ? 8 : 7; }
+
+function setProgress(idx) {
+  const fill = $('progressFill'), txt = $('progressText');
+  if (idx <= 0) { fill.style.width = '0%'; txt.textContent = ''; return; }
+  const t = totalQ();
+  const n = Math.min(idx, t);
+  fill.style.width = Math.round(((n - 1) / t) * 100) + '%';
+  txt.textContent = n + ' of ' + t;
+}
+
+function focusScreen(s) {
+  const inp = s.querySelector('input:not([type="radio"]):not([type="checkbox"])');
+  if (inp) { inp.focus(); return; }
+  const checked = s.querySelector('input[type="radio"]:checked, input[type="checkbox"]:checked')
+    || s.querySelector('input[type="radio"], input[type="checkbox"]');
+  if (checked) { checked.focus(); return; }
+  const btn = s.querySelector('button');
+  if (btn) btn.focus();
+}
+
+function showScreen(idx) {
+  const old = document.querySelector('#funnel .screen:not([hidden])');
+  if (old) old.hidden = true;
+  cur = idx;
+  const s = $(SCREENS[idx]);
+  s.hidden = false;
+  s.classList.remove('in');
+  void s.offsetWidth; // restart the entrance animation
+  s.classList.add('in');
+  $('backBtn').hidden = idx < 2;
+  setProgress(idx);
+  focusScreen(s);
+}
+
+function finishFunnel(screenId) {
+  funnelDone = true;
+  const old = document.querySelector('#funnel .screen:not([hidden])');
+  if (old) old.hidden = true;
+  $('backBtn').hidden = true;
+  $('progressFill').style.width = '100%';
+  $('progressText').textContent = 'All done';
+  const s = $(screenId);
+  s.hidden = false;
+  s.classList.add('in');
+  const h = s.querySelector('h2');
+  if (h) h.focus();
+}
+
+function collapseShell() {
+  funnelDone = true;
+  const old = document.querySelector('#funnel .screen:not([hidden])');
+  if (old) old.hidden = true;
+  $('backBtn').hidden = true;
+  $('progressFill').style.width = '100%';
+  $('progressText').textContent = '';
+  $('shell').classList.add('done');
+  $('shellBody').hidden = true;
+  // the fixed top progress bar has no job once the funnel is done, and it
+  // would otherwise sit over the scrolled report forever
+  document.querySelector('.progress-track').hidden = true;
+}
+
+function reopenFunnelAtSite() {
+  funnelDone = false;
+  $('shell').classList.remove('done');
+  $('shellBody').hidden = false;
+  document.querySelector('.progress-track').hidden = false;
+  $('thanksCard').hidden = true;
+  $('noSiteCard').hidden = true;
+  $('urlInput').value = '';
+  $('kwInput').value = '';
+  setFieldError('urlInput', null);
+  window.scrollTo({ top: 0, behavior: SCROLL_BEHAVIOR });
+  showScreen(SITE_SCREEN_INDEX);
+}
+
+function captureLead(hasWebsite, website, keyword) {
+  currentLead = {
+    name: answers.name, business: answers.business, email: answers.email, phone: answers.phone,
+    industry: answers.industry, service: answers.services.join(', '), adSpend: answers.adSpend,
+    hasWebsite: hasWebsite, website: website, keyword: keyword || ''
+  };
+  storeLead(currentLead);
+  suppressLead = !!$('hpInput').value;
+  if (suppressLead) console.warn('[lead] send suppressed (honeypot filled)');
+}
+
+const SERVICE_LINKS = {
+  ads:   { href: '/ads',        label: 'See how we run paid ads' },
+  web:   { href: '/web-design', label: 'See our web design services' },
+  leads: { href: '/lead-gen',   label: 'See our lead generation services' },
+  seo:   { href: '/seo',        label: 'See our SEO services' }
+};
+
+function completeNonSeo() {
+  captureLead(false, null, '');
+  if (!suppressLead) sendLead(buildLeadPayload('captured'));
+  // Multi-select: link out to the first picked service that has a page.
+  let link = { href: '/contact', label: 'Get in touch' };
+  for (const svc of answers.services) {
+    if (SERVICE_LINKS[svc]) { link = SERVICE_LINKS[svc]; break; }
+  }
+  const a = $('thanksServiceLink');
+  a.href = link.href;
+  a.textContent = link.label;
+  finishFunnel('thanksCard');
+  $('srStatus').textContent = 'Thanks. We have your details. We review your answers and reply by email.';
+}
+
+function completeSeo(website, keyword) {
+  captureLead(true, website, keyword);
+  if (!suppressLead) sendLead(buildLeadPayload('captured'));
+  lastRun = { url: website, keyword: keyword };
+  collapseShell();
+  runAudit(website, keyword);
+}
+
+function advance() {
+  if (funnelDone) return;
+  const id = SCREENS[cur];
+  switch (id) {
+    case 's-intro': {
+      showScreen(1);
+      break;
+    }
+    case 'q-name': {
+      const v = $('nameInput').value.trim();
+      if (v.length < 2) { setFieldError('nameInput', 'Please enter your full name.'); $('nameInput').focus(); return; }
+      setFieldError('nameInput', null);
+      answers.name = v;
+      showScreen(2);
+      break;
+    }
+    case 'q-email': {
+      const v = $('emailInput').value.trim();
+      if (!EMAIL_FORMAT_RE.test(v)) { setFieldError('emailInput', 'That doesn’t look like a valid email address.'); $('emailInput').focus(); return; }
+      setFieldError('emailInput', null);
+      answers.email = v;
+      showScreen(3);
+      break;
+    }
+    case 'q-phone': {
+      const v = $('phoneInput').value.trim();
+      if (!validPhone(v)) { setFieldError('phoneInput', 'That doesn’t look like a valid phone number: digits only, with an optional leading +.'); $('phoneInput').focus(); return; }
+      setFieldError('phoneInput', null);
+      answers.phone = v;
+      showScreen(4);
+      break;
+    }
+    case 'q-biz': {
+      const v = $('bizInput').value.trim();
+      if (v.length < 2) { setFieldError('bizInput', 'Please enter your business name.'); $('bizInput').focus(); return; }
+      setFieldError('bizInput', null);
+      answers.business = v;
+      showScreen(5);
+      break;
+    }
+    case 'q-industry': {
+      const v = $('industryInput').value.trim();
+      if (v.length < 2) { setFieldError('industryInput', 'Please tell us your industry. Pick one from the list or type your own.'); $('industryInput').focus(); return; }
+      setFieldError('industryInput', null);
+      answers.industry = v;
+      showScreen(6);
+      break;
+    }
+    case 'q-service': {
+      const picked = document.querySelectorAll('input[name="service"]:checked');
+      if (!picked.length) { setChoiceError('service', 'serviceError', 'Please choose at least one service.'); focusScreen($('q-service')); return; }
+      setChoiceError('service', 'serviceError', null);
+      answers.services = Array.from(picked, (c) => c.value);
+      showScreen(7);
+      break;
+    }
+    case 'q-adspend': {
+      const r = document.querySelector('input[name="adspend"]:checked');
+      if (!r) { setChoiceError('adspend', 'adspendError', 'Please choose an option.'); focusScreen($('q-adspend')); return; }
+      setChoiceError('adspend', 'adspendError', null);
+      answers.adSpend = r.value;
+      if (answers.services.indexOf('seo') !== -1) { showScreen(8); } else { completeNonSeo(); }
+      break;
+    }
+    case 'q-site': {
+      const website = normalizeUrl($('urlInput').value);
+      if (!website) { setFieldError('urlInput', 'That doesn’t look like a valid website address. Try something like yourwebsite.com'); $('urlInput').focus(); return; }
+      setFieldError('urlInput', null);
+      completeSeo(website, $('kwInput').value.trim());
+      break;
+    }
+  }
+}
+
+/* Next buttons + Back + Enter-to-advance */
+document.querySelectorAll('.q-next').forEach(b => b.addEventListener('click', advance));
+$('backBtn').addEventListener('click', () => {
+  if (funnelDone || cur < 2) return;
+  showScreen(cur - 1);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' || e.isComposing || funnelDone) return;
+  const t = e.target;
+  if (t && (t.tagName === 'BUTTON' || t.tagName === 'A')) return; // let buttons/links activate normally
+  e.preventDefault();
+  advance();
+});
+
+/* Clear inline errors as the visitor types / picks */
+for (const inputId of Object.keys(FIELD_ERROR_IDS)) {
+  $(inputId).addEventListener('input', () => setFieldError(inputId, null));
+}
+document.querySelectorAll('input[name="service"]').forEach(r => r.addEventListener('change', () => setChoiceError('service', 'serviceError', null)));
+document.querySelectorAll('input[name="adspend"]').forEach(r => r.addEventListener('change', () => setChoiceError('adspend', 'adspendError', null)));
+
+$('noSiteBtn').addEventListener('click', () => {
+  if (funnelDone) return;
+  captureLead(false, null, '');
+  if (!suppressLead) sendLead(buildLeadPayload('no-website'));
+  finishFunnel('noSiteCard');
+  $('srStatus').textContent = 'Thanks. We have your details. Position Xero also designs and builds websites.';
+});
+
+/* ---------------- Grading animation ---------------- */
+const SCAN_ITEMS = ['scan-content', 'scan-tech', 'scan-meta', 'scan-structure'];
+const SCAN_DONE_MSGS = {
+  'scan-content': 'Content checks complete.',
+  'scan-tech': 'Technical checks complete.',
+  'scan-meta': 'Meta & social checks complete.',
+  'scan-structure': 'Structure checks complete.'
+};
+const FETCH_MSGS = [
+  'Fetching your page…',
+  'Reading the server HTML…',
+  'Measuring readable content…',
+  'Checking meta tags…',
+  'Scanning heading structure…',
+  'Weighing technical signals…'
+];
+let msgTimer = null;
+function startFetchMsgs() {
+  let i = 0;
+  $('liveMsg').textContent = FETCH_MSGS[0];
+  msgTimer = setInterval(() => {
+    i = (i + 1) % FETCH_MSGS.length;
+    $('liveMsg').textContent = FETCH_MSGS[i];
+  }, 1400);
+}
+function stopFetchMsgs() {
+  if (msgTimer) { clearInterval(msgTimer); msgTimer = null; }
+}
+function resetScan() {
+  for (const id of SCAN_ITEMS) {
+    const li = $(id);
+    li.classList.remove('done');
+    li.classList.add('running');
+  }
+}
+
+/* ---------------- Flow control ---------------- */
+let lastRun = null;
+let auditRunning = false;
+
+async function runAudit(rawUrl, keyword) {
+  if (auditRunning) return;
+  auditRunning = true;
+  const stage = $('stage'), loading = $('loadingCard'), errorCard = $('errorCard'),
+        live = $('liveMsg'), report = $('report');
+  // Bind this run's payloads to the lead + site at start time: currentLead can
+  // change ("Audit another site") before async enrichment lands.
+  const leadSnapshot = (currentLead && !suppressLead)
+    ? Object.assign({}, currentLead, { hasWebsite: true, website: rawUrl, keyword: keyword || '' })
+    : null;
+
+  report.hidden = true;
+  errorCard.hidden = true;
+  stage.hidden = false;
+  loading.hidden = false;
+  resetScan();
+  startFetchMsgs();
+  loading.scrollIntoView({ behavior: SCROLL_BEHAVIOR, block: 'center' });
+
+  try {
+    const html = await fetchViaProxies(rawUrl);
+    stopFetchMsgs();
+    // Lead enrichment runs alongside the report build; its failure never breaks the audit.
+    let emailsPromise = Promise.resolve([]);
+    try { emailsPromise = findEmails(html, rawUrl).catch(() => []); } catch (e) {}
+    const result = analyze(html, rawUrl, keyword);
+    // Ticks are presentational pacing, but they only ever start AFTER the fetch succeeded.
+    for (const id of SCAN_ITEMS) {
+      const li = $(id);
+      li.classList.remove('running');
+      li.classList.add('done');
+      live.textContent = SCAN_DONE_MSGS[id];
+      await sleep(REDUCED ? 60 : 600);
+    }
+    live.textContent = 'Building your report card…';
+    await sleep(REDUCED ? 0 : 350);
+    loading.hidden = true;
+    stage.hidden = true;
+    buildReport(result, rawUrl, keyword);
+    const runTopIssues = topIssueTitles(result);
+    lastReport = { leadSnapshot: leadSnapshot, grade: result.grade, score: result.score, topIssues: runTopIssues };
+    $('srStatus').textContent = 'Report ready. Grade: ' + result.grade + ', score ' + result.score + ' out of 100.';
+    if (leadSnapshot) {
+      emailsPromise.then((emails) => {
+        sendLead(buildLeadPayload('enriched', {
+          auditOk: true,
+          grade: result.grade,
+          score: result.score,
+          topIssues: runTopIssues,
+          emailsFound: emails || []
+        }, leadSnapshot));
+      }).catch(() => {});
+    }
+  } catch (err) {
+    stopFetchMsgs();
+    loading.hidden = true;
+    const title = $('errorTitle'), msg = $('errorMsg');
+    if (err && err.message === 'non-html') {
+      title.textContent = 'That URL didn’t return a web page';
+      msg.textContent = 'The address responded, but not with HTML. It may be a file, an API endpoint, or a redirect we can’t follow. Try the site’s homepage URL instead.';
+    } else {
+      title.textContent = 'We couldn’t reach that site right now';
+      msg.textContent = 'Free proxy servers can be busy. Try again in a minute. If it keeps failing, check the URL is live and publicly accessible (password-protected or firewalled pages can’t be audited).';
+    }
+    errorCard.hidden = false;
+    $('srStatus').textContent = title.textContent + '. ' + msg.textContent;
+    errorCard.scrollIntoView({ behavior: SCROLL_BEHAVIOR, block: 'center' });
+    if (leadSnapshot) {
+      sendLead(buildLeadPayload('enriched', { auditOk: false, emailsFound: [] }, leadSnapshot));
+    }
+  } finally {
+    auditRunning = false;
+  }
+}
+
+$('retryBtn').addEventListener('click', () => {
+  if (lastRun) runAudit(lastRun.url, lastRun.keyword);
+});
+$('editUrlBtn').addEventListener('click', () => {
+  $('errorCard').hidden = true;
+  $('stage').hidden = true;
+  reopenFunnelAtSite();
+  if (lastRun && lastRun.url && !$('urlInput').value) $('urlInput').value = lastRun.url;
+});
+
+/* ---------------- Init: prefill from stored lead, flush any undelivered leads ----------------
+   Prefill only: the visitor always starts at the first screen; questions are never skipped. */
+(function init() {
+  const stored = loadStoredLead();
+  if (stored) {
+    $('nameInput').value = stored.name || '';
+    $('bizInput').value = stored.business || '';
+    $('emailInput').value = stored.email || '';
+    $('phoneInput').value = stored.phone || '';
+    if (stored.industry) $('industryInput').value = stored.industry;
+    if (stored.service) {
+      // 'seo, web' since multi-select; a bare 'seo' from older stored leads still works.
+      for (const svc of String(stored.service).split(',')) {
+        const c = $('service-' + svc.trim());
+        if (c) c.checked = true;
+      }
+    }
+    if (stored.adSpend) {
+      const r = $('adspend-' + stored.adSpend);
+      if (r) r.checked = true;
+    }
+    if (stored.website) $('urlInput').value = stored.website;
+    if (stored.keyword) $('kwInput').value = stored.keyword;
+  }
+  setProgress(0);
+  flushOutbox();
+})();
+</script>
+
+<script>
+/* ============================================================
+   Cloth-warp grid, same effect as the site hero / dark sections
+   (js/main.js). Inlined here because this page is standalone.
+   ============================================================ */
+(function () {
+  // Reduced motion: skip entirely, the static CSS grid stays as the fallback.
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const host = document.getElementById('shell');
+  if (!host) return;
+
+  // Geometry / physics, identical to the hero.
+  const STEPS    = 16;  // polyline segments per line (more = smoother curve)
+  const SIGMA    = 200; // px, radius of cloth depression
+  const STRENGTH = 90;  // px, max inward pull at dead-centre
+  const SPRING   = 0.055;
+  const CELL     = 68;
+  const COLOR    = 'rgba(255,255,255,0.06)';
+
+  const canvas = document.createElement('canvas');
+  canvas.className = 'warp-grid';
+  canvas.setAttribute('aria-hidden', 'true');
+  host.insertBefore(canvas, host.firstChild);
+  host.classList.add('has-warp-grid'); // hides the static CSS grid
+  const ctx = canvas.getContext('2d');
+
+  let W = 0, H = 0;
+  let rawX = -9999, rawY = -9999;  // actual mouse position (relative to host)
+  let smX  = -9999, smY  = -9999;  // spring-eased position
+  let velX = 0, velY = 0;
+
+  function resize() { W = canvas.width = host.offsetWidth; H = canvas.height = host.offsetHeight; }
+
+  host.addEventListener('mousemove', e => {
+    const r = host.getBoundingClientRect();
+    rawX = e.clientX - r.left;
+    rawY = e.clientY - r.top;
+  });
+  host.addEventListener('mouseleave', () => { rawX = -9999; rawY = -9999; });
+
+  // Gaussian pull toward cursor: strongest at centre, zero at infinity.
+  function warp(px, py) {
+    const dx = px - smX, dy = py - smY, d2 = dx * dx + dy * dy;
+    const pull = STRENGTH * Math.exp(-d2 / (2 * SIGMA * SIGMA));
+    const dist = Math.sqrt(d2) || 1;
+    return { x: px - (dx / dist) * pull, y: py - (dy / dist) * pull };
+  }
+
+  function drawWarpedLine(x0, y0, x1, y1) {
+    ctx.beginPath();
+    for (let i = 0; i <= STEPS; i++) {
+      const t = i / STEPS, px = x0 + (x1 - x0) * t, py = y0 + (y1 - y0) * t, w = warp(px, py);
+      i === 0 ? ctx.moveTo(w.x, w.y) : ctx.lineTo(w.x, w.y);
+    }
+    ctx.stroke();
+  }
+
+  function draw() {
+    // Critically-damped spring toward raw mouse (the "fabric sinking" lag).
+    const dx = rawX - smX, dy = rawY - smY;
+    velX += dx * SPRING; velY += dy * SPRING;
+    velX *= 0.78; velY *= 0.78;
+    smX += velX; smY += velY;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = COLOR;
+    ctx.lineWidth = 1;
+
+    const cols = Math.ceil(W / CELL) + 1, rows = Math.ceil(H / CELL) + 1;
+    for (let r = 0; r <= rows; r++) drawWarpedLine(0, r * CELL, W, r * CELL);
+    for (let c = 0; c <= cols; c++) drawWarpedLine(c * CELL, 0, c * CELL, H);
+
+    if (running) rafId = requestAnimationFrame(draw);
+  }
+
+  let rafId = null, running = false;
+  function start() { if (!running) { running = true; rafId = requestAnimationFrame(draw); } }
+  function stop()  { running = false; if (rafId) cancelAnimationFrame(rafId); rafId = null; }
+
+  resize();
+  window.addEventListener('resize', resize);
+  // The shell changes height as screens swap and when it collapses after
+  // submit, so track its own box too, not just the window.
+  if ('ResizeObserver' in window) new ResizeObserver(resize).observe(host);
+
+  // Only animate while the shell is on-screen (saves CPU/battery).
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(es => es.forEach(e => (e.isIntersecting ? start() : stop())), { threshold: 0 }).observe(host);
+  } else { start(); }
+})();
+</script>
+</body>
+</html>

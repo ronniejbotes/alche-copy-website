@@ -17,17 +17,23 @@ import * as THREE from 'three';
 const asset = (p) => `${import.meta.env.BASE_URL}${p}`.replace(/([^:])\/{2,}/g, '$1/');
 
 const WORKS = [
-  { title: 'TINY HOMES SA', sub: 'CONFIGURATOR + PAID SEARCH', pal: ['#FF6A1F', '#7A2E0C', '#05070A'], img: asset('works/kv-01.jpg') },
-  { title: 'OTAKU KULTURE', sub: 'ANIME + CAR CULTURE MERCH', pal: ['#2EE6FF', '#0E5C77', '#05070A'], img: asset('works/otaku-kulture.jpg') },
-  { title: 'EYE CANDY', sub: 'SHOWROOM + ENQUIRY FUNNEL', pal: ['#FF6A1F', '#7A2E0C', '#05070A'] },
-  { title: 'CAJEE BOTES', sub: 'BOOKINGS + LOCAL SEARCH', pal: ['#2EE6FF', '#0E5C77', '#05070A'], img: asset('works/cajee-botes.jpg') }
+  // Cognexa leads the wall — our own AI company, and the proof behind the
+  // AI-search work.
+  { title: 'COGNEXA', sub: 'AI SYSTEMS + AUTOMATION', pal: ['#2EE6FF', '#0E5C77', '#05070A'], img: asset('img/works/cognexa.jpg') },
+  { title: 'TINY HOMES SA', sub: 'CONFIGURATOR + PAID SEARCH', pal: ['#FF6A1F', '#7A2E0C', '#05070A'], img: asset('img/works/kv-01.jpg') },
+  { title: 'OTAKU KULTURE', sub: 'ANIME + CAR CULTURE MERCH', pal: ['#2EE6FF', '#0E5C77', '#05070A'], img: asset('img/works/otaku-kulture.jpg') },
+  { title: 'CAJEE BOTES', sub: 'BOOKINGS + LOCAL SEARCH', pal: ['#2EE6FF', '#0E5C77', '#05070A'], img: asset('img/works/cajee-botes.jpg') }
 ];
 
 const SERVICE = [
   { title: 'ADS', sub: 'GOOGLE + META', pal: ['#FF6A1F', '#7A2E0C', '#05070A'] },
   { title: 'SEARCH', sub: 'AI + TRADITIONAL', pal: ['#2EE6FF', '#0E5C77', '#05070A'] },
-  // the Cognexa reel goes fullscreen — bright field, no big title
-  { title: '', sub: '', pal: ['#EAF2F5', '#BFE9F5', '#8FD8EE'], bright: true }
+  // The Cognexa reel peels to a fullscreen cover-fit quad, so it carries the
+  // real site rather than generated art: this is the one panel a visitor reads
+  // as a preview. 2560x1440 because it fills the viewport on a retina display.
+  // The bright palette still paints the field while the image is in flight.
+  { title: '', sub: '', pal: ['#EAF2F5', '#BFE9F5', '#8FD8EE'], bright: true,
+    img: asset('img/works/cognexa-reel.jpg') }
 ];
 
 function seeded(seed) {
@@ -177,12 +183,19 @@ export class WorksMedia {
     return this._service[i]?.tex ?? null;
   }
 
-  /** Animate the "video" reels — cheap repaint a few times a second. */
+  /** Animate the "video" reels: cheap repaint a few times a second. */
   update(t) {
     if (!this._last) this._last = 0;
     if (t - this._last < 0.12) return;    // ~8fps repaint is plenty
     this._last = t;
     for (const m of this._service) {
+      // A panel carrying a real screenshot must not be repainted. This loop
+      // redraws the generated art onto the same canvas the image was drawn
+      // into, so without this guard the Cognexa reel loaded its image and then
+      // had it painted over 8 times a second. `hasImage` was already set for
+      // exactly this reason; nothing had ever needed to read it, because until
+      // the Cognexa panel got a screenshot no SERVICE entry carried an image.
+      if (m.hasImage) continue;
       paintArt(m.ctx, m.canvas.width, m.canvas.height, m.spec, m.seed, t);
       m.tex.needsUpdate = true;
     }

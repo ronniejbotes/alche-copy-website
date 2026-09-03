@@ -1266,7 +1266,7 @@ body[data-light="true"] .header__nav a[aria-current="page"] { color: var(--bg); 
   .btn-contact { display: none; }
   .hamburger { display: flex; }
   .rail { display: none; }
-  .works-item { left: 6vw; top: 16vh; width: 88vw; }
+  .works-layer .works-item { left: 6vw; top: 16vh; width: 88vw; }
   .works-more { left: 6vw; top: calc(16vh - 30px); }
   .works-item__title { font-size: 30px; }
   .works-item__result b { font-size: 26px; }
@@ -1276,11 +1276,15 @@ body[data-light="true"] .header__nav a[aria-current="page"] { color: var(--bg); 
   .service-item { left: 6vw; bottom: 12vh; width: 88vw; }
   .service-item::before { inset: -30px -30px -30px -6vw; }
   .outro__offer { left: 6vw; top: 12vh; width: 88vw; }
-  .outro__mark { right: 6vw; top: auto; bottom: 6vh; transform: none; width: 34%; }
+  /* Horizontal placement is owned by outro.js: it sizes the X from the whole
+     X+E+R+O lockup and slides it to the 6% slot, so a CSS `right` here would
+     fight the tween and the 34% width would blow the wordmark off-screen.
+     The 30% is only the no-JS fallback. */
+  .outro__mark { left: 50%; right: auto; top: auto; bottom: 6vh; transform: none; width: 30%; }
   .footer__top { flex-direction: column; padding: 0 15px; }
   .footer__copyright { font-size: 11px; margin-top: 40px; padding: 0 15px; }
   .cognexa__content { left: 20px; right: 20px; }
-  .outro { height: auto; aspect-ratio: 1.25; }
+  .outro { height: auto; }
 }
 @media (min-width: 769px) {
   .hamburger { display: none; }
@@ -1290,4 +1294,141 @@ body[data-light="true"] .header__nav a[aria-current="page"] { color: var(--bg); 
   .header__nav { display: none; }
   .footer__cols { gap: 32px; }
   .footer__bottom { padding: 32px 15px 0; flex-direction: column; gap: 10px; }
+}
+
+/* ---------- mobile: collisions and legibility ----------
+   Everything below is phone-only. The desktop layout composes a narrow copy
+   column against a wide WebGL stage; on a 390px screen that column becomes
+   full-bleed, and three desktop-only assumptions break with it:
+
+     1. the footer is absolutely pinned to the bottom of <body> so it can
+        overlay the lower band of the outro screen. At 88vw the outro copy
+        fills that same band, so the two render on top of each other.
+     2. every copy block is grounded by a LEFT-anchored radial scrim sized for
+        a ~30vw column. Stretched to 88vw the fade lands mid-sentence and the
+        text sits on bare artwork.
+     3. the calc beat is vertically centred in the viewport with no allowance
+        for the fixed header, which is painted above it at z-index 99.
+*/
+@media (max-width: 768px) {
+
+  /* --- 1. outro / footer ---------------------------------------------------
+     body is position:relative and .footer is absolute bottom:0, so the footer
+     pins to the bottom 503px of the document — which on a phone is the middle
+     of the outro's offer copy. Put it back in flow; it then stacks under the
+     outro screen instead of across it. */
+  body[data-page="top"] .footer { position: relative; }
+
+  /* --- 2. copy scrims ------------------------------------------------------
+     Full-bleed and centred rather than left-anchored, so the opaque plateau
+     covers the whole 88vw column and the fade happens in the overhang. */
+  .stakes__inner::before,
+  .works-layer .works-item::before,
+  .service-item::before,
+  .outro__offer::before {
+    /* Bleed past both screen edges and fade only on the vertical, so the scrim
+       reads as a band of shade rather than a panel laid over the artwork. A
+       radial here draws a visible rectangle: its 125%/105% radius is larger
+       than the box, so the fade is clipped by the box edge instead of ever
+       reaching zero, and you see the corner. */
+    inset: -52px -12vw -46px -12vw;
+    background: linear-gradient(180deg,
+      rgba(5, 7, 10, 0) 0%,
+      rgba(5, 7, 10, 0.88) 16%,
+      rgba(5, 7, 10, 0.93) 42%,
+      rgba(5, 7, 10, 0.93) 62%,
+      rgba(5, 7, 10, 0.88) 84%,
+      rgba(5, 7, 10, 0) 100%);
+  }
+
+  /* The Cognexa peel deliberately shows the live site behind the copy, but at
+     88vw the headline and paragraph sit right on top of that page's own
+     hero type. Enough shade to separate the two, not enough to kill the peel. */
+  .cognexa__main { position: relative; }
+  .cognexa__main::before {
+    content: ""; position: absolute; inset: -30px -12vw -26px -12vw;
+    z-index: -1; pointer-events: none;
+    background: linear-gradient(180deg,
+      rgba(5, 7, 10, 0) 0%,
+      rgba(5, 7, 10, 0.8) 18%,
+      rgba(5, 7, 10, 0.86) 50%,
+      rgba(5, 7, 10, 0.8) 82%,
+      rgba(5, 7, 10, 0) 100%);
+  }
+
+  /* --- 3. works ledger -----------------------------------------------------
+     The outcome and its label sit on one baseline row at 26px + 10px. Let the
+     label drop under the number rather than squeezing into the gutter. */
+  .works-item__result { flex-wrap: wrap; row-gap: 4px; }
+  .works-item__result i { flex-basis: 100%; }
+
+  /* --- 4. footer grid ------------------------------------------------------
+     Four flex columns with a 40px gap do not fit 390px: the market links wrap
+     into their neighbours and Instagram runs off the right edge. */
+  .footer__top { gap: 34px; }
+  .footer__links {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 26px 18px; width: 100%;
+  }
+  .footer__col { gap: 11px; min-width: 0; }
+  .footer__col a, .footer__links-title { font-size: 13px; overflow-wrap: anywhere; }
+  .footer__col .footer__sub { font-size: 12px; }
+  .footer__contact { align-items: flex-start; width: 100%; gap: 18px; }
+  .footer__contact-buttons { gap: 22px; flex-wrap: wrap; }
+  .footer__contact-btn { font-size: 14px; }
+  .footer__privacy { gap: 16px; }
+  .footer__privacy a { font-size: 13px; }
+
+  /* --- 5. calculator -------------------------------------------------------
+     Clear the fixed header (z-index 99 over the calc's 8, which is what put
+     "FREE TOOL" underneath the wordmark), and drop the rail padding since the
+     rail is display:none here. 8px/9px legal-and-scale type is below reading
+     size on a phone; the height that costs is taken back from the rhythm. */
+  .calc { padding-top: 62px; padding-bottom: 18px; }
+  .calc__kicker { margin-bottom: 8px; }
+  .calc__title { font-size: 19px; margin-bottom: 8px; }
+  .calc__text { font-size: 12px; line-height: 1.5; }
+  .calc__fields { margin-top: 12px; }
+  .calc-field + .calc-field { margin-top: 9px; }
+  .calc-field__label { font-size: 11.5px; }
+  .calc-field__value { font-size: 17px; margin: 2px 0 5px; }
+  .calc-field__ends { font-size: 10px; letter-spacing: 0.08em; }
+  .calc__result { margin-top: 11px; padding-top: 9px; }
+  .calc__total-num { font-size: 30px; }
+  .calc__total-unit { font-size: 13px; }
+  .calc__result-label { margin-top: 5px; font-size: 11.5px; }
+  .calc__result-sub { margin-top: 4px; font-size: 10px; }
+  .calc__note { margin-top: 9px; font-size: 10px; line-height: 1.55; letter-spacing: 0.02em; }
+  .calc__cta { margin-top: 9px; }
+  .calc__cta-link { font-size: 11px; }
+
+  /* --- 6. cognexa peel -----------------------------------------------------
+     .cognexa__wordmark bottoms out at its 72px clamp floor, so "Cognexa" plus
+     the 48px arrow and a 22px gap demands ~384px of min-content inside a
+     350px column and the arrow gets cut off at the right edge. Scale the pair
+     to the viewport and let the flex item shrink. */
+  .cognexa__main { padding-left: 0; min-width: 0; }
+  .cognexa__logo { gap: 12px; margin-bottom: 18px; }
+  .cognexa__wordmark { font-size: clamp(44px, 14vw, 72px); }
+  .cognexa__arrow { width: clamp(30px, 9vw, 48px); }
+  .cognexa__lead { margin-bottom: 16px; }
+}
+
+/* ---------- mobile: subpage header backdrop ----------
+   /works and /cognexa scroll ordinary document content beneath a transparent
+   fixed header, so a line of body copy passes straight through the wordmark
+   and neither is readable — "Booked hires" and the Cognexa lede both vanish
+   into it. The top page is excluded on purpose: its content is fixed layers
+   already positioned to clear the header, and it flips the header light/dark
+   per beat, so a painted bar there would fight the artwork. */
+@media (max-width: 768px) {
+  body:not([data-page="top"]) .header::before {
+    content: "";
+    position: absolute; inset: 0 0 -18px 0;
+    z-index: -1; pointer-events: none;
+    background: linear-gradient(180deg,
+      var(--bg) 0%,
+      var(--bg) 66%,
+      rgba(5, 7, 10, 0) 100%);
+  }
 }

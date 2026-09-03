@@ -67,20 +67,29 @@ export class Outro {
     // height %) and drifted apart at every viewport.
     const cw = this.canvas.clientWidth || window.innerWidth;
     const ch = this.canvas.clientHeight || window.innerHeight;
-    if (cw > 768) {
-      // X + 0.06 gap + 3 letters at 0.95 + 2 gaps at 0.22 = 4.4785 cap heights
-      const capH = Math.min((cw * 0.59) / 4.4785, ch * 0.3);
-      this.mark.style.width = `${(capH * 237) / 206}px`;
-    } else {
-      this.mark.style.width = '';      // narrow layout keeps its CSS sizing
-    }
+    // X + 0.06 gap + 3 letters at 0.95 + 2 gaps at 0.22 = 4.4785 cap heights.
+    // Narrow viewports have to be sized here too. Leaving them on the CSS
+    // 34% put a 153px X in a 465px screen, which hangs E R O out to x=631 —
+    // the wordmark never finished: you saw "X" and half an "E" and nothing
+    // else. The lockup is one indivisible unit, so it is measured against the
+    // width it has to fit in, at every viewport.
+    const span = cw > 768 ? 0.59 : 0.88;      // fraction of the screen it occupies
+    const capCap = cw > 768 ? 0.3 : 0.18;     // and its ceiling as a share of height
+    const capH = Math.min((cw * span) / 4.4785, ch * capCap);
+    this.mark.style.width = `${(capH * 237) / 206}px`;
+  }
+
+  /* Where the X parks once it has slid into the lockup. Narrow screens need
+     the whole 88% span, so the mark starts hard left instead of at 36%. */
+  _slotLeft() {
+    return (this.canvas.clientWidth || window.innerWidth) > 768 ? '36%' : '6%';
   }
 
   _play() {
     this._played = true;
     this._playing = true;
     this._glowTarget = 1;
-    gsap.to(this.mark, { left: '36%', duration: 1, ease: 'power2.inOut' });
+    gsap.to(this.mark, { left: this._slotLeft(), duration: 1, ease: 'power2.inOut' });
     setTimeout(() => { this._t0 = performance.now(); }, 1100);
   }
 
@@ -165,10 +174,17 @@ export class Outro {
     const cssW = this.canvas.clientWidth || 1;
     const k = W / cssW;                       // canvas px per CSS px
     const mr = this.mark.getBoundingClientRect();
+    // Measure the mark RELATIVE TO THE CANVAS, not the viewport. Both rects are
+    // viewport-space, so the canvas origin has to be subtracted off; using
+    // mr.left/mr.top raw only worked while .outro__screen happened to be stuck
+    // at top:0. It is not stuck once the footer sits below the outro in flow
+    // (the phone layout), and the whole E R O construction then drew a screen's
+    // worth above the visible area — the wordmark stopped at "X".
+    const cr = this.canvas.getBoundingClientRect();
     const markW = mr.width * k;
     const letterH = mr.height * k;
-    const markCx = mr.left * k;
-    const y0 = mr.top * k;
+    const markCx = (mr.left - cr.left) * k;
+    const y0 = (mr.top - cr.top) * k;
     const x0 = markCx + markW + letterH * 0.06;
     // Letters are proportioned off the cap height, never off "space that is
     // left" — the mark slides in on a tween, and deriving widths from the gap

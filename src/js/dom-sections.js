@@ -31,12 +31,12 @@ export class WorksItems {
 
   show(i) {
     if (i === this.current) return;
-    const prev = this.current;
     this.current = i;
-    if (prev >= 0) this._hideItem(prev);
+    // hide every other item, not just the outgoing one — see ServiceItems.show
+    this.items.forEach((_, idx) => { if (idx !== i) this._hideItem(idx); });
     const el = this.items[i];
     if (!el) return;
-    gsap.to(el, { opacity: 1, duration: 0.3, ease: 'power2.out' });
+    gsap.to(el, { opacity: 1, duration: 0.3, ease: 'power2.out', overwrite: 'auto' });
     gsap.fromTo(this._splits[i].chars,
       { y: 10, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.7, ease: 'power4.out', stagger: 0.01 }
@@ -51,7 +51,7 @@ export class WorksItems {
     gsap.to(this._splits[i].chars, {
       y: -10, opacity: 0, duration: 0.4, ease: 'power2.in', stagger: 0.001
     });
-    gsap.to(el, { opacity: 0, duration: 0.5, ease: 'power2.inOut' });
+    gsap.to(el, { opacity: 0, duration: 0.5, ease: 'power2.inOut', overwrite: 'auto' });
   }
 }
 
@@ -181,18 +181,31 @@ export class ServiceItems {
 
   show(i) {
     if (i === this.current) return;
-    if (this.current >= 0) {
-      gsap.to(this.items[this.current], { opacity: 0, duration: 0.5, ease: 'power2.inOut' });
-    }
     this.current = i;
-    const el = this.items[i];
-    if (el) gsap.to(el, { opacity: 1, duration: 0.5, ease: 'power2.out', delay: 0.15 });
+    // Drive EVERY item, and overwrite tweens already in flight. show() is
+    // called from the rAF loop off a rounded reel index, so it can fire again
+    // inside the incoming card's 0.15s fade-in delay. With gsap's default
+    // overwrite:false that stale delayed tween lands *after* the newer
+    // fade-out and strands its card at opacity 1 — two cards then render on
+    // top of each other, and hideAll() (which only cleared `current`) left
+    // the stranded one lit straight through the Cognexa peel.
+    this.items.forEach((el, idx) => {
+      const on = idx === i;
+      gsap.to(el, {
+        opacity: on ? 1 : 0,
+        duration: on ? 0.5 : 0.5,
+        delay: on ? 0.15 : 0,
+        ease: on ? 'power2.out' : 'power2.inOut',
+        overwrite: 'auto'
+      });
+    });
   }
 
   hideAll() {
-    if (this.current >= 0) {
-      gsap.to(this.items[this.current], { opacity: 0, duration: 0.4, ease: 'power2.inOut' });
-      this.current = -1;
+    if (this.current < 0) return;
+    this.current = -1;
+    for (const el of this.items) {
+      gsap.to(el, { opacity: 0, duration: 0.4, ease: 'power2.inOut', overwrite: 'auto' });
     }
   }
 
